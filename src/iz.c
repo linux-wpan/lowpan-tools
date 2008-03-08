@@ -64,6 +64,9 @@ static int scan_confirmation(struct genlmsghdr *ghdr, struct nlattr **attrs)
 				printf("\tCh%2d --- ED = %02x\n", i, edl[i]);
 			return 0;
 
+		case IEEE80215_MAC_SCAN_ACTIVE:
+			printf("Started active scan. Will catch beacons from now\n");
+			return 0;
 		default:
 			printf("Unsupported scan type: %d\n", type);
 			break;
@@ -73,6 +76,14 @@ static int scan_confirmation(struct genlmsghdr *ghdr, struct nlattr **attrs)
 
 }
 
+static int beacon_indication(struct genlmsghdr *ghdr, struct nlattr **attrs)
+{
+	if (!attrs[IEEE80215_ATTR_DEV_INDEX] ||
+	    !attrs[IEEE80215_ATTR_STATUS])
+	    	return -EINVAL;
+	printf("Got a beacon\n");
+	return 0;
+}
 
 static int parse_cb(struct nl_msg *msg, void *arg)
 {
@@ -102,6 +113,8 @@ static int parse_cb(struct nl_msg *msg, void *arg)
 			nla_get_u8(attrs[IEEE80215_ATTR_STATUS]));
 	} else if (ghdr->cmd == IEEE80215_SCAN_CONF) {
 		return scan_confirmation(ghdr, attrs);
+	} else if (ghdr->cmd == IEEE80215_BEACON_NOTIFY_INDIC) {
+		return beacon_indication(ghdr, attrs);
 	}
 
 	return 0;
