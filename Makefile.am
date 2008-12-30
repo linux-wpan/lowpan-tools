@@ -1,4 +1,4 @@
-zbtestdir =${libexecdir}/zigbee
+zbtestdir = @zbtestdir@
 zbtest_PROGRAMS = serial tests/test tests/test2 tests/test3 tests/test4
 
 AM_CPPFLAGS = -I$(top_srcdir)/include

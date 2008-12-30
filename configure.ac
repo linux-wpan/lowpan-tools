@@ -9,6 +9,11 @@ AM_INIT_AUTOMAKE([-Wall -Werror gnu])
 AC_CONFIG_SRCDIR([serial.c])
 AC_CONFIG_HEADER([config.h])
 
+AC_ARG_WITH(zbtestdir, [directory where all test programs will be installed],
+	    [zbtestdir=$withval],
+	    [zbtestdir='${libexecdir}/zigbee'])
+AC_SUBST(zbtestdir)
+
 # Checks for programs.
 AC_PROG_CC
 
