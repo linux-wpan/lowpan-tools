@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +13,7 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include "ieee802154.h"
 #define N_ZB 19
 
 int main(int argc, char **argv) {
@@ -66,7 +71,7 @@ int main(int argc, char **argv) {
 	}
 
 	int arg;
-	arg = N_ZB;
+	arg = N_IEEE80215;
 	ret = ioctl(fd, TIOCSETD, &arg);
 	if (ret < 0) {
 		perror("ioctl: TIOCSETD");

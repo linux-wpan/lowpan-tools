@@ -1,0 +1,51 @@
+/*
+ * IEEE802.15.4-2003 implementation user-space header.
+ * Copyright (C) 2008 Dmitry Eremin-Solenikov
+ * Copyright (C) 2008 Sergey Lapin
+ * 
+ *  This library is free software; you can redistribute it and/or
+ *  modify it under the terms of the GNU Lesser General Public
+ *  License as published by the Free Software Foundation; either
+ *  version 2.1 of the License, or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library; if not, write to the Free Software
+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#ifndef __IEEE802154_H
+#define __IEEE802154_H
+
+#ifdef HAVE_NET_IEEE80215_H
+#include <net/ieee80215.h>
+#endif
+#ifdef HAVE_NET_AF_IEEE80215_H
+#include <net/af_ieee80215.h>
+#endif
+
+#include <sys/socket.h>
+#include <stdint.h>
+#ifndef HAVE_STRUCT_SOCKADDR_IEEE80215
+struct sockaddr_ieee80215 {
+	sa_family_t family; /* AF_IEEE80215 */
+	int ifindex;
+	uint64_t addr; /* little endian */
+};
+#endif
+
+#ifndef N_IEEE80215
+#define N_IEEE80215 19
+#endif
+
+#ifndef PF_IEEE80215
+#define PF_IEEE80215 36
+#define AF_IEEE80215 PF_IEEE80215
+#endif
+
+
+#endif

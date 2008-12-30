@@ -1,17 +1,13 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <sys/socket.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <unistd.h>
 
-#define PF_IEEE80215 36
-#define AF_IEEE80215 PF_IEEE80215
-
-struct sockaddr_ieee80215 {
-	sa_family_t family; /* AF_IEEE80215 */
-	int ifindex;
-	uint64_t addr; /* little endian */
-};
-
+#include "ieee802154.h"
 
 int main() {
 	int ret;
