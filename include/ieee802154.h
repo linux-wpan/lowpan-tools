@@ -63,5 +63,9 @@ struct sockaddr_ieee80215 {
 /* master device */
 #define IEEE80215_SIOC_ADD_SLAVE		(SIOCDEVPRIVATE + 0)
 
+#include <linux/if_ether.h>
+#ifndef ETH_P_IEEE80215
+#define ETH_P_IEEE80215 0x00F6		/* IEEE802.15.4 frame		*/
+#endif
 
 #endif

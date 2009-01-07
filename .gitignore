@@ -10,8 +10,12 @@ Makefile
 misc/
 stamp*
 
+*.a
 *.o
+*.so
 .*.swp
 *.tar.gz
 
 serial
+listen
+listen-packet
