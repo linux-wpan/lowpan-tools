@@ -16,7 +16,12 @@ AC_SUBST(zbtestdir)
 
 # Checks for programs.
 AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
 AC_PROG_RANLIB
+AC_PROG_LIBTOOL
+AC_SUBST(LIBTOOL_DEPS)
 
 # Checks for libraries.
 
@@ -25,6 +30,7 @@ AC_HEADER_STDC
 AC_CHECK_HEADERS([fcntl.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h net/ieee80215.h net/af_ieee80215.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
 AC_TYPE_UINT64_T
 AC_CHECK_TYPE(struct sockaddr_ieee80215,
 	      [AC_DEFINE([HAVE_STRUCT_SOCKADDR_IEEE80215],[],[Define to 1 if you have struct sockaddr_ieee80215])],[],

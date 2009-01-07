@@ -1,10 +1,13 @@
-.deps
-.dirstamp
 aclocal.m4
 autom4te.cache
 config.*
 configure
+.deps
+.dirstamp
 INSTALL
+.libs
+libtool
+m4/
 Makefile.in
 Makefile
 misc/
@@ -12,8 +15,10 @@ stamp*
 
 *.a
 *.o
+*.la
+*.lo
 *.so
-.*.swp
+*.swp
 *.tar.gz
 
 serial

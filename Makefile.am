@@ -2,11 +2,15 @@ zbtestdir = @zbtestdir@
 zbtest_PROGRAMS = serial listen listen-packet tests/test tests/test2 tests/test3 tests/test4
 
 AM_CPPFLAGS = -I$(top_srcdir)/include
-LDADD = -L. -lcommon
+LDADD = libcommon.la
 
 noinst_HEADERS = include/ieee802154.h
 noinst_HEADERS += include/libcommon.h
-noinst_LIBRARIES = libcommon.a
+noinst_LTLIBRARIES = libcommon.la
 
-libcommon_a_SOURCES = printbuf.c
+libcommon_la_SOURCES = printbuf.c
+
+#LIBTOOL_DEPS = @LIBTOOL_DEPS@
+#libtool: $(LIBTOOL_DEPS)
+#	$(SHELL) ./config.status --recheck
 
