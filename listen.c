@@ -5,6 +5,7 @@
 #include <linux/sockios.h>
 #include <net/if.h>
 #include <sys/socket.h>
+#include <sys/ioctl.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -15,7 +16,7 @@
 
 int main(int argc, char **argv) {
 	int ret;
-	char buf[256];
+	unsigned char buf[256];
 	struct sockaddr_ieee80215 sa = {};
 	struct ifreq req = {};
 

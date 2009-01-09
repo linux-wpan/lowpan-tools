@@ -2,9 +2,9 @@
 
 #include <libcommon.h>
 
-int printbuf(const unsigned char *buf, int len) {
+void printbuf(const unsigned char *buf, int len) {
 	char outbuf[1024], outbuf2[1024];
-	int olen, olen2;
+	int olen = 0, olen2 = 0;
 	int i;
 	for (i = 0; i < len; ) {
 		if (i % 8 == 0) {

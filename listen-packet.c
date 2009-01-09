@@ -2,9 +2,11 @@
 #include <config.h>
 #endif
 
+#include <arpa/inet.h>
 #include <linux/sockios.h>
 #include <net/if.h>
 #include <netpacket/packet.h>
+#include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -16,7 +18,7 @@
 
 int main(int argc, char **argv) {
 	int ret;
-	char buf[256];
+	unsigned char buf[256];
 	struct sockaddr_ll sa = {};
 	struct ifreq req = {};
 
