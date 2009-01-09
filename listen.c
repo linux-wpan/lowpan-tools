@@ -26,16 +26,17 @@ int main(int argc, char **argv) {
 	}
 
 	strncpy(req.ifr_name, argv[1], IF_NAMESIZE);
-	ret = ioctl(sd, SIOCGIFINDEX, &req);
+	ret = ioctl(sd, SIOCGIFHWADDR, &req);
 	if (ret < 0)
-		perror("ioctl: SIOCGIFINDEX");
+		perror("ioctl: SIOCGIFHWADDR");
 
 	sa.family = AF_IEEE80215;
-	sa.ifindex = req.ifr_ifindex;
+	memcpy(&sa.hwaddr, req.ifr_hwaddr.sa_data, sizeof(sa.hwaddr));
 	ret = bind(sd, (struct sockaddr*)&sa, sizeof(sa));
 	if (ret < 0)
 		perror("bind");
 
+	ret = ioctl(sd, SIOCGIFADDR, &req);
 	do {
 		ret = recv(sd, buf, sizeof(buf), 0);
 		if (ret < 0)

@@ -31,10 +31,23 @@
 #include <sys/socket.h>
 #include <stdint.h>
 #ifndef HAVE_STRUCT_SOCKADDR_IEEE80215
+enum {
+	IEEE80215_ADDR_LONG, /* 64-bit address */
+	IEEE80215_ADDR_SHORT, /* 16-bit address + PANid */
+	IEEE80215_ADDR_IFINDEX, /* interface index, mainly for debugging only */
+};
+
 struct sockaddr_ieee80215 {
 	sa_family_t family; /* AF_IEEE80215 */
-	int ifindex;
-	uint64_t addr; /* little endian */
+	int addr_type;
+	union {
+		uint64_t hwaddr;
+		struct {
+			uint16_t pan_id;
+			uint16_t short_addr;
+		};
+		int ifindex;
+	};
 };
 #endif
 
