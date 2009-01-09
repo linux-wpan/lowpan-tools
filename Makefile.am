@@ -1,7 +1,9 @@
 zbtestdir = @zbtestdir@
-zbtest_PROGRAMS = serial listen listen-packet tests/test tests/test2 tests/test3 tests/test4
+zbtest_PROGRAMS = serial listen listen-packet izconfig
+zbtest_PROGRAMS += tests/test tests/test2 tests/test3 tests/test4
 
 AM_CPPFLAGS = -I$(top_srcdir)/include
+AM_CFLAGS = -g3 -Wall -Werror
 LDADD = libcommon.la
 
 noinst_HEADERS = include/ieee802154.h
