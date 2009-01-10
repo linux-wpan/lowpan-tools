@@ -151,13 +151,56 @@ int do_set_hw(const char *ifname, const char *hw) {
 		goto out_noclose;
 	}
 
-	strcpy(req.ifr_name, "wpan0");
+	strcpy(req.ifr_name, ifname);
 
 	req.ifr_hwaddr.sa_family = ARPHRD_IEEE80215;
 	memcpy(req.ifr_hwaddr.sa_data, buf, 8);
 	ret = ioctl(sd, SIOCSIFHWADDR, &req);
 	if (ret != 0) {
 		perror("ioctl: SIOCGIFHWADDR");
+		goto out;
+	}
+
+	return 0;
+out:
+	close(sd);
+out_noclose:
+	return 1;
+}
+
+int do_set_short(const char *ifname, const char *hw) {
+	struct ifreq req;
+	int ret;
+	struct sockaddr_ieee80215 *sa = (struct sockaddr_ieee80215 *)&req.ifr_addr;
+
+	sa->family = AF_IEEE80215;
+	sa->addr_type = IEEE80215_ADDR_SHORT;
+
+	strcpy(req.ifr_name, ifname);
+
+	char *temp;
+	sa->pan_id = strtol(hw, &temp, 16);
+	if (*temp != ':' && *temp == '.') {
+		fprintf(stderr, "Bad short address specified\n");
+		goto out_noclose;
+	} else
+		temp ++;
+
+	sa->short_addr  = strtol(temp, &temp, 16);
+	if (*temp) {
+		fprintf(stderr, "Bad short address specified\n");
+		goto out_noclose;
+	}
+
+	int sd = socket(PF_IEEE80215, SOCK_RAW, 0);
+	if (sd < 0) {
+		perror("socket");
+		goto out_noclose;
+	}
+
+	ret = ioctl(sd, SIOCSIFADDR, &req);
+	if (ret != 0) {
+		perror("ioctl: SIOCGIFADDR");
 		goto out;
 	}
 
@@ -188,6 +231,11 @@ int main(int argc, char **argv) {
 				fprintf(stderr, "no hw address specified\n");
 			else
 				ret = do_set_hw(interface, *(argv++));
+		} else if (!strcmp(*argv, "short")) {
+			if (!*(++argv))
+				fprintf(stderr, "no short address specified\n");
+			else
+				ret = do_set_short(interface, *(argv++));
 		} else {
 			fprintf(stderr, "Unknown command %s\n", *argv);
 			break;
