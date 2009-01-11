@@ -1,6 +1,7 @@
 zbtestdir = @zbtestdir@
 zbtest_PROGRAMS = serial listen listen-packet izconfig
 zbtest_PROGRAMS += tests/test tests/test2 tests/test3 tests/test4 tests/test5
+zbtest_PYTHON = test-serial/test_DQ.py test-serial/test.py test-serial/test_edscan.py
 
 AM_CPPFLAGS = -I$(top_srcdir)/include
 AM_CFLAGS = -g3 -Wall -Werror
