@@ -61,7 +61,10 @@ class DQ:
 
 	def read(self, num):
 		v =  os.read(self.file, num)
-		print "Reading %s %02x" %(v, ord(v))
+		if (num == 1) :
+			print "Reading %s %02x" %(v, ord(v))
+		else :
+			print "Got %s" %v
 		return v
 
 	def response(self):
@@ -89,60 +92,45 @@ class DQ:
 					self.status = ord(self.read(1))
 					self.data = self.read(1)
 				elif id == 0x8b:
-					self.status = ord(self.read(1))
-					len = self.read(1)
+					self.status = 0
+					self.lqi = ord(self.read(1))
+					len = ord(self.read(1))
 					self.data = self.read(len)
 				else:
 					self.status = ord(self.read(1))
 					self.data = None
 				self.parse_status()
+				print self.strstatus
 				return id
+
+	def send_cmd(self, cmd):
+		self.write(cmd)
+		while 1:
+			v = self.response()
+			if (v != ord(cmd[2]) | 0x80) :
+				print "Returned invalid id value %x" % (v)
+			else:
+				break
+		return self.status
+
 	def open(self):
-		self.write(cmd_open)
-		v = self.response()
-		if v != 0x81:
-			print "Returned invalid id value " +v
-			raise IOError
-		else:
-			return self.status
+		return self.send_cmd(cmd_open)
+
 	def close(self):
-		self.write(cmd_close)
-		v = self.response()
-		if v != 0x82:
-			print "Returned invalid id value " +v
-			raise IOError
-		else:
-			return self.status
+		return self.send_cmd(cmd_close)
+
 	def ed(self):
-		self.write(cmd_ed)
-		v = self.response()
-		if v != 0x85:
-			print "Returned invalid id value " +v
-			raise IOError
-		else:
-			return self.status
+		return self.send_cmd(cmd_ed)
+
+	def cca(self):
+		return self.send_cmd(cmd_cca)
+
 	def set_channel(self, channel):
-		self.write(cmd_set_channel+chr(channel))
-		v = self.response()
-		if v != 0x84:
-			print "Returned invalid id value " +v
-			raise IOError
-		else:
-			return self.status
+		return self.send_cmd(cmd_set_channel + chr(channel))
+
 	def set_state(self, mode):
-		self.write(cmd_set_state+chr(mode))
-		v = self.response()
-		if v != 0x87:
-			print "Returned invalid id value " +v
-			raise IOError
-		else:
-			return self.status
+		return self.send_cmd(cmd_set_state+chr(mode))
+
 	def send_block(self, data):
-		self.write(data_xmit_block+chr(len(data))+data)
-		v = self.response()
-		if v != 0x89:
-			print "Returned invalid id value " +v
-			raise IOError
-		else:
-			return self.status
+		return self.send_cmd(data_xmit_block+chr(len(data))+data)
 
