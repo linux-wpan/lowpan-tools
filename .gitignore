@@ -17,6 +17,7 @@ stamp*
 *.o
 *.la
 *.lo
+*.pyc
 *.so
 *.swp
 *.tar.gz
