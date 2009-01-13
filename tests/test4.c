@@ -31,12 +31,15 @@ int main(int argc, char **argv) {
 		perror("ioctl: SIOCGIFHWADDR");
 
 	sa.family = AF_IEEE80215;
-	memcpy(&sa.hwaddr, req.ifr_hwaddr.sa_data, sizeof(sa.hwaddr));
+	sa.addr_type = IEEE80215_ADDR_LONG;
+	memcpy(sa.hwaddr, req.ifr_hwaddr.sa_data, sizeof(sa.hwaddr));
 	ret = bind(sd, (struct sockaddr*)&sa, sizeof(sa));
 	if (ret < 0)
 		perror("bind");
 
-	sa.hwaddr = 0x0123456701234567LL;
+	sa.addr_type = IEEE80215_ADDR_LONG;
+	sa.pan_id = 0xffff;
+	memcpy(sa.hwaddr, (unsigned char[8]){0x67, 0x45, 0x23, 0x01, 0x67, 0x45, 0x23, 0x01}, IEEE80215_ADDR_LEN);
 	ret = connect(sd, (struct sockaddr*)&sa, sizeof(sa));
 	if (ret < 0)
 		perror("connect");

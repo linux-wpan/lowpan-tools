@@ -15,8 +15,7 @@
 
 int main(int argc, char **argv) {
 	int ret;
-	struct sockaddr_ieee80215 sa = {};
-	struct ifreq req = {};
+	char *iface = argv[1] ?: "mwpan0";
 
 	char buf[] = {0x40, 0x00, 0x56};
 	int sd = socket(PF_IEEE80215, SOCK_RAW, 0);
@@ -25,17 +24,9 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	strncpy(req.ifr_name, argv[1] ?: "mwpan0", IF_NAMESIZE);
-	ret = ioctl(sd, SIOCGIFINDEX, &req);
+	ret = setsockopt(sd, SOL_SOCKET, SO_BINDTODEVICE, iface, strlen(iface) + 1);
 	if (ret < 0)
-		perror("ioctl: SIOCGIFINDEX");
-
-	sa.family = AF_IEEE80215;
-	sa.addr_type = IEEE80215_ADDR_IFINDEX;
-	sa.ifindex = req.ifr_ifindex;
-	ret = bind(sd, (struct sockaddr*)&sa, sizeof(sa));
-	if (ret < 0)
-		perror("bind");
+		perror("setsockopt: BINDTODEVICE");
 
 	ret = send(sd, buf, sizeof(buf), 0);
 	if (ret < 0)
