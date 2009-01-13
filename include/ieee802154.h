@@ -28,25 +28,29 @@
 #include <net/af_ieee80215.h>
 #endif
 
+#ifndef IEEE80215_ADDR_LEN
+#define IEEE80215_ADDR_LEN 8
+#endif
+
 #include <sys/socket.h>
 #include <stdint.h>
 #ifndef HAVE_STRUCT_SOCKADDR_IEEE80215
+
 enum {
-	IEEE80215_ADDR_LONG, /* 64-bit address */
-	IEEE80215_ADDR_SHORT, /* 16-bit address + PANid */
-	IEEE80215_ADDR_IFINDEX, /* interface index, mainly for debugging only */
+	IEEE80215_ADDR_NONE = 0x0,
+	// RESERVER = 0x01,
+	IEEE80215_ADDR_LONG = 0x2, /* 64-bit address + PANid */
+	IEEE80215_ADDR_SHORT = 0x3, /* 16-bit address + PANid */
 };
+
 
 struct sockaddr_ieee80215 {
 	sa_family_t family; /* AF_IEEE80215 */
 	int addr_type;
+	uint16_t pan_id;
 	union {
-		uint64_t hwaddr;
-		struct {
-			uint16_t pan_id;
-			uint16_t short_addr;
-		};
-		int ifindex;
+		uint8_t hwaddr[IEEE80215_ADDR_LEN];
+		uint16_t short_addr;
 	};
 };
 #endif

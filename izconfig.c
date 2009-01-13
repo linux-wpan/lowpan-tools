@@ -200,7 +200,7 @@ int do_set_short(const char *ifname, const char *hw) {
 
 	ret = ioctl(sd, SIOCSIFADDR, &req);
 	if (ret != 0) {
-		perror("ioctl: SIOCGIFADDR");
+		perror("ioctl: SIOCSIFADDR");
 		goto out;
 	}
 

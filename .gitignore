@@ -22,6 +22,7 @@ stamp*
 *.swp
 *.tar.gz
 
+izconfig
 serial
 listen
 listen-packet
