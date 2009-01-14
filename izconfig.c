@@ -212,15 +212,30 @@ out_noclose:
 }
 
 int main(int argc, char **argv) {
-	const char *interface;
+	const char *interface = NULL;
+	char * prog = argv[0];
 	int ret = 0;
 
 	argv ++;
 
-	if (*argv)
+	if(!strcmp(*argv, "--help") || !strcmp(*argv, "help"))
+		printf("Usage: %s { --help | [dev] iface { hw hwaddr | short shortaddr } }\n", prog);
+
+	/* Optional "dev" keyword before interface name */
+
+	if((*argv != NULL) && (!strcmp(*argv, "dev")))
+		argv++;
+
+	if (*argv) {
+		if(!strcmp(*argv, "dev"))
+			argv++;
 		interface = *(argv++);
-	else
+	}
+
+	if(!interface) {
+		fprintf(stderr, "interface name is not specified\n");
 		interface = "wpan0";
+	}
 
 	if (!*argv)
 		return printinfo(interface);
