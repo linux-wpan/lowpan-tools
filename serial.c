@@ -38,18 +38,14 @@ int main(int argc, char **argv) {
 	memset(&tbuf, 0, sizeof(tbuf));
 
 	tbuf.c_iflag |= IGNBRK;		/* Ignores break condition */
-	tbuf.c_iflag &= !(INPCK|ICANON|ECHO);		/* */
 	tbuf.c_cc[VMIN] = 1;
 
-	tbuf.c_cflag |= CS8;		/* 8 bits */
-	tbuf.c_cflag |= CREAD;		/* Enables receiver */
-	tbuf.c_cflag |= CLOCAL;		/*  */
-	tbuf.c_cflag &= ~CRTSCTS;	/* not in POSIX. Enable RTS/CTS (hardware) flow control. requires _BSD_SOURCE or _SVID_SOURCE */
-        tbuf.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP
-                          | INLCR | IGNCR | ICRNL | IXON);
-        tbuf.c_oflag &= ~OPOST;
-        tbuf.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-        tbuf.c_cflag &= ~(CSIZE | PARENB);
+	tbuf.c_cflag &= ~(CSIZE | PARODD | CSTOPB | CRTSCTS | PARENB);
+	tbuf.c_cflag |= CLOCAL | CREAD | CS8;
+	tbuf.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+	tbuf.c_iflag &= ~(INPCK | ISTRIP);
+	tbuf.c_oflag &= ~OPOST;
+	tbuf.c_cc[VTIME] = 5; 
                                                                                   
 	/*
 	tbuf.c_cflag |= CLOCAL;
