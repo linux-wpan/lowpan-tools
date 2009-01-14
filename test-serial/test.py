@@ -3,8 +3,12 @@ import sys,os,time
 from termios import *
 from test_DQ import *
 
-if len(sys.argv) < 2:
-	print "Bad arguments"
+packet = "\x21\x88\xa5\x00\x00\xde\xad\xbe\xaf\xca\xfe\xba"
+packet += "\xbe\xff\xff\x67\x45\x23\x01\x67\x45\x23\x01\x01\x80\xa5\x5a\x42\x7c"
+
+if len(sys.argv) < 3:
+	print "Bad arguments."
+	print "Usage: %s tty channel" %(sys.argv[0])
 	sys.exit(2)
 
 cn = DQ(sys.argv[1])
@@ -24,9 +28,9 @@ print 'Result of open ' + hex(cn.open())
 # print 'Result of set_state ' + hex(cn.set_state(RX_MODE))
 try:
 	while 1:
-		print 'Result of set_channel' +hex(cn.set_channel(4))
+		print 'Result of set_channel' +hex(cn.set_channel(int(sys.argv[2])))
 		print 'Result of set_state' +hex(cn.set_state(TX_MODE))
-		print 'Result of send_block' +hex(cn.send_block("zzz"))
+		print 'Result of send_block' +hex(cn.send_block(packet))
 except KeyboardInterrupt:
 		cn.close()
 		sys.exit(2)
