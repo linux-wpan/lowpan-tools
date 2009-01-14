@@ -43,15 +43,18 @@ enum {
 	IEEE80215_ADDR_SHORT = 0x3, /* 16-bit address + PANid */
 };
 
-
-struct sockaddr_ieee80215 {
-	sa_family_t family; /* AF_IEEE80215 */
+struct ieee80215_addr {
 	int addr_type;
 	uint16_t pan_id;
 	union {
 		uint8_t hwaddr[IEEE80215_ADDR_LEN];
 		uint16_t short_addr;
 	};
+};
+
+struct sockaddr_ieee80215 {
+	sa_family_t family; /* AF_IEEE80215 */
+	struct ieee80215_addr addr;
 };
 #endif
 

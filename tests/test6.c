@@ -15,7 +15,6 @@
 
 int main(int argc, char **argv) {
 	int ret;
-	struct sockaddr_ieee80215 sa = {};
 	struct ifreq req = {};
 
 	char buf[] = {0x01, 0x80, 0xa5, 0x5a};
@@ -26,19 +25,17 @@ int main(int argc, char **argv) {
 	}
 
 	strncpy(req.ifr_name, argv[1] ?: "wpan0", IF_NAMESIZE);
-	ret = ioctl(sd, SIOCGIFHWADDR, &req);
-	if (ret < 0)
-		perror("ioctl: SIOCGIFHWADDR");
+	ret = ioctl(sd, SIOCGIFADDR, &req);
+	if (ret < 0) {
+		perror("ioctl: SIOCGIFADDR");
+		return 1;
+	}
 
-	sa.family = AF_IEEE80215;
-	sa.addr.addr_type = IEEE80215_ADDR_LONG;
-	sa.addr.pan_id = 0xffff;
-	memcpy(&sa.addr.hwaddr, req.ifr_hwaddr.sa_data, sizeof(sa.addr.hwaddr));
-	ret = bind(sd, (struct sockaddr*)&sa, sizeof(sa));
+	ret = bind(sd, &req.ifr_addr, sizeof(struct sockaddr_ieee80215));
 	if (ret < 0)
 		perror("bind");
 
-	ret = connect(sd, (struct sockaddr*)&sa, sizeof(sa));
+	ret = connect(sd, &req.ifr_addr, sizeof(struct sockaddr_ieee80215));
 	if (ret < 0)
 		perror("connect");
 

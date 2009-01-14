@@ -94,7 +94,7 @@ int printinfo(const char *ifname) {
 				perror("SIOCGIFADDR");
 		} else {
 			struct sockaddr_ieee80215 *sa = (struct sockaddr_ieee80215 *)&req.ifr_addr;
-			printf("  PAN ID: %04x  Addr: %04x\n", sa->pan_id, sa->short_addr);
+			printf("  PAN ID: %04x  Addr: %04x\n", sa->addr.pan_id, sa->addr.short_addr);
 		}
 	}
 	printf("\n\n");
@@ -174,19 +174,19 @@ int do_set_short(const char *ifname, const char *hw) {
 	struct sockaddr_ieee80215 *sa = (struct sockaddr_ieee80215 *)&req.ifr_addr;
 
 	sa->family = AF_IEEE80215;
-	sa->addr_type = IEEE80215_ADDR_SHORT;
+	sa->addr.addr_type = IEEE80215_ADDR_SHORT;
 
 	strcpy(req.ifr_name, ifname);
 
 	char *temp;
-	sa->pan_id = strtol(hw, &temp, 16);
+	sa->addr.pan_id = strtol(hw, &temp, 16);
 	if (*temp != ':' && *temp == '.') {
 		fprintf(stderr, "Bad short address specified\n");
 		goto out_noclose;
 	} else
 		temp ++;
 
-	sa->short_addr  = strtol(temp, &temp, 16);
+	sa->addr.short_addr  = strtol(temp, &temp, 16);
 	if (*temp) {
 		fprintf(stderr, "Bad short address specified\n");
 		goto out_noclose;

@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
 		perror("ioctl: SIOCGIFHWADDR");
 
 	sa.family = AF_IEEE80215;
-	memcpy(&sa.hwaddr, req.ifr_hwaddr.sa_data, sizeof(sa.hwaddr));
+	memcpy(&sa.addr.hwaddr, req.ifr_hwaddr.sa_data, sizeof(sa.addr.hwaddr));
 	ret = bind(sd, (struct sockaddr*)&sa, sizeof(sa));
 	if (ret < 0)
 		perror("bind");
