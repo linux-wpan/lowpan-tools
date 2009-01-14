@@ -218,7 +218,7 @@ int main(int argc, char **argv) {
 
 	argv ++;
 
-	if(!strcmp(*argv, "--help") || !strcmp(*argv, "help"))
+	if(*argv && (!strcmp(*argv, "--help") || !strcmp(*argv, "help")))
 		printf("Usage: %s { --help | [dev] iface { hw hwaddr | short shortaddr } }\n", prog);
 
 	/* Optional "dev" keyword before interface name */
