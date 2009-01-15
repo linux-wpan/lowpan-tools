@@ -13,6 +13,7 @@ Makefile
 misc/
 stamp*
 
+*~
 *.a
 *.o
 *.la
