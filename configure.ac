@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([zigbee-userspace], [0.1], [dbaryshkov@gmail.com])
+AC_INIT([zigbee-userspace],[0.1],[dbaryshkov@gmail.com])
 AC_CONFIG_AUX_DIR([misc])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror gnu])
@@ -16,6 +16,7 @@ AC_SUBST(zbtestdir)
 
 # Checks for programs.
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -25,6 +26,7 @@ AC_SUBST(LIBTOOL_DEPS)
 AM_PATH_PYTHON(,, [:])
 
 # Checks for libraries.
+PKG_CHECK_MODULES([NL], [libnl-1])
 
 # Checks for header files.
 AC_HEADER_STDC
