@@ -11,7 +11,7 @@ noinst_HEADERS = include/ieee802154.h
 noinst_HEADERS += include/libcommon.h
 noinst_LTLIBRARIES = libcommon.la
 
-libcommon_la_SOURCES = printbuf.c
+libcommon_la_SOURCES = printbuf.c genl.c
 tests_gnl_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS)
 tests_gnl_LDADD = $(LDADD) $(NL_LIBS)
 
