@@ -23,6 +23,7 @@ stamp*
 *.swp
 *.tar.gz
 
+coordinator
 izconfig
 serial
 listen
