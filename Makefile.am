@@ -7,7 +7,7 @@ AM_CPPFLAGS = -I$(top_srcdir)/include
 AM_CFLAGS = -g3 -Wall -Werror
 LDADD = libcommon.la
 
-noinst_HEADERS = include/ieee802154.h
+noinst_HEADERS = include/ieee802154.h include/ieee80215-nl.h
 noinst_HEADERS += include/libcommon.h
 noinst_LTLIBRARIES = libcommon.la
 
