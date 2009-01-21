@@ -9,6 +9,28 @@
 #include <libcommon.h>
 
 static int seq_expected;
+static int family;
+static struct nl_handle *nl;
+
+static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
+{
+	printf("Associate requested\n");
+
+	// FIXME: checks!!!
+
+	struct nl_msg *msg = nlmsg_alloc();
+
+	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_REQUEST, IEEE80215_ASSOCIATE_RESP, /* vers */ 1);
+
+	nla_put_u32(msg, IEEE80215_ATTR_DEV_INDEX, nla_get_u32(attrs[IEEE80215_ATTR_DEV_INDEX]));
+	nla_put_u32(msg, IEEE80215_ATTR_STATUS, 0x0 /* FIXME: status */);
+	nla_put_u64(msg, IEEE80215_ATTR_DEST_HW_ADDR, nla_get_u64(attrs[IEEE80215_ATTR_SRC_HW_ADDR]));
+	nla_put_u16(msg, IEEE80215_ATTR_DEST_SHORT_ADDR, 0xfffe); // FIXME: allocate short address
+
+	nl_send_auto_complete(nl, msg);
+	nl_perror("nl_send_auto_complete");
+	return 0;
+}
 
 static int parse_cb(struct nl_msg *msg, void *arg)
 {
@@ -23,6 +45,12 @@ static int parse_cb(struct nl_msg *msg, void *arg)
         ghdr = nlmsg_data(nlh);
 
 	printf("Received command %d (%d)\n", ghdr->cmd, ghdr->version);
+
+	switch (ghdr->cmd) {
+		case IEEE80215_ASSOCIATE_INDIC:
+			return coordinator_associate(ghdr, attrs);
+	}
+
 	if (!attrs[IEEE80215_ATTR_DEV_NAME] || !attrs[IEEE80215_ATTR_HW_ADDR])
 		return -EINVAL;
 
@@ -56,7 +84,7 @@ static int seq_check(struct nl_msg *msg, void *arg) {
 
 int main(void) {
 
-	struct nl_handle *nl = nl_handle_alloc();
+	nl = nl_handle_alloc();
 
 	if (!nl) {
 		nl_perror("nl_handle_alloc");
@@ -66,7 +94,7 @@ int main(void) {
 	genl_connect(nl);
 	nl_perror("genl_connect");
 
-	int family = genl_ctrl_resolve(nl, IEEE80215_NL_NAME);
+	family = genl_ctrl_resolve(nl, IEEE80215_NL_NAME);
 	nl_perror("genl_ctrl_resolve");
 
 	nl_socket_add_membership(nl, nl_get_multicast_id(nl, IEEE80215_NL_NAME, IEEE80215_MCAST_COORD_NAME));
