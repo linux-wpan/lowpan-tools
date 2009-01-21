@@ -211,6 +211,28 @@ out_noclose:
 	return 1;
 }
 
+int do_scan(const char * iface)
+{
+	int ret;
+	struct ieee80215_user_data req;
+	int sd;
+	strcpy(req.ifr_name, iface);
+	sd = socket(PF_IEEE80215, SOCK_DGRAM, 0);
+	if (sd < 0) {
+		perror("socket");
+		ret = sd;
+		goto out_noclose;
+	}
+	req.cmd = 0;
+	ret = ioctl(sd, IEEE80215_SIOC_MAC_CMD, &req);
+	if (ret < 0) {
+		perror("ioctl");
+		goto out_noclose;
+	}
+out_noclose:
+	return  ret;
+}
+
 int main(int argc, char **argv) {
 	const char *interface = NULL;
 	char * prog = argv[0];
@@ -251,6 +273,8 @@ int main(int argc, char **argv) {
 				fprintf(stderr, "no short address specified\n");
 			else
 				ret = do_set_short(interface, *(argv++));
+		} else if (!strcmp(*argv, "scan")) {
+			ret = do_scan(interface);
 		} else {
 			fprintf(stderr, "Unknown command %s\n", *argv);
 			break;

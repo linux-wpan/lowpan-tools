@@ -79,6 +79,7 @@ struct sockaddr_ieee80215 {
 #define IEEE80215_SIOC_PERMIT_JOINING		(SIOCPROTOPRIVATE + 2)
 #define IEEE80215_SIOC_START_ROUTER		(SIOCPROTOPRIVATE + 3)
 #define IEEE80215_SIOC_JOIN			(SIOCPROTOPRIVATE + 4)
+#define IEEE80215_SIOC_MAC_CMD			(SIOCPROTOPRIVATE + 5)
 
 /* master device */
 #define IEEE80215_SIOC_ADD_SLAVE		(SIOCDEVPRIVATE + 0)
@@ -87,5 +88,24 @@ struct sockaddr_ieee80215 {
 #ifndef ETH_P_IEEE80215
 #define ETH_P_IEEE80215 0x00F6		/* IEEE802.15.4 frame		*/
 #endif
-
+#ifndef HAVE_STRUCT_USER_DATA
+struct ieee80215_user_data {
+	/* This is used as ifr_name */
+	union
+	{
+		char	ifrn_name[IFNAMSIZ];		/* if name, e.g. "en0" */
+	} ifr_ifrn;
+	int channels;
+	int channel;
+	int duration;
+	int rejoin;
+	int rxon;
+	int as_router;
+	int power;
+	int mac_security;
+	int16_t panid;
+	int cmd;
+//	struct ieee80215_dev_address addr; /**< Peer address */
+};
+#endif
 #endif
