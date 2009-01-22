@@ -10,19 +10,23 @@
 
 static int end = 0;
 static int seq_expected;
+static const char *iface;
 
 static int parse_cb(struct nl_msg *msg, void *arg)
 {
 	struct nlmsghdr *nlh = nlmsg_hdr(msg);
 	struct nlattr *attrs[IEEE80215_ATTR_MAX+1];
         struct genlmsghdr *ghdr;
+	const char *name = nla_get_string(attrs[IEEE80215_ATTR_DEV_NAME]);
 
 	// Validate message and parse attributes
 	genlmsg_parse(nlh, 0, attrs, IEEE80215_ATTR_MAX, ieee80215_policy);
 
         ghdr = nlmsg_data(nlh);
 
-	printf("Received command %d (%d)\n", ghdr->cmd, ghdr->version);
+	printf("Received command %d (%d) for interface %s\n", ghdr->cmd, ghdr->version, iface);
+	if (strcmp(iface, name))
+		return 0;
 
 	if (ghdr->cmd == IEEE80215_ASSOCIATE_CONF ) {
 		end = 1;
@@ -54,7 +58,6 @@ int main(int argc, char **argv) {
 //	static int seq_expected;
 	static int family;
 	static struct nl_handle *nl;
-	char *name;
 	char *dummy;
 	uint16_t pan_id, coord_short_addr;
 
@@ -63,7 +66,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	name = argv[1];
+	iface = argv[1];
 
 	pan_id = strtol(argv[2], &dummy, 16);
 	if (*dummy) {
@@ -100,7 +103,7 @@ int main(int argc, char **argv) {
 	struct nl_msg *msg = nlmsg_alloc();
 	nl_perror("nlmsg_alloc");
 	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_REQUEST, IEEE80215_ASSOCIATE_REQ, /* vers */ 1);
-	nla_put_string(msg, IEEE80215_ATTR_DEV_NAME, name);
+	nla_put_string(msg, IEEE80215_ATTR_DEV_NAME, iface);
 	nla_put_u8(msg, IEEE80215_ATTR_CHANNEL, 16);
 	nla_put_u16(msg, IEEE80215_ATTR_COORD_PAN_ID, pan_id);
 	nla_put_u16(msg, IEEE80215_ATTR_COORD_SHORT_ADDR, coord_short_addr);
