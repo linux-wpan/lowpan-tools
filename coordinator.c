@@ -11,10 +11,15 @@
 static int seq_expected;
 static int family;
 static struct nl_handle *nl;
+static const char *iface;
 
 static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 {
 	printf("Associate requested\n");
+
+	if (!attrs[IEEE80215_ATTR_DEV_INDEX] ||
+	    !attrs[IEEE80215_ATTR_SRC_HW_ADDR])
+		return -EINVAL;
 
 	// FIXME: checks!!!
 
@@ -37,7 +42,7 @@ static int parse_cb(struct nl_msg *msg, void *arg)
 	struct nlmsghdr *nlh = nlmsg_hdr(msg);
 	struct nlattr *attrs[IEEE80215_ATTR_MAX+1];
         struct genlmsghdr *ghdr;
-
+	const char *name;
 
 	// Validate message and parse attributes
 	genlmsg_parse(nlh, 0, attrs, IEEE80215_ATTR_MAX, ieee80215_policy);
@@ -46,12 +51,20 @@ static int parse_cb(struct nl_msg *msg, void *arg)
 
 	printf("Received command %d (%d)\n", ghdr->cmd, ghdr->version);
 
+	if (!attrs[IEEE80215_ATTR_DEV_NAME])
+		return -EINVAL;
+
+	name = nla_get_string(attrs[IEEE80215_ATTR_DEV_NAME]);
+	if (strcmp(name, iface)) {
+		return 0;
+	}
+
 	switch (ghdr->cmd) {
 		case IEEE80215_ASSOCIATE_INDIC:
 			return coordinator_associate(ghdr, attrs);
 	}
 
-	if (!attrs[IEEE80215_ATTR_DEV_NAME] || !attrs[IEEE80215_ATTR_HW_ADDR])
+	if (!attrs[IEEE80215_ATTR_HW_ADDR])
 		return -EINVAL;
 
 	uint64_t addr = nla_get_u64(attrs[IEEE80215_ATTR_HW_ADDR]);
@@ -82,7 +95,14 @@ static int seq_check(struct nl_msg *msg, void *arg) {
 	return NL_SKIP;
 }
 
-int main(void) {
+int main(int argc, char **argv) {
+
+	if (argc != 2) {
+		printf("Usage: %s iface\n", argv[0]);
+		return 1;
+	}
+
+	iface = argv[1];
 
 	nl = nl_handle_alloc();
 
