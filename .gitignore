@@ -24,6 +24,7 @@ stamp*
 *.tar.gz
 
 coordinator
+iz
 izconfig
 serial
 listen

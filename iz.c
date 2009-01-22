@@ -8,36 +8,14 @@
 #include <ieee80215-nl.h>
 #include <libcommon.h>
 
+static int end = 0;
 static int seq_expected;
-static int family;
-static struct nl_handle *nl;
-
-static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
-{
-	printf("Associate requested\n");
-
-	// FIXME: checks!!!
-
-	struct nl_msg *msg = nlmsg_alloc();
-
-	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_REQUEST, IEEE80215_ASSOCIATE_RESP, /* vers */ 1);
-
-	nla_put_u32(msg, IEEE80215_ATTR_DEV_INDEX, nla_get_u32(attrs[IEEE80215_ATTR_DEV_INDEX]));
-	nla_put_u32(msg, IEEE80215_ATTR_STATUS, 0x0 /* FIXME: status */);
-	nla_put_u64(msg, IEEE80215_ATTR_DEST_HW_ADDR, nla_get_u64(attrs[IEEE80215_ATTR_SRC_HW_ADDR]));
-	nla_put_u16(msg, IEEE80215_ATTR_DEST_SHORT_ADDR, 0xfffe); // FIXME: allocate short address
-
-	nl_send_auto_complete(nl, msg);
-	nl_perror("nl_send_auto_complete");
-	return 0;
-}
 
 static int parse_cb(struct nl_msg *msg, void *arg)
 {
 	struct nlmsghdr *nlh = nlmsg_hdr(msg);
 	struct nlattr *attrs[IEEE80215_ATTR_MAX+1];
         struct genlmsghdr *ghdr;
-
 
 	// Validate message and parse attributes
 	genlmsg_parse(nlh, 0, attrs, IEEE80215_ATTR_MAX, ieee80215_policy);
@@ -46,22 +24,12 @@ static int parse_cb(struct nl_msg *msg, void *arg)
 
 	printf("Received command %d (%d)\n", ghdr->cmd, ghdr->version);
 
-	switch (ghdr->cmd) {
-		case IEEE80215_ASSOCIATE_INDIC:
-			return coordinator_associate(ghdr, attrs);
+	if (ghdr->cmd == IEEE80215_ASSOCIATE_CONF ) {
+		end = 1;
+		printf("Received short address %04hx, status %02hhx\n",
+			nla_get_u16(attrs[IEEE80215_ATTR_SHORT_ADDR]),
+			nla_get_u8(attrs[IEEE80215_ATTR_STATUS]));
 	}
-
-	if (!attrs[IEEE80215_ATTR_DEV_NAME] || !attrs[IEEE80215_ATTR_HW_ADDR])
-		return -EINVAL;
-
-	uint64_t addr = nla_get_u64(attrs[IEEE80215_ATTR_HW_ADDR]);
-	uint8_t buf[8];
-	memcpy(buf, &addr, 8);
-
-	printf("Addr for %s is %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
-			nla_get_string(attrs[IEEE80215_ATTR_DEV_NAME]),
-			buf[0], buf[1],	buf[2], buf[3],
-			buf[4], buf[5],	buf[6], buf[7]);
 
 	return 0;
 }
@@ -82,7 +50,32 @@ static int seq_check(struct nl_msg *msg, void *arg) {
 	return NL_SKIP;
 }
 
-int main(void) {
+int main(int argc, char **argv) {
+//	static int seq_expected;
+	static int family;
+	static struct nl_handle *nl;
+	char *name;
+	char *dummy;
+	uint16_t pan_id, coord_short_addr;
+
+	if (argc != 4) {
+		printf("Usage: %s iface PANid CoordAddr\n", argv[0]);
+		return 1;
+	}
+
+	name = argv[1];
+
+	pan_id = strtol(argv[2], &dummy, 16);
+	if (*dummy) {
+		printf("Bad PAN id\n");
+		return 1;
+	}
+
+	coord_short_addr = strtol(argv[3], &dummy, 16);
+	if (*dummy) {
+		printf("Bad CoordAddr\n");
+		return 1;
+	}
 
 	nl = nl_handle_alloc();
 
@@ -104,7 +97,25 @@ int main(void) {
 	nl_socket_modify_cb(nl, NL_CB_VALID, NL_CB_CUSTOM, parse_cb, NULL);
 	nl_socket_modify_cb(nl, NL_CB_SEQ_CHECK, NL_CB_CUSTOM, seq_check, NULL);
 
-	while (1) {
+	struct nl_msg *msg = nlmsg_alloc();
+	nl_perror("nlmsg_alloc");
+	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_REQUEST, IEEE80215_ASSOCIATE_REQ, /* vers */ 1);
+	nla_put_string(msg, IEEE80215_ATTR_DEV_NAME, name);
+	nla_put_u8(msg, IEEE80215_ATTR_CHANNEL, 16);
+	nla_put_u16(msg, IEEE80215_ATTR_COORD_PAN_ID, pan_id);
+	nla_put_u16(msg, IEEE80215_ATTR_COORD_SHORT_ADDR, coord_short_addr);
+	nla_put_u8(msg, IEEE80215_ATTR_CAPABILITY, 0
+						| (1 << 1) /* FFD */
+						| (1 << 3) /* Receiver ON */
+//						| (1 << 7) /* allocate short */
+						);
+
+	nl_send_auto_complete(nl, msg);
+	nl_perror("nl_send_auto_complete");
+
+	nlmsg_free(msg);
+
+	while (!end) {
 		nl_recvmsgs_default(nl);
 	}
 

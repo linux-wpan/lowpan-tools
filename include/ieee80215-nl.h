@@ -134,6 +134,7 @@ int ieee80215_nl_init(void);
 void ieee80215_nl_exit(void);
 
 int ieee80215_nl_assoc_indic(struct net_device *dev, struct ieee80215_addr *addr, u8 cap);
+int ieee80215_nl_assoc_confirm(struct net_device *dev, u16 short_addr, u8 status);
 #endif
 
 #endif
