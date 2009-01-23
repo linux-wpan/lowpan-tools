@@ -51,6 +51,10 @@ enum {
 	IEEE80215_ATTR_DEST_PAN_ID,
 
 	IEEE80215_ATTR_CAPABILITY, // FIXME: this is association
+	IEEE80215_ATTR_REASON,
+	IEEE80215_ATTR_SCAN_TYPE,
+	IEEE80215_ATTR_CHANNELS,
+	IEEE80215_ATTR_DURATION,
 
 	__IEEE80215_ATTR_MAX,
 };
@@ -81,6 +85,10 @@ static struct nla_policy ieee80215_policy[IEEE80215_ATTR_MAX + 1] = {
 	[IEEE80215_ATTR_DEST_PAN_ID] = { .type = NLA_U16, },
 
 	[IEEE80215_ATTR_CAPABILITY] = { .type = NLA_U8, },
+	[IEEE80215_ATTR_REASON] = { .type = NLA_U8, },
+	[IEEE80215_ATTR_SCAN_TYPE] = { .type = NLA_U8, },
+	[IEEE80215_ATTR_CHANNELS] = { .type = NLA_U32, },
+	[IEEE80215_ATTR_DURATION] = { .type = NLA_U8, },
 };
 #endif
 
@@ -135,6 +143,8 @@ void ieee80215_nl_exit(void);
 
 int ieee80215_nl_assoc_indic(struct net_device *dev, struct ieee80215_addr *addr, u8 cap);
 int ieee80215_nl_assoc_confirm(struct net_device *dev, u16 short_addr, u8 status);
+int ieee80215_nl_disassoc_indic(struct net_device *dev, struct ieee80215_addr *addr, u8 reason);
+int ieee80215_nl_disassoc_confirm(struct net_device *dev, u8 status);
 #endif
 
 #endif
