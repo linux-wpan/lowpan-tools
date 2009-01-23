@@ -23,6 +23,10 @@
  * This ought to be provided by libnl
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <asm/errno.h>
 #include <netlink/genl/genl.h>
 #include <netlink/genl/family.h>
