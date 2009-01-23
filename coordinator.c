@@ -1,3 +1,7 @@
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <netlink/netlink.h>
 #include <netlink/genl/genl.h>
 #include <netlink/genl/ctrl.h>
@@ -37,6 +41,20 @@ static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 	return 0;
 }
 
+static int coordinator_disassociate(struct genlmsghdr *ghdr, struct nlattr **attrs)
+{
+	printf("Disassociate requested\n");
+
+	if (!attrs[IEEE80215_ATTR_DEV_INDEX] ||
+	    !attrs[IEEE80215_ATTR_REASON])
+		return -EINVAL;
+
+	// FIXME: checks!!!
+	// FIXME: disassociate device
+
+	return 0;
+}
+
 static int parse_cb(struct nl_msg *msg, void *arg)
 {
 	struct nlmsghdr *nlh = nlmsg_hdr(msg);
@@ -49,10 +67,11 @@ static int parse_cb(struct nl_msg *msg, void *arg)
 
         ghdr = nlmsg_data(nlh);
 
-	printf("Received command %d (%d)\n", ghdr->cmd, ghdr->version);
-
 	if (!attrs[IEEE80215_ATTR_DEV_NAME])
 		return -EINVAL;
+
+	name = nla_get_string(attrs[IEEE80215_ATTR_DEV_NAME]);
+	printf("Received command %d (%d) for interface %s\n", ghdr->cmd, ghdr->version, name);
 
 	name = nla_get_string(attrs[IEEE80215_ATTR_DEV_NAME]);
 	if (strcmp(name, iface)) {
@@ -62,6 +81,8 @@ static int parse_cb(struct nl_msg *msg, void *arg)
 	switch (ghdr->cmd) {
 		case IEEE80215_ASSOCIATE_INDIC:
 			return coordinator_associate(ghdr, attrs);
+		case IEEE80215_DISASSOCIATE_INDIC:
+			return coordinator_disassociate(ghdr, attrs);
 	}
 
 	if (!attrs[IEEE80215_ATTR_HW_ADDR])
