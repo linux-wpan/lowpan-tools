@@ -17,6 +17,7 @@
 #include <errno.h>
 
 #include "ieee802154.h"
+#include <libcommon.h>
 
 #define IOREQ(cmd)			\
 	ret = ioctl(sd, cmd, &req);	\
@@ -115,35 +116,10 @@ out_noclose:
 
 int do_set_hw(const char *ifname, const char *hw) {
 	unsigned char buf[8] = {};
-	int i = 0;
 	struct ifreq req;
 	int ret;
 
-	while (*hw) {
-		unsigned char c = *(hw++);
-		switch (c) {
-			case '0'...'9':
-				c -= '0';
-				break;
-			case 'a'...'f':
-				c -= 'a' - 10;
-				break;
-			case 'A'...'F':
-				c -= 'A' - 10;
-				break;
-			case ':':
-			case '.':
-				continue;
-			default:
-				fprintf(stderr, "Bad HW address encountered (%c)\n", c);
-				goto out_noclose;
-		}
-		buf[i / 2] = (buf[i/2] & (0xf << (4 * (i % 2)))) | (c << 4 * (1 -i % 2));
-
-		i++;
-		if (i == 16)
-			break;
-	}
+	ret = parse_hw_addr(hw, buf);
 
 	int sd = socket(PF_IEEE80215, SOCK_RAW, 0);
 	if (sd < 0) {
