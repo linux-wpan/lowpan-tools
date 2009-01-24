@@ -193,6 +193,7 @@ int do_scan(const char * iface)
 	struct ieee80215_user_data req;
 	int sd;
 	strcpy(req.ifr_name, iface);
+	req.channels = 0xffffffff;
 	sd = socket(PF_IEEE80215, SOCK_DGRAM, 0);
 	if (sd < 0) {
 		perror("socket");
@@ -205,6 +206,8 @@ int do_scan(const char * iface)
 		perror("ioctl");
 		goto out_noclose;
 	}
+	close(sd);
+	return 0;
 out_noclose:
 	return  ret;
 }
@@ -251,6 +254,7 @@ int main(int argc, char **argv) {
 				ret = do_set_short(interface, *(argv++));
 		} else if (!strcmp(*argv, "scan")) {
 			ret = do_scan(interface);
+			break;
 		} else {
 			fprintf(stderr, "Unknown command %s\n", *argv);
 			break;
