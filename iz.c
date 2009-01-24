@@ -146,6 +146,53 @@ nla_put_failure:
 	return -1;
 }
 
+static int scan(struct nl_msg *msg, char **args) {
+	int type;
+	int duration;
+	char *dummy;
+
+	if (!args[1])
+		return -EINVAL;
+
+	switch (*args[1]) {
+		case 'e':
+			type = IEEE80215_MAC_SCAN_ED;
+			break;
+		case 'a':
+			type = IEEE80215_MAC_SCAN_ACTIVE;
+			break;
+		case 'p':
+			type = IEEE80215_MAC_SCAN_PASSIVE;
+			break;
+		case 'o':
+			type = IEEE80215_MAC_SCAN_ORPHAN;
+			break;
+		default:
+			printf("Invalid type\n");
+			return -EINVAL;
+	}
+
+	if (!args[2])
+		return -EINVAL;
+	duration = strtol(args[2], &dummy, 10);
+	if (*dummy) {
+		printf("Bad duration\n");
+		return -EINVAL;
+	}
+
+	if (args[3])
+		return -EINVAL;
+
+	NLA_PUT_U8(msg, IEEE80215_ATTR_SCAN_TYPE, type);
+	NLA_PUT_U32(msg, IEEE80215_ATTR_CHANNELS, (1 << 28) - 1); // FIXME: all channels
+	NLA_PUT_U8(msg, IEEE80215_ATTR_DURATION, duration);
+
+	return 0;
+
+nla_put_failure:
+	return -1;
+}
+
 struct {
 	const char *name;
 	const char *usage;
@@ -167,7 +214,14 @@ struct {
 		.nl_cmd = IEEE80215_DISASSOCIATE_REQ,
 		.nl_resp = IEEE80215_DISASSOCIATE_CONF,
 		.fillmsg = disassociate,
-	}
+	},
+	{
+		.name = "scan",
+		.usage = "[eapo] duration",
+		.nl_cmd = IEEE80215_SCAN_REQ,
+		.nl_resp = IEEE80215_SCAN_CONF,
+		.fillmsg = scan,
+	},
 };
 
 static int usage(char **args) {
