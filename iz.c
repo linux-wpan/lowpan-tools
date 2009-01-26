@@ -17,6 +17,44 @@ static int last_cmd = -1;
 static int seq_expected;
 static const char *iface;
 
+static int scan_confirmation(struct genlmsghdr *ghdr, struct nlattr **attrs)
+{
+	uint8_t status, type;
+	int i;
+	uint8_t edl[27];
+
+	if (!attrs[IEEE80215_ATTR_DEV_INDEX] ||
+	    !attrs[IEEE80215_ATTR_STATUS] ||
+	    !attrs[IEEE80215_ATTR_SCAN_TYPE])
+		return -EINVAL;
+
+	status = nla_get_u8(attrs[IEEE80215_ATTR_STATUS]);
+	if (status != 0)
+		printf("Scan failed: %02x\n", status);
+
+	type = nla_get_u8(attrs[IEEE80215_ATTR_SCAN_TYPE]);
+
+	switch (type) {
+		case IEEE80215_MAC_SCAN_ED:
+			if (!attrs[IEEE80215_ATTR_ED_LIST])
+				return -EINVAL;
+
+			nla_memcpy(edl, attrs[IEEE80215_ATTR_ED_LIST], 27);
+			printf("ED Scan results:\n");
+			for (i = 0; i < 27; i++)
+				printf("\tCh%2d --- ED = %02x\n", i, edl[i]);
+			return 0;
+
+		default:
+			printf("Unsupported scan type: %d\n", type);
+			break;
+	}
+
+	return 0;
+
+}
+
+
 static int parse_cb(struct nl_msg *msg, void *arg)
 {
 	struct nlmsghdr *nlh = nlmsg_hdr(msg);
@@ -43,6 +81,8 @@ static int parse_cb(struct nl_msg *msg, void *arg)
 		printf("Received short address %04hx, status %02hhx\n",
 			nla_get_u16(attrs[IEEE80215_ATTR_SHORT_ADDR]),
 			nla_get_u8(attrs[IEEE80215_ATTR_STATUS]));
+	} else if (ghdr->cmd == IEEE80215_SCAN_CONF) {
+		return scan_confirmation(ghdr, attrs);
 	}
 
 	return 0;
