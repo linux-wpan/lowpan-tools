@@ -55,6 +55,7 @@ enum {
 	IEEE80215_ATTR_SCAN_TYPE,
 	IEEE80215_ATTR_CHANNELS,
 	IEEE80215_ATTR_DURATION,
+	IEEE80215_ATTR_ED_LIST,
 
 	__IEEE80215_ATTR_MAX,
 };
@@ -89,6 +90,11 @@ static struct nla_policy ieee80215_policy[IEEE80215_ATTR_MAX + 1] = {
 	[IEEE80215_ATTR_SCAN_TYPE] = { .type = NLA_U8, },
 	[IEEE80215_ATTR_CHANNELS] = { .type = NLA_U32, },
 	[IEEE80215_ATTR_DURATION] = { .type = NLA_U8, },
+#ifdef __KERNEL__
+	[IEEE80215_ATTR_ED_LIST] = { .len = 27 },
+#else
+	[IEEE80215_ATTR_ED_LIST] = { .minlen = 27, .maxlen = 27 },
+#endif
 };
 #endif
 
@@ -145,6 +151,8 @@ int ieee80215_nl_assoc_indic(struct net_device *dev, struct ieee80215_addr *addr
 int ieee80215_nl_assoc_confirm(struct net_device *dev, u16 short_addr, u8 status);
 int ieee80215_nl_disassoc_indic(struct net_device *dev, struct ieee80215_addr *addr, u8 reason);
 int ieee80215_nl_disassoc_confirm(struct net_device *dev, u8 status);
+int ieee80215_nl_scan_confirm(struct net_device *dev, u8 status, u8 scan_type, u32 unscanned,
+		u8 *edl/*, struct list_head *pan_desc_list */);
 #endif
 
 #endif
