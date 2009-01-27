@@ -190,6 +190,7 @@ static int scan(struct nl_msg *msg, char **args) {
 	int type;
 	int duration;
 	char *dummy;
+	int channels;
 
 	if (!args[1])
 		return -EINVAL;
@@ -214,17 +215,25 @@ static int scan(struct nl_msg *msg, char **args) {
 
 	if (!args[2])
 		return -EINVAL;
-	duration = strtol(args[2], &dummy, 10);
+	channels = strtol(args[2], &dummy, 16);
+	if (*dummy) {
+		printf("Bad channels\n");
+		return -EINVAL;
+	}
+
+	if (!args[3])
+		return -EINVAL;
+	duration = strtol(args[3], &dummy, 10);
 	if (*dummy) {
 		printf("Bad duration\n");
 		return -EINVAL;
 	}
 
-	if (args[3])
+	if (args[4])
 		return -EINVAL;
 
 	NLA_PUT_U8(msg, IEEE80215_ATTR_SCAN_TYPE, type);
-	NLA_PUT_U32(msg, IEEE80215_ATTR_CHANNELS, (1 << 28) - 1); // FIXME: all channels
+	NLA_PUT_U32(msg, IEEE80215_ATTR_CHANNELS, channels);
 	NLA_PUT_U8(msg, IEEE80215_ATTR_DURATION, duration);
 
 	return 0;
@@ -257,7 +266,7 @@ struct {
 	},
 	{
 		.name = "scan",
-		.usage = "[eapo] duration",
+		.usage = "[eapo] chans duration",
 		.nl_cmd = IEEE80215_SCAN_REQ,
 		.nl_resp = IEEE80215_SCAN_CONF,
 		.fillmsg = scan,
