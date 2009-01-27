@@ -74,6 +74,7 @@ int main(int argc, char **argv) {
 		} else if (FD_ISSET(sd, &rs)) {
 			r = sd;
 			w = 1;
+			write(w, "> ", 2);
 		} else {
 			printf("Something bad happened!\n");
 			continue;
