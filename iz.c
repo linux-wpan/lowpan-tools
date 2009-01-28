@@ -108,6 +108,8 @@ static int associate(struct nl_msg *msg, char **args) {
 	char *dummy;
 	uint16_t pan_id, coord_short_addr;
 	uint8_t chan;
+	unsigned char hwa[IEEE80215_ADDR_LEN];
+	int ret;
 
 	if (!args[1])
 		return -EINVAL;
@@ -119,11 +121,24 @@ static int associate(struct nl_msg *msg, char **args) {
 
 	if (!args[2])
 		return -EINVAL;
-	coord_short_addr = strtol(args[2], &dummy, 16);
-	if (*dummy) {
-		printf("Bad CoordAddr\n");
-		return -EINVAL;
+	if (args[2][0] == 'H' || args[2][0] == 'h') {
+		ret = parse_hw_addr(args[2]+1, hwa);
+
+		if (ret) {
+			printf("Bad CoordAddr\n");
+			return ret;
+		}
+
+		NLA_PUT_HW_ADDR(msg, IEEE80215_ATTR_COORD_HW_ADDR, hwa);
+	} else {
+		coord_short_addr = strtol(args[2], &dummy, 16);
+		if (*dummy) {
+			printf("Bad CoordAddr\n");
+			return -EINVAL;
+		}
+		NLA_PUT_U16(msg, IEEE80215_ATTR_COORD_SHORT_ADDR, coord_short_addr);
 	}
+
 
 	if (!args[3])
 		return -EINVAL;
@@ -139,7 +154,6 @@ static int associate(struct nl_msg *msg, char **args) {
 
 	NLA_PUT_U8(msg, IEEE80215_ATTR_CHANNEL, chan);
 	NLA_PUT_U16(msg, IEEE80215_ATTR_COORD_PAN_ID, pan_id);
-	NLA_PUT_U16(msg, IEEE80215_ATTR_COORD_SHORT_ADDR, coord_short_addr);
 	NLA_PUT_U8(msg, IEEE80215_ATTR_CAPABILITY, 0
 						| (1 << 1) /* FFD */
 						| (1 << 3) /* Receiver ON */
@@ -156,14 +170,27 @@ static int disassociate(struct nl_msg *msg, char **args) {
 	char *dummy;
 	uint8_t reason;
 	unsigned char hwa[IEEE80215_ADDR_LEN];
+	uint16_t  short_addr;
 	int ret;
 
 	if (!args[1])
 		return -EINVAL;
-	ret = parse_hw_addr(args[1], hwa);
-	if (ret) {
-		printf("Bad DestAddr\n");
-		return ret;
+	if (args[1][0] == 'H' || args[1][0] == 'h') {
+		ret = parse_hw_addr(args[1]+1, hwa);
+
+		if (ret) {
+			printf("Bad DestAddr\n");
+			return ret;
+		}
+
+		NLA_PUT_HW_ADDR(msg, IEEE80215_ATTR_DEST_HW_ADDR, hwa);
+	} else {
+		short_addr = strtol(args[1], &dummy, 16);
+		if (*dummy) {
+			printf("Bad DestAddr\n");
+			return -EINVAL;
+		}
+		NLA_PUT_U16(msg, IEEE80215_ATTR_DEST_SHORT_ADDR, short_addr);
 	}
 
 	if (!args[2])
@@ -177,7 +204,6 @@ static int disassociate(struct nl_msg *msg, char **args) {
 	if (args[3])
 		return -EINVAL;
 
-	NLA_PUT_HW_ADDR(msg, IEEE80215_ATTR_DEST_HW_ADDR, hwa);
 	NLA_PUT_U8(msg, IEEE80215_ATTR_REASON, reason);
 
 	return 0;
