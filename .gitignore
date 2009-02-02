@@ -12,6 +12,7 @@ Makefile.in
 Makefile
 misc/
 stamp*
+TAGS
 
 *~
 *.a
@@ -25,7 +26,11 @@ stamp*
 
 coordinator
 iz
+izattach
+izchat
 izconfig
+izcoordinator
+izlisten
 serial
 listen
 listen-packet
