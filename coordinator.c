@@ -31,6 +31,10 @@
 #include <ieee80215-nl.h>
 #include <libcommon.h>
 
+#include "addrdb.h"
+
+#define u64 uint64_t
+
 static int seq_expected;
 static int family;
 static struct nl_handle *nl;
@@ -41,19 +45,28 @@ static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 	printf("Associate requested\n");
 
 	if (!attrs[IEEE80215_ATTR_DEV_INDEX] ||
-	    !attrs[IEEE80215_ATTR_SRC_HW_ADDR])
+	    !attrs[IEEE80215_ATTR_SRC_HW_ADDR] ||
+	    !attrs[IEEE80215_ATTR_CAPABILITY])
 		return -EINVAL;
 
 	// FIXME: checks!!!
 
 	struct nl_msg *msg = nlmsg_alloc();
+	uint8_t cap = nla_get_u8(attrs[IEEE80215_ATTR_CAPABILITY]);
+	uint16_t shaddr = 0xfffe;
 
 	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_REQUEST, IEEE80215_ASSOCIATE_RESP, /* vers */ 1);
 
+	if (cap & (1 << 7)) { /* FIXME: constant */
+		uint8_t hwa[IEEE80215_ADDR_LEN];
+		NLA_GET_HW_ADDR(attrs[IEEE80215_ATTR_SRC_HW_ADDR], hwa);
+		shaddr = addrdb_alloc(hwa);
+	}
+
 	nla_put_u32(msg, IEEE80215_ATTR_DEV_INDEX, nla_get_u32(attrs[IEEE80215_ATTR_DEV_INDEX]));
-	nla_put_u32(msg, IEEE80215_ATTR_STATUS, 0x0 /* FIXME: status */);
+	nla_put_u32(msg, IEEE80215_ATTR_STATUS, (shaddr != 0xffff) ? 0x0: 0x01);
 	nla_put_u64(msg, IEEE80215_ATTR_DEST_HW_ADDR, nla_get_u64(attrs[IEEE80215_ATTR_SRC_HW_ADDR]));
-	nla_put_u16(msg, IEEE80215_ATTR_DEST_SHORT_ADDR, 0xfffe); // FIXME: allocate short address
+	nla_put_u16(msg, IEEE80215_ATTR_DEST_SHORT_ADDR, shaddr);
 
 	nl_send_auto_complete(nl, msg);
 	nl_perror("nl_send_auto_complete");
@@ -143,6 +156,8 @@ int main(int argc, char **argv) {
 	}
 
 	iface = argv[1];
+
+	addrdb_init();
 
 	nl = nl_handle_alloc();
 
