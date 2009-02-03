@@ -18,7 +18,7 @@ izattach_SOURCES = serial.c
 izcoordinator_SOURCES = coordinator.c
 izlisten_SOURCES = listen.c
 
-lib_libcommon_la_SOURCES = lib/printbuf.c lib/genl.c lib/parse.c
+lib_libcommon_la_SOURCES = lib/printbuf.c lib/genl.c lib/parse.c lib/shash.c
 lib_libcommon_la_DEPENDENCIES = libtool
 
 tests_gnl_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS)

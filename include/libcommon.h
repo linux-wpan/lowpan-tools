@@ -27,4 +27,12 @@ int parse_hw_addr(const char *addr, unsigned char *buf);
 struct nl_handle;
 int nl_get_multicast_id(struct nl_handle *handle, const char *family, const char *group);
 
+struct simple_hash;
+typedef unsigned int (*shash_hash)(const void *key);
+typedef int (*shash_eq)(const void *key1, const void *key2);
+struct simple_hash *shash_new(shash_hash hashfn, shash_eq eqfn);
+void *shash_insert(struct simple_hash *hash, const void *key, void *ptr);
+void *shash_get(struct simple_hash *hash, const void *key);
+void *shash_drop(struct simple_hash *hash, const void *key);
+
 #endif
