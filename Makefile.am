@@ -28,6 +28,8 @@ izcoordinator_LDADD = $(LDADD) $(NL_LIBS)
 iz_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS)
 iz_LDADD = $(LDADD) $(NL_LIBS)
 
+EXTRA_DIST = debian/
+
 #LIBTOOL_DEPS = @LIBTOOL_DEPS@
 #libtool: $(LIBTOOL_DEPS)
 #	$(SHELL) ./config.status --recheck
