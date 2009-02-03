@@ -1,6 +1,7 @@
 zbtestdir = @zbtestdir@
 zbtest_PROGRAMS = listen-packet tests/test tests/test2 tests/test3 tests/test4 tests/test5 tests/test6 tests/gnl
-zbtest_PYTHON = test-serial/test_DQ.py test-serial/test.py test-serial/test_edscan.py
+python_PYTHON = test-serial/test_DQ.py
+zbtest_SCRIPTS = $(srcdir)/test-serial/test.py $(srcdir)/test-serial/test_edscan.py
 
 sbin_PROGRAMS = izattach izconfig izcoordinator iz
 bin_PROGRAMS = izchat izlisten
