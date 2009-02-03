@@ -129,6 +129,11 @@ static int associate(struct nl_msg *msg, char **args) {
 	uint8_t chan;
 	unsigned char hwa[IEEE80215_ADDR_LEN];
 	int ret;
+	uint8_t cap =  0
+			| (1 << 1) /* FFD */
+			| (1 << 3) /* Receiver ON */
+			;
+//			| (1 << 7) /* allocate short */
 
 	if (!args[1])
 		return -EINVAL;
@@ -168,16 +173,16 @@ static int associate(struct nl_msg *msg, char **args) {
 	}
 
 
-	if (args[4])
-		return -EINVAL;
+	if (args[4]) {
+		if (strcmp(args[4], "short") || args[5])
+			return -EINVAL;
+		else
+			cap |= 1 << 7; /* Request short addr */
+	}
 
 	NLA_PUT_U8(msg, IEEE80215_ATTR_CHANNEL, chan);
 	NLA_PUT_U16(msg, IEEE80215_ATTR_COORD_PAN_ID, pan_id);
-	NLA_PUT_U8(msg, IEEE80215_ATTR_CAPABILITY, 0
-						| (1 << 1) /* FFD */
-						| (1 << 3) /* Receiver ON */
-//						| (1 << 7) /* allocate short */
-						);
+	NLA_PUT_U8(msg, IEEE80215_ATTR_CAPABILITY, cap);
 
 	return 0;
 
@@ -297,7 +302,7 @@ struct {
 } commands[] = {
 	{
 		.name = "assoc",
-		.usage = "PANid CoordAddr chan#",
+		.usage = "PANid CoordAddr chan# [short]",
 		.nl_cmd = IEEE80215_ASSOCIATE_REQ,
 		.nl_resp = IEEE80215_ASSOCIATE_CONF,
 		.fillmsg = associate,
