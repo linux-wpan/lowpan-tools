@@ -7,17 +7,17 @@ bin_PROGRAMS = izchat izlisten
 
 AM_CPPFLAGS = -I$(top_srcdir)/include
 AM_CFLAGS = -g3 -Wall -Werror
-LDADD = libcommon.la
+LDADD = lib/libcommon.la
 
 include_HEADERS = include/ieee802154.h include/ieee80215-nl.h
 noinst_HEADERS = include/libcommon.h
-noinst_LTLIBRARIES = libcommon.la
+noinst_LTLIBRARIES = lib/libcommon.la
 
 izattach_SOURCES = serial.c
 izcoordinator_SOURCES = coordinator.c
 izlisten_SOURCES = listen.c
 
-libcommon_la_SOURCES = printbuf.c genl.c parse.c
+lib_libcommon_la_SOURCES = lib/printbuf.c lib/genl.c lib/parse.c
 
 tests_gnl_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS)
 tests_gnl_LDADD = $(LDADD) $(NL_LIBS)
