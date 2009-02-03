@@ -18,6 +18,7 @@ izcoordinator_SOURCES = coordinator.c
 izlisten_SOURCES = listen.c
 
 lib_libcommon_la_SOURCES = lib/printbuf.c lib/genl.c lib/parse.c
+lib_libcommon_la_DEPENDENCIES = libtool
 
 tests_gnl_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS)
 tests_gnl_LDADD = $(LDADD) $(NL_LIBS)
@@ -30,7 +31,7 @@ iz_LDADD = $(LDADD) $(NL_LIBS)
 
 EXTRA_DIST = debian/
 
-#LIBTOOL_DEPS = @LIBTOOL_DEPS@
-#libtool: $(LIBTOOL_DEPS)
-#	$(SHELL) ./config.status --recheck
+LIBTOOL_DEPS = @LIBTOOL_DEPS@
+libtool: $(LIBTOOL_DEPS)
+	$(SHELL) ./config.status --recheck
 
