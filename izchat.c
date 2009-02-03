@@ -31,8 +31,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <linux/if.h>
-
 #include <ieee802154.h>
 #include <libcommon.h>
 

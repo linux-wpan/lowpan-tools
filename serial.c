@@ -32,7 +32,6 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
-#include <linux/if.h>
 
 #include "ieee802154.h"
 #define N_ZB 19
