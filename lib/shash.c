@@ -85,4 +85,15 @@ void *shash_get(struct simple_hash *hash, const void *key)
 
 	return NULL;
 }
-void *shash_drop(struct simple_hash *hash, const void *key);
+void *shash_drop(struct simple_hash *hash, const void *key)
+{
+	struct shash_elem *elem;
+
+	for (elem = hash->elem; elem; elem = elem->next) {
+		if (!hash->eqfn(elem->key, key)) {
+			*(elem->prev) = elem->next;
+		}
+	}
+
+	return elem;
+}
