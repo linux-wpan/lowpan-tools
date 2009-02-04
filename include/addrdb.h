@@ -22,5 +22,7 @@
 
 void addrdb_init(/*uint8_t *hwa, uint16_t short_addr*/void);
 uint16_t addrdb_alloc(uint8_t *hwa);
+void addrdb_free_hw(uint8_t *hwa);
+void addrdb_free_short(uint16_t shirt_addr);
 
 #endif

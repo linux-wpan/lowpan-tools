@@ -78,11 +78,19 @@ static int coordinator_disassociate(struct genlmsghdr *ghdr, struct nlattr **att
 	printf("Disassociate requested\n");
 
 	if (!attrs[IEEE80215_ATTR_DEV_INDEX] ||
-	    !attrs[IEEE80215_ATTR_REASON])
+	    !attrs[IEEE80215_ATTR_REASON] ||
+	    (!attrs[IEEE80215_ATTR_SRC_HW_ADDR] && !attrs[IEEE80215_ATTR_SRC_SHORT_ADDR]))
 		return -EINVAL;
 
 	// FIXME: checks!!!
-	// FIXME: disassociate device
+	if (attrs[IEEE80215_ATTR_SRC_HW_ADDR]) {
+		uint8_t hwa[IEEE80215_ADDR_LEN];
+		NLA_GET_HW_ADDR(attrs[IEEE80215_ATTR_SRC_HW_ADDR], hwa);
+		addrdb_free_hw(hwa);
+	} else {
+		uint16_t short_addr = nla_get_u16(attrs[IEEE80215_ATTR_SRC_SHORT_ADDR]);
+		addrdb_free_short(short_addr);
+	}
 
 	return 0;
 }

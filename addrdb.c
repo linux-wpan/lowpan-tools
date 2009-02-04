@@ -102,6 +102,35 @@ uint16_t addrdb_alloc(uint8_t *hwa)
 	return addr;
 }
 
+static void addrdb_free(struct lease *lease)
+{
+	shash_drop(hwa_hash, &lease->hwaddr);
+	shash_drop(shorta_hash, &lease->short_addr);
+	free(lease);
+}
+
+void addrdb_free_hw(uint8_t *hwa)
+{
+	struct lease *lease = shash_get(hwa_hash, hwa);
+	if (!lease) {
+		fprintf(stderr, "Can't remove unknown HWA\n");
+		return;
+	}
+
+	addrdb_free(lease);
+}
+void addrdb_free_short(uint16_t short_addr)
+{
+	struct lease *lease = shash_get(shorta_hash, &short_addr);
+	if (!lease) {
+		fprintf(stderr, "Can't remove unknown short address %04x\n", short_addr);
+		return;
+	}
+
+	addrdb_free(lease);
+}
+
+
 void addrdb_init(/*uint8_t *hwa, uint16_t short_addr*/void)
 {
 	hwa_hash = shash_new(hw_hash, hw_eq);
