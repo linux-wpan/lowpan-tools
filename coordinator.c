@@ -30,6 +30,7 @@
 #define IEEE80215_NL_WANT_POLICY
 #include <ieee80215-nl.h>
 #include <libcommon.h>
+#include <signal.h>
 
 #include "addrdb.h"
 
@@ -156,7 +157,15 @@ static int seq_check(struct nl_msg *msg, void *arg) {
 	return NL_SKIP;
 }
 
-int main(int argc, char **argv) {
+void sigusr_handler(int t)
+{
+	void dump_leases(void);
+	dump_leases();
+}
+
+int main(int argc, char **argv)
+{
+	struct sigaction sa;
 
 	if (argc != 2) {
 		printf("Usage: %s iface\n", argv[0]);
@@ -166,6 +175,10 @@ int main(int argc, char **argv) {
 	iface = argv[1];
 
 	addrdb_init();
+	sa.sa_handler = sigusr_handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sigaction(SIGUSR1, &sa, NULL);
 
 	nl = nl_handle_alloc();
 
