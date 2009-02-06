@@ -71,7 +71,7 @@ unsigned int short_hash(const void *key)
 
 int short_eq(const void *key1, const void *key2)
 {
-	const uint16_t *addr1 = key1, *addr2 = key2;
+	const uint16_t addr1 = *(uint16_t *) key1, addr2 = *(uint16_t *) key2;
 	return addr1 - addr2;
 }
 
@@ -101,7 +101,7 @@ uint16_t addrdb_alloc(uint8_t *hwa)
 
 	last_addr = addr;
 
-	shash_insert(hwa_hash, &lease->hwaddr, lease);
+	shash_insert(hwa_hash, lease->hwaddr, lease);
 	shash_insert(shorta_hash, &lease->short_addr, lease);
 
 	printf("addr %d:..:%d\n", lease->hwaddr[0], lease->hwaddr[7]);
