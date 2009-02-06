@@ -9,12 +9,12 @@ AM_INIT_AUTOMAKE([-Wall -Werror gnu])
 AC_CONFIG_SRCDIR([serial.c])
 AC_CONFIG_HEADER([config.h])
 
-AC_ARG_WITH(zbtestdir, [directory where all test programs will be installed],
+AC_ARG_WITH(zbtestdir, [  --with-zbtestdir	directory where all test programs will be installed],
 	    [zbtestdir=$withval],
 	    [zbtestdir='${libexecdir}/zigbee'])
 AC_SUBST(zbtestdir)
 
-AC_ARG_WITH(leasefile, [File for persistent storage],
+AC_ARG_WITH(leasefile, [  --with-leasefile	file for persistent lease storage],
 	    [leasefile=$withval],
 	    [leasefile='${localstatedir}/zigbee/izcoordinator.leases'])
 AC_SUBST(leasefile)
