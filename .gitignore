@@ -10,6 +10,8 @@ libtool
 m4/
 Makefile.in
 Makefile
+parse/Makefile.in
+parse/Makefile
 misc/
 stamp*
 TAGS

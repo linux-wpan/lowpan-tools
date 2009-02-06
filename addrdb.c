@@ -21,11 +21,16 @@
 #include <config.h>
 #endif
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include <time.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include <libcommon.h>
 #include <ieee802154.h>
@@ -99,6 +104,7 @@ uint16_t addrdb_alloc(uint8_t *hwa)
 	shash_insert(hwa_hash, &lease->hwaddr, lease);
 	shash_insert(shorta_hash, &lease->short_addr, lease);
 
+	printf("addr %d:..:%d\n", lease->hwaddr[0], lease->hwaddr[7]);
 	return addr;
 }
 
@@ -144,5 +150,34 @@ void addrdb_init(/*uint8_t *hwa, uint16_t short_addr*/void)
 		fprintf(stderr, "Error initialising hash\n");
 		exit(1);
 	}
+}
+
+#define MAX_CONFIG_BLOCK 128
+
+void dump_leases(void)
+{
+	int fd, i;
+	struct lease *lease;
+	char buffer[128];
+	char hwaddr_buf[8 * 3];
+	fd = open(LEASE_FILE, O_CREAT|O_RDWR, 0644);
+	for (i = 0; i < 65536; i++)
+	{
+		lease = shash_get(shorta_hash, &i);
+		if (!lease) {
+			continue;
+		}
+		snprintf(hwaddr_buf, sizeof(hwaddr_buf),
+				"%02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
+				lease->hwaddr[0], lease->hwaddr[1],
+				lease->hwaddr[2], lease->hwaddr[3],
+				lease->hwaddr[4], lease->hwaddr[5],
+				lease->hwaddr[6], lease->hwaddr[7]);
+		snprintf(buffer, sizeof(buffer),
+			"lease {\n\tpan 0x%04x;\n\thwaddr %s;\n\tshortaddr 0x%04x;\n};\n",
+			0, hwaddr_buf, lease->short_addr);
+		write(fd, buffer, strlen(buffer));
+	}
+	close(fd);
 }
 

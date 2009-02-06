@@ -14,6 +14,11 @@ AC_ARG_WITH(zbtestdir, [directory where all test programs will be installed],
 	    [zbtestdir='${libexecdir}/zigbee'])
 AC_SUBST(zbtestdir)
 
+AC_ARG_WITH(leasefile, [File for persistent storage],
+	    [leasefile=$withval],
+	    [leasefile='${localstatedir}/zigbee/izcoordinator.leases'])
+AC_SUBST(leasefile)
+
 # Checks for programs.
 AC_PROG_CC
 AM_PROG_CC_C_O
@@ -22,6 +27,8 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_LIBTOOL
+AM_PROG_LEX
+AC_PROG_YACC
 AC_SUBST(LIBTOOL_DEPS)
 AM_PATH_PYTHON(,, [:])
 
@@ -53,5 +60,6 @@ AC_CHECK_FUNCS([memset socket])
 
 AC_CONFIG_FILES([
 	Makefile
+	parse/Makefile
 ])
 AC_OUTPUT
