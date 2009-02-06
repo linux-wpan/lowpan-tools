@@ -12,6 +12,10 @@ Makefile.in
 Makefile
 parse/Makefile.in
 parse/Makefile
+parse/coord-config-lex.c
+parse/coord-config-parse.c
+parse/coord-config-parse.h
+parse/coord-config-parse.output
 misc/
 stamp*
 TAGS
@@ -36,3 +40,11 @@ izlisten
 serial
 listen
 listen-packet
+parsetest
+debian/*.debhelper.log
+debian/*.substvars
+debian/liblowpan-dev
+debian/tmp
+debian/lowpan-tools
+debian/files
+
