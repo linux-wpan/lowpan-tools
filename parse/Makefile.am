@@ -1,3 +1,4 @@
+AM_CPPFLAGS = -I$(top_srcdir)/include
 noinst_LTLIBRARIES = libconfigparse.la
 AM_YFLAGS = -d --report=all
 PARSER_HEADER = coord-config-parse.h

@@ -18,10 +18,10 @@ noinst_LTLIBRARIES = lib/libcommon.la
 noinst_PROGRAMS = parsetest
 
 izattach_SOURCES = serial.c
-izcoordinator_SOURCES = coordinator.c addrdb.c
+izcoordinator_SOURCES = coordinator.c addrdb.c lease.h
 izlisten_SOURCES = listen.c
 parsetest_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS) -DLEASE_FILE=\"$(leasefile)\"
-parsetest_SOURCES = parse/parsetest.c addrdb.c
+parsetest_SOURCES = parse/parsetest.c addrdb.c lease.h
 parsetest_DEPENDENCIES = parse/libconfigparse.la lib/libcommon.la
 parsetest_LDADD = parse/libconfigparse.la lib/libcommon.la $(LEXLIB)
 
@@ -32,7 +32,7 @@ tests_gnl_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS)
 tests_gnl_LDADD = $(LDADD) $(NL_LIBS)
 
 izcoordinator_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS) -DLEASE_FILE=\"$(leasefile)\"
-izcoordinator_LDADD = $(LDADD) $(NL_LIBS) parse/libconfigparse.la
+izcoordinator_LDADD = $(LDADD) $(NL_LIBS) parse/libconfigparse.la $(LEXLIB)
 
 iz_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS)
 iz_LDADD = $(LDADD) $(NL_LIBS)

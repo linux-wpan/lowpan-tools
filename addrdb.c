@@ -34,12 +34,7 @@
 
 #include <libcommon.h>
 #include <ieee802154.h>
-
-struct lease {
-	uint8_t hwaddr[IEEE80215_ADDR_LEN];
-	uint16_t short_addr;
-	time_t time;
-};
+#include "lease.h"
 
 struct simple_hash *hwa_hash;
 struct simple_hash *shorta_hash;
@@ -136,6 +131,7 @@ void addrdb_free_short(uint16_t short_addr)
 	addrdb_free(lease);
 }
 
+void do_parse(void);
 
 void addrdb_init(/*uint8_t *hwa, uint16_t short_addr*/void)
 {
@@ -150,6 +146,7 @@ void addrdb_init(/*uint8_t *hwa, uint16_t short_addr*/void)
 		fprintf(stderr, "Error initialising hash\n");
 		exit(1);
 	}
+	do_parse();
 }
 
 #define MAX_CONFIG_BLOCK 128
@@ -158,7 +155,7 @@ void dump_leases(void)
 {
 	int fd, i;
 	struct lease *lease;
-	char buffer[128];
+	char buffer[168];
 	char hwaddr_buf[8 * 3];
 	fd = open(LEASE_FILE, O_CREAT|O_RDWR, 0644);
 	for (i = 0; i < 65536; i++)
@@ -174,8 +171,9 @@ void dump_leases(void)
 				lease->hwaddr[4], lease->hwaddr[5],
 				lease->hwaddr[6], lease->hwaddr[7]);
 		snprintf(buffer, sizeof(buffer),
-			"lease {\n\tpan 0x%04x;\n\thwaddr %s;\n\tshortaddr 0x%04x;\n};\n",
-			0, hwaddr_buf, lease->short_addr);
+			"lease {\n\tpan 0x%04x;\n\thwaddr %s;"
+			"\n\tshortaddr 0x%04x;\n\ttimestamp 0x%08lx;\n};\n",
+			0, hwaddr_buf, lease->short_addr, lease->time);
 		write(fd, buffer, strlen(buffer));
 	}
 	close(fd);

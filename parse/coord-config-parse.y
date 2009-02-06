@@ -3,19 +3,26 @@
 	#include <unistd.h>
 	#include <string.h>
 	#include <stdint.h>
+	#include "lease.h"
+
+	extern struct simple_hash *hwa_hash;
+	extern struct simple_hash *shorta_hash;
+	int lineno;
 
 	#define YYDEBUG 1
 	int yylex();
 	static uint16_t short_addr, pan_addr;
 	static uint8_t hwaddr[8];
+	static time_t mystamp;
 	void yyerror(char *s)
 	{
-		printf("Error: %s\n", s);
+		printf("Error: %s at line %d\n", s, lineno);
 	}
 	static void init_data(void)
 	{
 		memset(hwaddr, 0, 8);
 		short_addr = pan_addr = 0;
+		mystamp = 0;
 	}
 	static void dump_data(void)
 	{
@@ -60,13 +67,34 @@
 	{
 		short_addr = addr;
 	}
+	static void do_set_timestamp(time_t value)
+	{
+		mystamp = value;
+	}
 	static void do_commit_data()
 	{
+		struct lease * lease = shash_get(hwa_hash, hwaddr);
+		if(lease) {
+			if(mystamp > lease->time) /* FIXME */
+				lease->time = mystamp;
+			printf("Got existing lease\n");
+			return;
+		} else {
+			printf("Adding lease\n");
+			lease = calloc(1, sizeof(*lease));
+			memcpy(lease->hwaddr, hwaddr, IEEE80215_ADDR_LEN);
+			lease->short_addr = short_addr;
+			lease->time = mystamp;
+			shash_insert(hwa_hash, lease->hwaddr, lease);
+			shash_insert(shorta_hash, &lease->short_addr, lease);
+		}
 	}
+
 %}
 
 %union {
 	unsigned long number;
+	time_t timestamp;
 	unsigned char hw_addr[8];
 }
 
@@ -75,12 +103,14 @@
 %token <number> TOK_NUMBER
 %type <hw_addr> cmd_hwaddr
 %type <number> num_col cmd_pan cmd_shortaddr
+%type <timestamp> cmd_timestamp
 %type <number> num 
 
 %token TOK_LEASE
 %token TOK_HWADDR
 %token TOK_SHORTADDR
 %token TOK_PAN
+%token TOK_TIMESTAMP
 
 %left ':' ';' '{' '}'
 
@@ -104,12 +134,15 @@ operators: cmd semicolon
 cmd:      cmd_hwaddr				{do_set_hw_addr($1);}
 	| cmd_pan				{do_set_pan_addr($1);}
 	| cmd_shortaddr				{do_set_short_addr($1);}
+	| cmd_timestamp				{do_set_timestamp($1);}
 	;
 cmd_hwaddr: TOK_HWADDR ' ' hardaddr		{memcpy($$, $3, 8);}
 	;
 cmd_pan:  TOK_PAN ' ' TOK_NUMBER		{$$ = $3;}
 	;
-cmd_shortaddr:  TOK_SHORTADDR ' ' TOK_NUMBER	{$$ = $3;;}
+cmd_shortaddr:  TOK_SHORTADDR ' ' TOK_NUMBER	{$$ = $3;}
+	;
+cmd_timestamp:  TOK_TIMESTAMP ' ' TOK_NUMBER	{$$ = (time_t) $3;}
 	;
 
 colon: space_or_not ':' space_or_not
@@ -139,6 +172,7 @@ num: TOK_NUMBER
 extern FILE * yyin;
 void do_parse()
 {
+	lineno = 1;
 	yyin = fopen(LEASE_FILE, "r");
 	if (!yyin)
 		return;
