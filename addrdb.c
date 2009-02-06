@@ -171,9 +171,9 @@ void dump_leases(void)
 				lease->hwaddr[4], lease->hwaddr[5],
 				lease->hwaddr[6], lease->hwaddr[7]);
 		snprintf(buffer, sizeof(buffer),
-			"lease {\n\tpan 0x%04x;\n\thwaddr %s;"
+			"lease {\n\thwaddr %s;"
 			"\n\tshortaddr 0x%04x;\n\ttimestamp 0x%08lx;\n};\n",
-			0, hwaddr_buf, lease->short_addr, lease->time);
+			hwaddr_buf, lease->short_addr, lease->time);
 		write(fd, buffer, strlen(buffer));
 	}
 	close(fd);
