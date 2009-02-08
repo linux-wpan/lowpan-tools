@@ -111,8 +111,7 @@
 %token TOK_SHORTADDR
 %token TOK_PAN
 %token TOK_TIMESTAMP
-
-%left ':' ';' '{' '}'
+%token TOK_LBRACE TOK_RBRACE TOK_COLON TOK_SEMICOLON
 
 %%
 input:  /* empty */
@@ -122,13 +121,13 @@ input:  /* empty */
 block:  lease_begin operators lease_end	{do_commit_data();}
 	;
 
-lease_begin: TOK_LEASE lbrace {init_data();}
+lease_begin: TOK_LEASE TOK_LBRACE {init_data();}
 	;
-lease_end: rbrace semicolon {dump_data();}
+lease_end: TOK_RBRACE TOK_SEMICOLON {dump_data();}
 	;
 
-operators: cmd semicolon
-	| cmd semicolon operators
+operators: cmd TOK_SEMICOLON
+	| cmd TOK_SEMICOLON operators
 	;
 
 cmd:      cmd_hwaddr				{do_set_hw_addr($1);}
@@ -136,33 +135,20 @@ cmd:      cmd_hwaddr				{do_set_hw_addr($1);}
 	| cmd_shortaddr				{do_set_short_addr($1);}
 	| cmd_timestamp				{do_set_timestamp($1);}
 	;
-cmd_hwaddr: TOK_HWADDR ' ' hardaddr		{memcpy($$, $3, 8);}
+cmd_hwaddr: TOK_HWADDR hardaddr			{memcpy($$, $2, 8);}
 	;
-cmd_pan:  TOK_PAN ' ' TOK_NUMBER		{$$ = $3;}
+cmd_pan:  TOK_PAN TOK_NUMBER			{$$ = $2;}
 	;
-cmd_shortaddr:  TOK_SHORTADDR ' ' TOK_NUMBER	{$$ = $3;}
+cmd_shortaddr:  TOK_SHORTADDR TOK_NUMBER	{$$ = $2;}
 	;
-cmd_timestamp:  TOK_TIMESTAMP ' ' TOK_NUMBER	{$$ = (time_t) $3;}
-	;
-
-colon: space_or_not ':' space_or_not
-	;
-semicolon: space_or_not ';' space_or_not
-	;
-lbrace: space_or_not '{' space_or_not
-	;
-
-rbrace: space_or_not '}' space_or_not
-	;
-space_or_not: /* nothing */
-	| ' '
+cmd_timestamp:  TOK_TIMESTAMP TOK_NUMBER	{$$ = (time_t) $2;}
 	;
 
 hardaddr: num_col num_col num_col num_col num_col num_col num_col num
 				{set_hwaddr_octets($$, $1, $2, $3, $4, $5, $6, $7, $8);}
 	;
 
-num_col: num colon {$$ = $1;}
+num_col: num TOK_COLON {$$ = $1;}
 	;
 num: TOK_NUMBER
 	;
