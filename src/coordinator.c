@@ -31,6 +31,7 @@
 #include <ieee80215-nl.h>
 #include <libcommon.h>
 #include <signal.h>
+#include <getopt.h>
 
 #include "addrdb.h"
 
@@ -40,6 +41,8 @@ static int seq_expected;
 static int family;
 static struct nl_handle *nl;
 static const char *iface;
+
+extern int yydebug;
 
 static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 {
@@ -162,19 +165,79 @@ void sigusr_handler(int t)
 	addrdb_dump_leases(LEASE_FILE);
 }
 
+void usage(char * name)
+{
+	printf("usage: %s [options] -i interface\n", name);
+	printf("\t-l lease_file\t\t-- where we store lease file\n"
+		"\t-d debug_level\t\t-- set debug level of application\n"
+		"\t\tWill not demonize on levels > 0\n"
+		"\t-m range_min\t\t-- minimal new 16-bit address allocated\n"
+		"\t-n range_max\t\t-- maximal new 16-bit address allocated\n"
+		"\t-i iface\t\t-- interface to work with\n");
+}
 int main(int argc, char **argv)
 {
 	struct sigaction sa;
+	int opt, debug, range_min, range_max;
+	char lease_file[PATH_MAX];
+	char pname[PATH_MAX];
+	char iface[16]; /* FIXME */
+	char * p;
 
-	if (argc != 2) {
-		printf("Usage: %s iface\n", argv[0]);
-		return 1;
+	debug = 0;
+	range_min = 0;
+	range_max = 0xffff;
+
+	memcpy(lease_file, LEASE_FILE, sizeof(lease_file));
+
+	p = getenv("LEASE_FILE");
+	if(p)
+		strncpy(lease_file, p, PATH_MAX);
+
+	p = getenv("IFACE");
+	if(p)
+		strncpy(iface, p, sizeof(iface));
+
+	strncpy(pname, argv[0], PATH_MAX);
+	memset(iface, 0, sizeof(iface));
+
+	while ((opt = getopt(argc, argv, "l:d:m:n:i:")) != -1) {
+		switch(opt) {
+		case 'l':
+			strncpy(lease_file, optarg, PATH_MAX);
+			break;
+		case 'd':
+			debug = atoi(optarg);
+			break;
+		case 'm':
+			range_min = atoi(optarg);
+			break;
+		case 'n':
+			range_max = atoi(optarg);
+			break;
+		case 'i':
+			strncpy(iface, optarg, sizeof(iface));
+			break;
+		case 'h':
+			usage(pname);
+			return 0;
+		default:
+			usage(pname);
+			return -1;
+		}
+	}
+	if (debug > 1)
+		yydebug = 1; /* Parser debug */
+	else
+		yydebug = 0;
+
+	if (!iface[0]) {
+		usage(pname);
+		return -1;
 	}
 
-	iface = argv[1];
-
 	addrdb_init();
-	addrdb_parse(LEASE_FILE);
+	addrdb_parse(lease_file);
 
 	sa.sa_handler = sigusr_handler;
 	sigemptyset(&sa.sa_mask);
@@ -200,6 +263,23 @@ int main(int argc, char **argv)
 
 	nl_socket_modify_cb(nl, NL_CB_VALID, NL_CB_CUSTOM, parse_cb, NULL);
 	nl_socket_modify_cb(nl, NL_CB_SEQ_CHECK, NL_CB_CUSTOM, seq_check, NULL);
+
+#if 0
+	if(debug == 0) {
+		int f, c;
+		close(0);
+		close(1);
+		close(2);
+		c = 20;
+		while(((f = fork()) == EAGAIN) && c) c--;
+		if (f > 0) {
+			return 0; /* Exiting parent */
+		} else if (f < 0) {
+			fprintf(stderr, "Out of memory\n");
+			return -1; /* Error exit */
+		}
+	}
+#endif
 
 	while (1) {
 		nl_recvmsgs_default(nl);
