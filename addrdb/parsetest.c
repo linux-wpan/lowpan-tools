@@ -12,7 +12,7 @@ extern int yydebug;
 int main(int argc, char **argv)
 {
 	unsigned char gwa[8];
-	const char *fname = argv[1] ? : LEASE_FILE;
+	const char *fname = argv[1] ? argv[1] : LEASE_FILE;
 	int i, fd;
 //	yydebug = 1;
 	fd = open("/dev/urandom", O_RDONLY);
