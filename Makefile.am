@@ -13,7 +13,7 @@ AM_CFLAGS = -g3 -Wall -Werror
 LDADD = lib/libcommon.la
 
 include_HEADERS = include/ieee802154.h include/ieee80215-nl.h
-noinst_HEADERS = include/libcommon.h
+noinst_HEADERS = include/libcommon.h include/addrdb.h
 noinst_LTLIBRARIES = lib/libcommon.la 
 noinst_PROGRAMS = parsetest
 

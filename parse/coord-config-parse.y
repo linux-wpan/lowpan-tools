@@ -10,7 +10,7 @@
 
 	#define YYDEBUG 1
 	int yylex();
-	static uint16_t short_addr, pan_addr;
+	static uint16_t short_addr;
 	static uint8_t hwaddr[8];
 	static time_t mystamp;
 	void yyerror(char *s)
@@ -20,7 +20,7 @@
 	static void init_data(void)
 	{
 		memset(hwaddr, 0, 8);
-		short_addr = pan_addr = 0;
+		short_addr = 0;
 		mystamp = 0;
 	}
 	static void dump_data(void)
@@ -29,7 +29,6 @@
 		printf("HW addr: ");
 		for(i = 0; i < 8; i++)
 			printf("%02x", hwaddr[i]);
-		printf(" PAN id %u ", pan_addr);
 		printf(" short addr %u", short_addr);
 		printf("\n");
 	}
@@ -58,10 +57,6 @@
 	{
 		memcpy(hwaddr, s, 8);
 	}
-	static void do_set_pan_addr(unsigned short addr)
-	{
-		pan_addr = addr;
-	}
 	static void do_set_short_addr(unsigned short addr)
 	{
 		short_addr = addr;
@@ -87,14 +82,13 @@
 %type <hw_addr> hardaddr
 %token <number> TOK_NUMBER
 %type <hw_addr> cmd_hwaddr
-%type <number> num_col cmd_pan cmd_shortaddr
+%type <number> num_col cmd_shortaddr
 %type <timestamp> cmd_timestamp
 %type <number> num 
 
 %token TOK_LEASE
 %token TOK_HWADDR
 %token TOK_SHORTADDR
-%token TOK_PAN
 %token TOK_TIMESTAMP
 %token TOK_LBRACE TOK_RBRACE TOK_COLON TOK_SEMICOLON
 
@@ -116,13 +110,10 @@ operators: cmd TOK_SEMICOLON
 	;
 
 cmd:      cmd_hwaddr				{do_set_hw_addr($1);}
-	| cmd_pan				{do_set_pan_addr($1);}
 	| cmd_shortaddr				{do_set_short_addr($1);}
 	| cmd_timestamp				{do_set_timestamp($1);}
 	;
 cmd_hwaddr: TOK_HWADDR hardaddr			{memcpy($$, $2, 8);}
-	;
-cmd_pan:  TOK_PAN TOK_NUMBER			{$$ = $2;}
 	;
 cmd_shortaddr:  TOK_SHORTADDR TOK_NUMBER	{$$ = $2;}
 	;
