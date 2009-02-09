@@ -18,10 +18,7 @@ static void process_lineno(char *s)
 %option nounput
 
 %%
-\{				return TOK_LBRACE;
-\}				return TOK_RBRACE;
-:				return TOK_COLON;
-;				return TOK_SEMICOLON;
+[\{\}:;]			return yytext[0];
 lease				return TOK_LEASE;
 hwaddr				return TOK_HWADDR;
 shortaddr			return TOK_SHORTADDR;

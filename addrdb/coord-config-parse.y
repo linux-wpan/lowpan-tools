@@ -16,7 +16,7 @@
 	static time_t mystamp;
 	void yyerror(char *s)
 	{
-		printf("Error: %s at line %d\n", s, lineno);
+		fprintf(stderr, "Error: %s at line %d\n", s, lineno);
 	}
 	static void init_data(void)
 	{
@@ -93,7 +93,7 @@
 %token TOK_HWADDR
 %token TOK_SHORTADDR
 %token TOK_TIMESTAMP
-%token TOK_LBRACE TOK_RBRACE TOK_COLON TOK_SEMICOLON
+%left '{' '}' ':' ';'
 
 %%
 input:  /* empty */
@@ -103,13 +103,13 @@ input:  /* empty */
 block:  lease_begin operators lease_end	{do_commit_data();}
 	;
 
-lease_begin: TOK_LEASE TOK_LBRACE {init_data();}
+lease_begin: TOK_LEASE '{' {init_data();}
 	;
-lease_end: TOK_RBRACE TOK_SEMICOLON {dump_data();}
+lease_end: '}' ';' {dump_data();}
 	;
 
-operators: cmd TOK_SEMICOLON
-	| cmd TOK_SEMICOLON operators
+operators: cmd ';'
+	| cmd ';' operators
 	;
 
 cmd:      cmd_hwaddr				{do_set_hw_addr($1);}
@@ -127,7 +127,7 @@ hardaddr: num_col num_col num_col num_col num_col num_col num_col num
 				{set_hwaddr_octets($$, $1, $2, $3, $4, $5, $6, $7, $8);}
 	;
 
-num_col: num TOK_COLON {$$ = $1;}
+num_col: num ':' {$$ = $1;}
 	;
 num: TOK_NUMBER
 	;
