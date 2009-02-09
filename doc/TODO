@@ -1,0 +1,7 @@
+make range_min and range_max actually work
+
+put all debug messages into wrappers,
+implement logging and fork()
+
+make help2man manpage
+
