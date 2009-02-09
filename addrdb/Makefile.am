@@ -4,7 +4,8 @@ AM_YFLAGS = -d --report=all
 BUILT_SOURCE = coord-config-parse.h
 
 noinst_LTLIBRARIES = libaddrdb.la
-zbtest_PROGRAMS = parsetest
+check_PROGRAMS = parsetest
+TESTS = parsetest-check.sh
 
 libaddrdb_la_SOURCES = coord-config-parse.y coord-config-lex.l addrdb.c
 parsetest_CFLAGS = $(AM_CFLAGS) -DLEASE_FILE=\"$(leasefile)\"
