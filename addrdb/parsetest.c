@@ -31,7 +31,7 @@ testing:
 		gwa[0] = i;
 		printf("allocating %d\n", addrdb_alloc(gwa));
 	}
-	addrdb_dump_leases(LEASE_FILE);
+	addrdb_dump_leases(fname);
 	addrdb_parse(fname);
 	return 0;
 }

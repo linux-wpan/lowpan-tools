@@ -6,17 +6,17 @@
 	#include <libcommon.h>
 	#include <time.h>
 	#include <addrdb.h>
-
-	int lineno;
+	#include "coord-config-parse.h"
+	#include "parser.h"
 
 	#define YYDEBUG 1
-	int yylex();
+
 	static uint16_t short_addr;
 	static uint8_t hwaddr[8];
 	static time_t mystamp;
-	void yyerror(char *s)
+	void yyerror(YYLTYPE * yylloc, yyscan_t yyscanner, char *s)
 	{
-		fprintf(stderr, "Error: %s at line %d\n", s, lineno);
+		fprintf(stderr, "Error: %s at line %d\n", s, yylloc->first_line);
 	}
 	static void init_data(void)
 	{
@@ -30,7 +30,7 @@
 		printf("HW addr: ");
 		for(i = 0; i < 8; i++)
 			printf("%02x", hwaddr[i]);
-		printf(" short addr %u", short_addr);
+		printf(" short addr %#x", short_addr);
 		printf("\n");
 	}
 #if 0
@@ -82,6 +82,11 @@
 }
 
 %error-verbose
+%pure-parser
+%locations
+%lex-param	{ yyscan_t yyscanner }
+%parse-param	{ yyscan_t yyscanner }
+
 %type <hw_addr> hardaddr
 %token <number> TOK_NUMBER
 %type <hw_addr> cmd_hwaddr
@@ -134,15 +139,28 @@ num: TOK_NUMBER
 
 
 %%
-extern FILE * yyin;
+
 int addrdb_parse(const char *fname)
 {
-	lineno = 1;
-	yyin = fopen(fname, "r");
-	if (!yyin)
+	yyscan_t scanner;
+	int rc;
+	FILE *fin = fopen(fname, "r");
+	if (!fin) {
+		perror("fopen");
 		return -1;
-	yyparse();
-	fclose(yyin);
+	}
+
+	rc = addrdb_parser_init(&scanner, fname);
+	if (rc) {
+		perror("addrdb_parser_init");
+		return 1;
+	}
+
+	yyparse(scanner);
+
+	addrdb_parser_destroy(scanner);
+	scanner = NULL;
+
 	return 0;
 }
 
