@@ -1,5 +1,6 @@
 %{
 #include "coord-config-parse.h"
+#define YY_NO_INPUT
 
 extern int lineno;
 
@@ -13,6 +14,9 @@ static void process_lineno(char *s)
 	}
 }
 %}
+
+%option nounput
+
 %%
 \{				return TOK_LBRACE;
 \}				return TOK_RBRACE;

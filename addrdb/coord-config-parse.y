@@ -5,6 +5,7 @@
 	#include <stdint.h>
 	#include <libcommon.h>
 	#include <time.h>
+	#include <addrdb.h>
 
 	int lineno;
 
@@ -32,6 +33,7 @@
 		printf(" short addr %u", short_addr);
 		printf("\n");
 	}
+#if 0
 	static void dump_addr(unsigned char *s)
 	{
 		int i;
@@ -39,6 +41,7 @@
 		for(i = 0; i < 8; i++)
 			printf("%02x", s[i]);
 	}
+#endif
 	static void set_hwaddr_octets(unsigned char *s, unsigned char a1,
 				unsigned char a2,  unsigned char a3,  unsigned char a4,
 				unsigned char a5,  unsigned char a6,  unsigned char a7,
@@ -84,7 +87,7 @@
 %type <hw_addr> cmd_hwaddr
 %type <number> num_col cmd_shortaddr
 %type <timestamp> cmd_timestamp
-%type <number> num 
+%type <number> num
 
 %token TOK_LEASE
 %token TOK_HWADDR

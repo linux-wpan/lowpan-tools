@@ -5,10 +5,14 @@ Maintainer: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
 Build-Depends: debhelper (>= 7), autotools-dev
 Standards-Version: 3.8.0
 Homepage: http://linux-zigbee.sourceforge.net/
+XS-Python-Version: all
 
 Package: lowpan-tools
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+XB-Python-Version: ${python:Version}
+Provides: ${python:Provides}
+Recommends: python
 Description: Base programs for LoWPAN in Linux, the net-tools for LoWPAN
  This package provides all basic prorgrams needed for setting up, monitoring
  and tuning LoWPAN networks.

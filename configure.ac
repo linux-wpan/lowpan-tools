@@ -6,7 +6,7 @@ AC_INIT([lowpan-utils],[0.1],[dbaryshkov@gmail.com])
 AC_CONFIG_AUX_DIR([misc])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror gnu])
-AC_CONFIG_SRCDIR([serial.c])
+AC_CONFIG_SRCDIR([src/serial.c])
 AC_CONFIG_HEADER([config.h])
 
 AC_ARG_WITH(zbtestdir, [  --with-zbtestdir	directory where all test programs will be installed],
@@ -60,6 +60,10 @@ AC_CHECK_FUNCS([memset socket])
 
 AC_CONFIG_FILES([
 	Makefile
-	parse/Makefile
+	lib/Makefile
+	addrdb/Makefile
+	src/Makefile
+	tests/Makefile
+	test-serial/Makefile
 ])
 AC_OUTPUT

@@ -10,14 +10,8 @@ libtool
 m4/
 Makefile.in
 Makefile
-parse/Makefile.in
-parse/Makefile
-parse/coord-config-lex.c
-parse/coord-config-parse.c
-parse/coord-config-parse.h
-parse/coord-config-parse.output
 misc/
-stamp*
+*stamp*
 TAGS
 
 *~
@@ -30,6 +24,15 @@ TAGS
 *.swp
 *.tar.gz
 
+addrdb/coord-config-lex.c
+addrdb/coord-config-parse.c
+addrdb/coord-config-parse.h
+addrdb/coord-config-parse.output
+
+tests/*
+!tests/*.c
+!tests/Makefile.am
+
 coordinator
 iz
 izattach
@@ -41,6 +44,8 @@ serial
 listen
 listen-packet
 parsetest
+
+debian/*.debhelper
 debian/*.debhelper.log
 debian/*.substvars
 debian/liblowpan-dev
