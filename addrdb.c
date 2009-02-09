@@ -34,7 +34,12 @@
 
 #include <libcommon.h>
 #include <ieee802154.h>
-#include "lease.h"
+
+struct lease {
+	uint8_t hwaddr[IEEE80215_ADDR_LEN];
+	uint16_t short_addr;
+	time_t time;
+};
 
 struct simple_hash *hwa_hash;
 struct simple_hash *shorta_hash;
@@ -131,8 +136,6 @@ void addrdb_free_short(uint16_t short_addr)
 	addrdb_free(lease);
 }
 
-void do_parse(void);
-
 void addrdb_init(/*uint8_t *hwa, uint16_t short_addr*/void)
 {
 	hwa_hash = shash_new(hw_hash, hw_eq);
@@ -146,20 +149,21 @@ void addrdb_init(/*uint8_t *hwa, uint16_t short_addr*/void)
 		fprintf(stderr, "Error initialising hash\n");
 		exit(1);
 	}
-	do_parse();
 }
 
 #define MAX_CONFIG_BLOCK 128
 
-void dump_leases(void)
+int addrdb_dump_leases(const char *lease_file)
 {
-	int fd, i;
+	int i;
 	struct lease *lease;
-	char buffer[168];
 	char hwaddr_buf[8 * 3];
-	fd = open(LEASE_FILE, O_CREAT|O_RDWR, 0644);
+	FILE *f = fopen(lease_file, "w");
+	if (!f)
+		return -1;
 	for (i = 0; i < 65536; i++)
 	{
+		// FIXME: shash_for_each ?!
 		lease = shash_get(shorta_hash, &i);
 		if (!lease) {
 			continue;
@@ -170,12 +174,31 @@ void dump_leases(void)
 				lease->hwaddr[2], lease->hwaddr[3],
 				lease->hwaddr[4], lease->hwaddr[5],
 				lease->hwaddr[6], lease->hwaddr[7]);
-		snprintf(buffer, sizeof(buffer),
+		fprintf(f,
 			"lease {\n\tpan 0x%04x;\n\thwaddr %s;"
 			"\n\tshortaddr 0x%04x;\n\ttimestamp 0x%08lx;\n};\n",
 			0, hwaddr_buf, lease->short_addr, lease->time);
-		write(fd, buffer, strlen(buffer));
 	}
-	close(fd);
+	fclose(f);
+	return 0;
 }
 
+void addrdb_insert(uint8_t *hwaddr, uint16_t short_addr, time_t stamp)
+{
+	struct lease * lease = shash_get(hwa_hash, hwaddr);
+	if(lease) {
+		printf("Got existing lease\n");
+		if (lease->short_addr != short_addr)
+			fprintf(stderr, "Mismatch of short addresses for the node!\n");
+		else if(stamp > lease->time) /* FIXME */
+			lease->time = stamp;
+	} else {
+		printf("Adding lease\n");
+		lease = calloc(1, sizeof(*lease));
+		memcpy(lease->hwaddr, hwaddr, IEEE80215_ADDR_LEN);
+		lease->short_addr = short_addr;
+		lease->time = stamp;
+		shash_insert(hwa_hash, lease->hwaddr, lease);
+		shash_insert(shorta_hash, &lease->short_addr, lease);
+	}
+}

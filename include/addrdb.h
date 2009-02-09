@@ -20,9 +20,16 @@
 #ifndef ADDRDB_H
 #define ADDRDB_H
 
+#include <time.h>
+
 void addrdb_init(/*uint8_t *hwa, uint16_t short_addr*/void);
 uint16_t addrdb_alloc(uint8_t *hwa);
 void addrdb_free_hw(uint8_t *hwa);
 void addrdb_free_short(uint16_t shirt_addr);
+
+int addrdb_parse(const char *fname);
+int addrdb_dump_leases(const char *lease_file);
+void addrdb_insert(uint8_t *hwa, uint16_t short_addr, time_t stamp);
+
 
 #endif

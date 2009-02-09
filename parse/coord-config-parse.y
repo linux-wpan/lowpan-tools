@@ -3,10 +3,9 @@
 	#include <unistd.h>
 	#include <string.h>
 	#include <stdint.h>
-	#include "lease.h"
+	#include <libcommon.h>
+	#include <time.h>
 
-	extern struct simple_hash *hwa_hash;
-	extern struct simple_hash *shorta_hash;
 	int lineno;
 
 	#define YYDEBUG 1
@@ -73,21 +72,7 @@
 	}
 	static void do_commit_data()
 	{
-		struct lease * lease = shash_get(hwa_hash, hwaddr);
-		if(lease) {
-			if(mystamp > lease->time) /* FIXME */
-				lease->time = mystamp;
-			printf("Got existing lease\n");
-			return;
-		} else {
-			printf("Adding lease\n");
-			lease = calloc(1, sizeof(*lease));
-			memcpy(lease->hwaddr, hwaddr, IEEE80215_ADDR_LEN);
-			lease->short_addr = short_addr;
-			lease->time = mystamp;
-			shash_insert(hwa_hash, lease->hwaddr, lease);
-			shash_insert(shorta_hash, &lease->short_addr, lease);
-		}
+		addrdb_insert(hwaddr, short_addr, mystamp);
 	}
 
 %}
@@ -156,13 +141,14 @@ num: TOK_NUMBER
 
 %%
 extern FILE * yyin;
-void do_parse()
+int addrdb_parse(const char *fname)
 {
 	lineno = 1;
-	yyin = fopen(LEASE_FILE, "r");
+	yyin = fopen(fname, "r");
 	if (!yyin)
-		return;
+		return -1;
 	yyparse();
 	fclose(yyin);
+	return 0;
 }
 

@@ -166,6 +166,7 @@ int main(int argc, char **argv) {
 	iface = argv[1];
 
 	addrdb_init();
+	addrdb_parse(LEASE_FILE);
 
 	nl = nl_handle_alloc();
 
