@@ -181,7 +181,6 @@ int main(int argc, char **argv)
 	int opt, debug, range_min, range_max;
 	char lease_file[PATH_MAX];
 	char pname[PATH_MAX];
-	char iface[16]; /* FIXME */
 	char * p;
 
 	debug = 0;
@@ -194,12 +193,7 @@ int main(int argc, char **argv)
 	if(p)
 		strncpy(lease_file, p, PATH_MAX);
 
-	p = getenv("IFACE");
-	if(p)
-		strncpy(iface, p, sizeof(iface));
-
 	strncpy(pname, argv[0], PATH_MAX);
-	memset(iface, 0, sizeof(iface));
 
 	while ((opt = getopt(argc, argv, "l:d:m:n:i:")) != -1) {
 		switch(opt) {
@@ -216,7 +210,7 @@ int main(int argc, char **argv)
 			range_max = atoi(optarg);
 			break;
 		case 'i':
-			strncpy(iface, optarg, sizeof(iface));
+			iface = strdup(optarg);
 			break;
 		case 'h':
 			usage(pname);
@@ -231,7 +225,7 @@ int main(int argc, char **argv)
 	else
 		yydebug = 0;
 
-	if (!iface[0]) {
+	if (!iface) {
 		usage(pname);
 		return -1;
 	}
