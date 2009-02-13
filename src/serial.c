@@ -120,6 +120,11 @@ int main(int argc, char **argv) {
 	}
 	close(s);
 
+	if (daemon(0, 0) < 0) {
+		perror("daemon");
+		exit(255);
+	}
+
 	while (1)
 		select(0, NULL, NULL, NULL, NULL);
 
@@ -127,3 +132,4 @@ int main(int argc, char **argv) {
 
 	return 0;
 }
+
