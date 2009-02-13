@@ -41,6 +41,7 @@ static int seq_expected;
 static int family;
 static struct nl_handle *nl;
 static const char *iface;
+static char lease_file[PATH_MAX];
 
 extern int yydebug;
 
@@ -65,6 +66,7 @@ static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 		uint8_t hwa[IEEE80215_ADDR_LEN];
 		NLA_GET_HW_ADDR(attrs[IEEE80215_ATTR_SRC_HW_ADDR], hwa);
 		shaddr = addrdb_alloc(hwa);
+		addrdb_dump_leases(lease_file);
 	}
 
 	nla_put_u32(msg, IEEE80215_ATTR_DEV_INDEX, nla_get_u32(attrs[IEEE80215_ATTR_DEV_INDEX]));
@@ -95,6 +97,7 @@ static int coordinator_disassociate(struct genlmsghdr *ghdr, struct nlattr **att
 		uint16_t short_addr = nla_get_u16(attrs[IEEE80215_ATTR_SRC_SHORT_ADDR]);
 		addrdb_free_short(short_addr);
 	}
+	addrdb_dump_leases(lease_file);
 
 	return 0;
 }
@@ -162,7 +165,7 @@ static int seq_check(struct nl_msg *msg, void *arg) {
 
 void sigusr_handler(int t)
 {
-	addrdb_dump_leases(LEASE_FILE);
+	addrdb_dump_leases(lease_file);
 }
 
 void usage(char * name)
@@ -179,7 +182,6 @@ int main(int argc, char **argv)
 {
 	struct sigaction sa;
 	int opt, debug, range_min, range_max;
-	char lease_file[PATH_MAX];
 	char pname[PATH_MAX];
 	char * p;
 
@@ -220,6 +222,7 @@ int main(int argc, char **argv)
 			return -1;
 		}
 	}
+	lease_file[sizeof(lease_file)-1] = '\0';
 	if (debug > 1)
 		yydebug = 1; /* Parser debug */
 	else
