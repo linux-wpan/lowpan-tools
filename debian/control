@@ -1,8 +1,8 @@
-Source: lowpan-utils
+Source: lowpan-tools
 Section: net
 Priority: extra
 Maintainer: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
-Build-Depends: debhelper (>= 7), autotools-dev
+Build-Depends: debhelper (>= 7), autotools-dev, python-central
 Standards-Version: 3.8.0
 Homepage: http://linux-zigbee.sourceforge.net/
 XS-Python-Version: all
