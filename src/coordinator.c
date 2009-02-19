@@ -20,6 +20,7 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
+#include <unistd.h>
 
 #include <netlink/netlink.h>
 #include <netlink/genl/genl.h>
@@ -32,10 +33,14 @@
 #include <libcommon.h>
 #include <signal.h>
 #include <getopt.h>
+#include <libgen.h>
+
+#include <logging.h>
 
 #include "addrdb.h"
 
 #define u64 uint64_t
+
 
 static int seq_expected;
 static int family;
@@ -45,9 +50,15 @@ static char lease_file[PATH_MAX];
 
 extern int yydebug;
 
+static void log_msg_nl_perror(char *s)
+{
+	if (nl_get_errno())
+		log_msg(0, "%s: %s", s, nl_geterror());
+}
+
 static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 {
-	printf("Associate requested\n");
+	log_msg(0, "Associate requested\n");
 
 	if (!attrs[IEEE80215_ATTR_DEV_INDEX] ||
 	    !attrs[IEEE80215_ATTR_SRC_HW_ADDR] ||
@@ -75,13 +86,15 @@ static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 	nla_put_u16(msg, IEEE80215_ATTR_DEST_SHORT_ADDR, shaddr);
 
 	nl_send_auto_complete(nl, msg);
-	nl_perror("nl_send_auto_complete");
+
+	log_msg_nl_perror("nl_send_auto_complete");
+
 	return 0;
 }
 
 static int coordinator_disassociate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 {
-	printf("Disassociate requested\n");
+	log_msg(0, "Disassociate requested\n");
 
 	if (!attrs[IEEE80215_ATTR_DEV_INDEX] ||
 	    !attrs[IEEE80215_ATTR_REASON] ||
@@ -118,7 +131,7 @@ static int parse_cb(struct nl_msg *msg, void *arg)
 		return -EINVAL;
 
 	name = nla_get_string(attrs[IEEE80215_ATTR_DEV_NAME]);
-	printf("Received command %d (%d) for interface %s\n", ghdr->cmd, ghdr->version, name);
+	log_msg(0, "Received command %d (%d) for interface %s\n", ghdr->cmd, ghdr->version, name);
 
 	name = nla_get_string(attrs[IEEE80215_ATTR_DEV_NAME]);
 	if (strcmp(name, iface)) {
@@ -139,7 +152,7 @@ static int parse_cb(struct nl_msg *msg, void *arg)
 	uint8_t buf[8];
 	memcpy(buf, &addr, 8);
 
-	printf("Addr for %s is %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
+	log_msg(0, "Addr for %s is %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
 			nla_get_string(attrs[IEEE80215_ATTR_DEV_NAME]),
 			buf[0], buf[1],	buf[2], buf[3],
 			buf[4], buf[5],	buf[6], buf[7]);
@@ -158,7 +171,7 @@ static int seq_check(struct nl_msg *msg, void *arg) {
 		return NL_OK;
 	}
 
-	fprintf(stderr, "Sequence number mismatch: %x != %x\n", seq, seq_expected);
+	log_msg(0, "Sequence number mismatch: %x != %x\n", seq, seq_expected);
 
 	return NL_SKIP;
 }
@@ -228,6 +241,8 @@ int main(int argc, char **argv)
 	else
 		yydebug = 0;
 
+	init_log(basename(argv[0]), debug);
+
 	if (!iface) {
 		usage(pname);
 		return -1;
@@ -244,15 +259,16 @@ int main(int argc, char **argv)
 	nl = nl_handle_alloc();
 
 	if (!nl) {
-		nl_perror("nl_handle_alloc");
+		log_msg_nl_perror("nl_handle_alloc");
 		return 1;
 	}
 
+	log_msg_nl_perror("genl_connect");
 	genl_connect(nl);
-	nl_perror("genl_connect");
+	log_msg_nl_perror("genl_connect");
 
 	family = genl_ctrl_resolve(nl, IEEE80215_NL_NAME);
-	nl_perror("genl_ctrl_resolve");
+	log_msg_nl_perror("genl_ctrl_resolve");
 
 	nl_socket_add_membership(nl, nl_get_multicast_id(nl, IEEE80215_NL_NAME, IEEE80215_MCAST_COORD_NAME));
 
@@ -277,6 +293,10 @@ int main(int argc, char **argv)
 		}
 	}
 #endif
+	if(daemon(0, 0) < 0) {
+		perror("daemon");
+		return 2;
+	}
 
 	while (1) {
 		nl_recvmsgs_default(nl);
