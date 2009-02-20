@@ -189,8 +189,17 @@ void usage(char * name)
 		"\t\tWill not demonize on levels > 0\n"
 		"\t-m range_min\t\t-- minimal new 16-bit address allocated\n"
 		"\t-n range_max\t\t-- maximal new 16-bit address allocated\n"
-		"\t-i iface\t\t-- interface to work with\n");
+		"\t-i iface\t\t-- interface to work with\n"
+		"\t--help -h\t\t-- this usage information\n"
+	);
 }
+#ifdef HAVE_GETOPT_LONG
+static struct option long_options[] = {
+	{"help", 0, 0, 0},
+	{0, 0, 0, 0}
+};
+#endif
+
 int main(int argc, char **argv)
 {
 	struct sigaction sa;
@@ -210,8 +219,25 @@ int main(int argc, char **argv)
 
 	strncpy(pname, argv[0], PATH_MAX);
 
+#ifndef HAVE_GETOPT_LONG
 	while ((opt = getopt(argc, argv, "l:d:m:n:i:")) != -1) {
+#else
+	while(1) {
+		int option_index = 0;
+		opt = getopt_long(argc, argv, "l:d:m:n:i:",
+				long_options, &option_index);
+		if (opt == -1)
+			break;
+#endif
 		switch(opt) {
+#ifdef HAVE_GETOPT_LONG
+		case 0:
+			if (!strcmp(long_options[option_index].name, "help")) {
+				usage(pname);
+			}
+			return 0;
+			break;
+#endif
 		case 'l':
 			strncpy(lease_file, optarg, PATH_MAX);
 			break;

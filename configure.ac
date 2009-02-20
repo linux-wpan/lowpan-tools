@@ -56,7 +56,7 @@ AC_CHECK_TYPE(struct sockaddr_ieee80215,
 
 # Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
-AC_CHECK_FUNCS([memset socket])
+AC_CHECK_FUNCS([memset socket getopt_long])
 
 AC_CONFIG_FILES([
 	Makefile
