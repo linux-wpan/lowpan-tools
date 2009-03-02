@@ -200,10 +200,12 @@ static struct option long_options[] = {
 };
 #endif
 
+int range_min, range_max;
+
 int main(int argc, char **argv)
 {
 	struct sigaction sa;
-	int opt, debug, range_min, range_max;
+	int opt, debug;
 	char pname[PATH_MAX];
 	char * p;
 

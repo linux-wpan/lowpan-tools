@@ -34,6 +34,7 @@
 
 #include <libcommon.h>
 #include <ieee802154.h>
+#include <logging.h>
 
 struct lease {
 	uint8_t hwaddr[IEEE80215_ADDR_LEN];
@@ -75,7 +76,8 @@ int short_eq(const void *key1, const void *key2)
 	return addr1 - addr2;
 }
 
-static int last_addr = 0x8000;
+static int last_addr = -1;
+extern int range_min, range_max;
 uint16_t addrdb_alloc(uint8_t *hwa)
 {
 	struct lease *lease = shash_get(hwa_hash, hwa);
@@ -83,15 +85,19 @@ uint16_t addrdb_alloc(uint8_t *hwa)
 		lease->time = time(NULL);
 		return lease->short_addr;
 	}
+	if (last_addr == -1)
+		last_addr = range_min;
 
 	int addr = last_addr + 1;
+	if (addr > range_max)
+			return 0xffff;
 
 	while (shash_get(shorta_hash, &addr)) {
 		addr ++;
-		if (addr == last_addr)
+		if (addr == last_addr || addr > range_max)
 			return 0xffff;
 		else if (addr == 0xfffe)
-			addr = 0x8000;
+			addr = range_min;
 	}
 
 	lease = calloc(1, sizeof(*lease));
@@ -104,7 +110,7 @@ uint16_t addrdb_alloc(uint8_t *hwa)
 	shash_insert(hwa_hash, lease->hwaddr, lease);
 	shash_insert(shorta_hash, &lease->short_addr, lease);
 
-	printf("addr %d:..:%d\n", lease->hwaddr[0], lease->hwaddr[7]);
+	log_msg(0, "addr %d:..:%d\n", lease->hwaddr[0], lease->hwaddr[7]);
 	return addr;
 }
 
@@ -119,7 +125,7 @@ void addrdb_free_hw(uint8_t *hwa)
 {
 	struct lease *lease = shash_get(hwa_hash, hwa);
 	if (!lease) {
-		fprintf(stderr, "Can't remove unknown HWA\n");
+		log_msg(0, "Can't remove unknown HWA\n");
 		return;
 	}
 
@@ -129,7 +135,7 @@ void addrdb_free_short(uint16_t short_addr)
 {
 	struct lease *lease = shash_get(shorta_hash, &short_addr);
 	if (!lease) {
-		fprintf(stderr, "Can't remove unknown short address %04x\n", short_addr);
+		log_msg(0, "Can't remove unknown short address %04x\n", short_addr);
 		return;
 	}
 
@@ -140,13 +146,13 @@ void addrdb_init(/*uint8_t *hwa, uint16_t short_addr*/void)
 {
 	hwa_hash = shash_new(hw_hash, hw_eq);
 	if (!hwa_hash) {
-		fprintf(stderr, "Error initialising hash\n");
+		log_msg(0, "Error initialising hash\n");
 		exit(1);
 	}
 
 	shorta_hash = shash_new(short_hash, short_eq);
 	if (!shorta_hash) {
-		fprintf(stderr, "Error initialising hash\n");
+		log_msg(0, "Error initialising hash\n");
 		exit(1);
 	}
 }
@@ -187,13 +193,13 @@ void addrdb_insert(uint8_t *hwaddr, uint16_t short_addr, time_t stamp)
 {
 	struct lease * lease = shash_get(hwa_hash, hwaddr);
 	if(lease) {
-		printf("Got existing lease\n");
+		log_msg(0, "Got existing lease\n");
 		if (lease->short_addr != short_addr)
-			fprintf(stderr, "Mismatch of short addresses for the node!\n");
+			log_msg(0, "Mismatch of short addresses for the node!\n");
 		else if(stamp > lease->time) /* FIXME */
 			lease->time = stamp;
 	} else {
-		printf("Adding lease\n");
+		log_msg(0, "Adding lease\n");
 		lease = calloc(1, sizeof(*lease));
 		memcpy(lease->hwaddr, hwaddr, IEEE80215_ADDR_LEN);
 		lease->short_addr = short_addr;
