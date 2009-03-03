@@ -21,6 +21,9 @@
 #include <config.h>
 #endif
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include <netlink/netlink.h>
 #include <netlink/genl/genl.h>
@@ -205,13 +208,13 @@ int range_min, range_max;
 int main(int argc, char **argv)
 {
 	struct sigaction sa;
-	int opt, debug;
+	int opt, debug, pid_fd;
 	char pname[PATH_MAX];
 	char * p;
 
 	debug = 0;
-	range_min = 0;
-	range_max = 0xffff;
+	range_min = 0x8000;
+	range_max = 0xfffd;
 
 	memcpy(lease_file, LEASE_FILE, sizeof(lease_file));
 
@@ -321,9 +324,28 @@ int main(int argc, char **argv)
 		}
 	}
 #endif
+	#define PID_BUF_LEN 32
+	#define PID_FILE "/var/run/izcoordinator.pid" /* FIXME */
 	if(daemon(0, 0) < 0) {
 		perror("daemon");
 		return 2;
+	}
+	pid_fd = open (PID_FILE, O_WRONLY | O_CREAT, 0640);
+	if (pid_fd < 0) {
+		perror ("open");
+		return 1;
+	} else {
+		char buf[PID_BUF_LEN];
+		int ret;
+		snprintf (buf, sizeof(buf), "%d\n", getpid());
+		ret = write (pid_fd, buf, strlen(buf));
+
+		if (ret < 0) {
+			perror ("write");
+			return 1;
+		}
+
+		close (pid_fd);
 	}
 
 	while (1) {
