@@ -20,8 +20,9 @@
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
-#include <unistd.h>
 #include <sys/types.h>
+#include <unistd.h>
+#include <grp.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
@@ -179,9 +180,15 @@ static int seq_check(struct nl_msg *msg, void *arg) {
 	return NL_SKIP;
 }
 
-void sigusr_handler(int t)
+void dump_lease_handler(int t)
 {
 	addrdb_dump_leases(lease_file);
+}
+
+int die_flag = 0;
+void exit_handler(int t)
+{
+	die_flag = 1;
 }
 
 void usage(char * name)
@@ -208,7 +215,7 @@ int range_min, range_max;
 int main(int argc, char **argv)
 {
 	struct sigaction sa;
-	int opt, debug, pid_fd;
+	int opt, debug, pid_fd, uid;
 	char pname[PATH_MAX];
 	char * p;
 
@@ -282,10 +289,21 @@ int main(int argc, char **argv)
 	addrdb_init();
 	addrdb_parse(lease_file);
 
-	sa.sa_handler = sigusr_handler;
+	sa.sa_handler = dump_lease_handler;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	sigaction(SIGUSR1, &sa, NULL);
+	sa.sa_handler = dump_lease_handler;
+	sigaction(SIGHUP, &sa, NULL);
+
+	sa.sa_handler = exit_handler;
+	sigaction(SIGTERM, &sa, NULL);
+
+	sa.sa_handler = exit_handler;
+	sigaction(SIGINT, &sa, NULL);
+
+	sa.sa_handler = SIG_IGN;
+	sigaction(SIGPIPE, &sa, NULL);
 
 	nl = nl_handle_alloc();
 
@@ -326,6 +344,16 @@ int main(int argc, char **argv)
 #endif
 	#define PID_BUF_LEN 32
 	#define PID_FILE "/var/run/izcoordinator.pid" /* FIXME */
+	uid = getuid();
+	umask(022);
+
+	if (uid == 0) {
+		gid_t gid = getgid();
+
+		/* If run by hand, ensure groups vector gets trashed */
+		setgroups(1, &gid);
+	}
+
 	if(daemon(0, 0) < 0) {
 		perror("daemon");
 		return 2;
@@ -348,12 +376,14 @@ int main(int argc, char **argv)
 		close (pid_fd);
 	}
 
-	while (1) {
+	while (!die_flag) {
 		nl_recvmsgs_default(nl);
 	}
 
 
 	nl_close(nl);
+
+	unlink(PID_FILE);
 
 	return 0;
 }

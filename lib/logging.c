@@ -44,7 +44,7 @@ void init_log(char * name, int level)
 {
 #ifdef HAVE_SYSLOG_H
 	log_level = level;
-	openlog(name, LOG_PID|LOG_CONS, LOG_DAEMON);
+	openlog(name, LOG_PID|LOG_CONS|LOG_NOWAIT, LOG_DAEMON);
 #endif
 }
 
