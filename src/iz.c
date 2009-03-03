@@ -295,6 +295,7 @@ nla_put_failure:
 struct {
 	const char *name;
 	const char *usage;
+	const char *usage_exp;
 	int nl_cmd;
 	int nl_resp;
 	int (*fillmsg)(struct nl_msg *msg, char **args);
@@ -303,6 +304,10 @@ struct {
 	{
 		.name = "assoc",
 		.usage = "PANid CoordAddr chan# [short]",
+		.usage_exp = "\t\tPANid = 16-bit hex PAN idi"
+				"\n\t\tCoordAddr - 16-bit hex coordinator address\n"
+				"\t\tchan# - radio channel no, from 0 to 26 (radio hardware dependant)\n"
+				"\t\tshort - add word 'short' to command line to get real address (not 0xfffe)\n",
 		.nl_cmd = IEEE80215_ASSOCIATE_REQ,
 		.nl_resp = IEEE80215_ASSOCIATE_CONF,
 		.fillmsg = associate,
@@ -310,6 +315,7 @@ struct {
 	{
 		.name = "disassoc",
 		.usage = "DestAddr reason",
+		.usage_exp = "\t\tDestAddr - destination address\n\t\treason - disassociation reason\n",
 		.nl_cmd = IEEE80215_DISASSOCIATE_REQ,
 		.nl_resp = IEEE80215_DISASSOCIATE_CONF,
 		.fillmsg = disassociate,
@@ -317,6 +323,11 @@ struct {
 	{
 		.name = "scan",
 		.usage = "[eapo] chans duration",
+		.usage_exp = "\t\tscan modes:\n"
+				"\t\t\te - ED scan\n"
+				"\t\t\ta - active scan\n"
+				"\t\t\tp - passive scan\n"
+				"\t\t\to - orphan scan\n",
 		.nl_cmd = IEEE80215_SCAN_REQ,
 		.nl_resp = IEEE80215_SCAN_CONF,
 		.fillmsg = scan,
@@ -326,11 +337,14 @@ struct {
 static int usage(char **args) {
 	int i;
 	printf("Usage: %s iface cmd args...\n", args[0]);
+	printf("%s --help\n\n", args[0]);
 	printf("\tcmd is one of:\n");
 	for (i = 0; i < sizeof(commands) / sizeof(commands[0]); i++) {
 		printf("\t%s%s%s\n", commands[i].name,
 				commands[i].usage ? " " : "",
 				commands[i].usage ?: "");
+		if (commands[i].usage_exp)
+			printf("%s\n\n", commands[i].usage_exp);
 	}
 	printf("\n");
 	return 1;
@@ -341,6 +355,10 @@ int main(int argc, char **argv) {
 	int family;
 	struct nl_handle *nl;
 	int cmd;
+	if (argc == 1) {
+		if (!strcmp(argv[1], "--help"))
+			return usage(argv);
+	}
 
 	if (argc < 3) {
 		return usage(argv);
