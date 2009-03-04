@@ -1,0 +1,13 @@
+lowpan-tools (0.1-2) unstable; urgency=low
+
+  * Move localstate dir (and thus leases file) to correct place (/var).
+  * Rename source package to lowpan-tools.
+
+ -- Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>  Fri, 13 Feb 2009 21:45:02 +0300
+
+lowpan-utils (0.1-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>  Tue, 03 Feb 2009 02:08:17 +0300
+

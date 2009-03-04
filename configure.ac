@@ -2,17 +2,22 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([zigbee-userspace],[0.1],[dbaryshkov@gmail.com])
+AC_INIT([lowpan-utils],[0.1],[dbaryshkov@gmail.com])
 AC_CONFIG_AUX_DIR([misc])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror gnu])
-AC_CONFIG_SRCDIR([serial.c])
+AC_CONFIG_SRCDIR([src/serial.c])
 AC_CONFIG_HEADER([config.h])
 
-AC_ARG_WITH(zbtestdir, [directory where all test programs will be installed],
+AC_ARG_WITH(zbtestdir, [  --with-zbtestdir	directory where all test programs will be installed],
 	    [zbtestdir=$withval],
 	    [zbtestdir='${libexecdir}/zigbee'])
 AC_SUBST(zbtestdir)
+
+AC_ARG_WITH(leasefile, [  --with-leasefile	file for persistent lease storage],
+	    [leasefile=$withval],
+	    [leasefile='${localstatedir}/zigbee/izcoordinator.leases'])
+AC_SUBST(leasefile)
 
 # Checks for programs.
 AC_PROG_CC
@@ -22,6 +27,8 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_RANLIB
 AC_PROG_LIBTOOL
+AM_PROG_LEX
+AC_PROG_YACC
 AC_SUBST(LIBTOOL_DEPS)
 AM_PATH_PYTHON(,, [:])
 
@@ -49,9 +56,14 @@ AC_CHECK_TYPE(struct sockaddr_ieee80215,
 
 # Checks for library functions.
 AC_PROG_GCC_TRADITIONAL
-AC_CHECK_FUNCS([memset socket])
+AC_CHECK_FUNCS([memset socket getopt_long])
 
 AC_CONFIG_FILES([
 	Makefile
+	lib/Makefile
+	addrdb/Makefile
+	src/Makefile
+	tests/Makefile
+	test-serial/Makefile
 ])
 AC_OUTPUT

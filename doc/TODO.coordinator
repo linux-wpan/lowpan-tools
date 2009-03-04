@@ -1,0 +1,8 @@
+make range_min and range_max actually work
+
+make help2man manpage
+
+Generate PID file
+
+Properly check PID file at startup.
+

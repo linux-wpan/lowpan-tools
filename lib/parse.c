@@ -17,22 +17,43 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-#ifndef _LIBCOMMON_H_
-#define _LIBCOMMON_H_
-
-void printbuf(const unsigned char *buf, int len);
-
-int parse_hw_addr(const char *addr, unsigned char *buf);
-
-struct nl_handle;
-int nl_get_multicast_id(struct nl_handle *handle, const char *family, const char *group);
-
-struct simple_hash;
-typedef unsigned int (*shash_hash)(const void *key);
-typedef int (*shash_eq)(const void *key1, const void *key2);
-struct simple_hash *shash_new(shash_hash hashfn, shash_eq eqfn);
-void *shash_insert(struct simple_hash *hash, const void *key, void *ptr);
-void *shash_get(struct simple_hash *hash, const void *key);
-void *shash_drop(struct simple_hash *hash, const void *key);
-
+#ifdef HAVE_CONFIG_H
+#include <config.h>
 #endif
+
+#include <libcommon.h>
+#include <errno.h>
+#include <stdio.h>
+
+int parse_hw_addr(const char *hw, unsigned char *buf) {
+	int i = 0;
+
+	while (*hw) {
+		unsigned char c = *(hw++);
+		switch (c) {
+			case '0'...'9':
+				c -= '0';
+				break;
+			case 'a'...'f':
+				c -= 'a' - 10;
+				break;
+			case 'A'...'F':
+				c -= 'A' - 10;
+				break;
+			case ':':
+			case '.':
+				continue;
+			default:
+				fprintf(stderr, "Bad HW address encountered (%c)\n", c);
+				return -EINVAL;
+		}
+		buf[i / 2] = (buf[i/2] & (0xf << (4 * (i % 2)))) | (c << 4 * (1 -i % 2));
+
+		i++;
+		if (i == 16)
+			return 0;
+	}
+
+	return -EINVAL;
+}
+

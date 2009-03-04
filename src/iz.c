@@ -1,3 +1,22 @@
+/*
+ * Linux IEEE 802.15.4 userspace tools
+ *
+ * Copyright (C) 2008 Dmitry Eremin-Solenikov
+ * Copyright (C) 2008 Sergey Lapin
+ *
+ *  This program is free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; version 2 of the License.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License along
+ *  with this program; if not, write to the Free Software Foundation, Inc.,
+ *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
 #endif
@@ -110,6 +129,11 @@ static int associate(struct nl_msg *msg, char **args) {
 	uint8_t chan;
 	unsigned char hwa[IEEE80215_ADDR_LEN];
 	int ret;
+	uint8_t cap =  0
+			| (1 << 1) /* FFD */
+			| (1 << 3) /* Receiver ON */
+			;
+//			| (1 << 7) /* allocate short */
 
 	if (!args[1])
 		return -EINVAL;
@@ -149,16 +173,16 @@ static int associate(struct nl_msg *msg, char **args) {
 	}
 
 
-	if (args[4])
-		return -EINVAL;
+	if (args[4]) {
+		if (strcmp(args[4], "short") || args[5])
+			return -EINVAL;
+		else
+			cap |= 1 << 7; /* Request short addr */
+	}
 
 	NLA_PUT_U8(msg, IEEE80215_ATTR_CHANNEL, chan);
 	NLA_PUT_U16(msg, IEEE80215_ATTR_COORD_PAN_ID, pan_id);
-	NLA_PUT_U8(msg, IEEE80215_ATTR_CAPABILITY, 0
-						| (1 << 1) /* FFD */
-						| (1 << 3) /* Receiver ON */
-//						| (1 << 7) /* allocate short */
-						);
+	NLA_PUT_U8(msg, IEEE80215_ATTR_CAPABILITY, cap);
 
 	return 0;
 
@@ -278,7 +302,7 @@ struct {
 } commands[] = {
 	{
 		.name = "assoc",
-		.usage = "PANid CoordAddr chan#",
+		.usage = "PANid CoordAddr chan# [short]",
 		.nl_cmd = IEEE80215_ASSOCIATE_REQ,
 		.nl_resp = IEEE80215_ASSOCIATE_CONF,
 		.fillmsg = associate,

@@ -11,7 +11,8 @@ m4/
 Makefile.in
 Makefile
 misc/
-stamp*
+*stamp*
+TAGS
 
 *~
 *.a
@@ -23,9 +24,32 @@ stamp*
 *.swp
 *.tar.gz
 
+addrdb/coord-config-lex.c
+addrdb/coord-config-parse.c
+addrdb/coord-config-parse.h
+addrdb/coord-config-parse.output
+
+tests/*
+!tests/*.c
+!tests/Makefile.am
+
 coordinator
 iz
+izattach
+izchat
 izconfig
+izcoordinator
+izlisten
 serial
 listen
 listen-packet
+parsetest
+
+debian/*.debhelper
+debian/*.debhelper.log
+debian/*.substvars
+debian/liblowpan-dev
+debian/tmp
+debian/lowpan-tools
+debian/files
+

@@ -17,22 +17,19 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-#ifndef _LIBCOMMON_H_
-#define _LIBCOMMON_H_
+#ifndef ADDRDB_H
+#define ADDRDB_H
 
-void printbuf(const unsigned char *buf, int len);
+#include <time.h>
 
-int parse_hw_addr(const char *addr, unsigned char *buf);
+void addrdb_init(/*uint8_t *hwa, uint16_t short_addr*/void);
+uint16_t addrdb_alloc(uint8_t *hwa);
+void addrdb_free_hw(uint8_t *hwa);
+void addrdb_free_short(uint16_t shirt_addr);
 
-struct nl_handle;
-int nl_get_multicast_id(struct nl_handle *handle, const char *family, const char *group);
+int addrdb_parse(const char *fname);
+int addrdb_dump_leases(const char *lease_file);
+void addrdb_insert(uint8_t *hwa, uint16_t short_addr, time_t stamp);
 
-struct simple_hash;
-typedef unsigned int (*shash_hash)(const void *key);
-typedef int (*shash_eq)(const void *key1, const void *key2);
-struct simple_hash *shash_new(shash_hash hashfn, shash_eq eqfn);
-void *shash_insert(struct simple_hash *hash, const void *key, void *ptr);
-void *shash_get(struct simple_hash *hash, const void *key);
-void *shash_drop(struct simple_hash *hash, const void *key);
 
 #endif
