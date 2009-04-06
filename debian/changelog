@@ -4,6 +4,12 @@ lowpan-tools (0.2-1) unstable; urgency=low
 
  -- Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>  Fri, 24 Apr 2009 18:11:39 +0400
 
+lowpan-tools (0.1-3) unstable; urgency=low
+
+  * Bump down debhelper version to build on Ubuntu.
+
+ -- Maxim Osipov <maxim.osipov@siemens.com>  Mon, 06 Apr 2009 17:17:49 +0400
+
 lowpan-tools (0.1-2) unstable; urgency=low
 
   * Move localstate dir (and thus leases file) to correct place (/var).
