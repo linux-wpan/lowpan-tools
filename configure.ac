@@ -22,6 +22,7 @@ AC_SUBST(leasefile)
 # Checks for programs.
 AC_PROG_CC
 AM_PROG_CC_C_O
+AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -37,11 +38,21 @@ PKG_CHECK_MODULES([NL], [libnl-1])
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([fcntl.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h termios.h unistd.h net/ieee80215.h net/af_ieee80215.h])
+AC_FUNC_ALLOCA
+AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h libintl.h limits.h malloc.h stddef.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h syslog.h termios.h unistd.h])
+AC_CHECK_HEADERS([net/ieee80215.h net/af_ieee80215.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
+AC_TYPE_UID_T
+AC_TYPE_INT16_T
+AC_TYPE_INT32_T
+AC_TYPE_INT8_T
+AC_TYPE_SIZE_T
+AC_TYPE_UINT16_T
+AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
+AC_TYPE_UINT8_T
 AC_CHECK_TYPE(struct sockaddr_ieee80215,
 	      [AC_DEFINE([HAVE_STRUCT_SOCKADDR_IEEE80215],[],[Define to 1 if you have struct sockaddr_ieee80215])],[],
 	      [#include <sys/types.h>
@@ -55,7 +66,9 @@ AC_CHECK_TYPE(struct sockaddr_ieee80215,
 	       ])
 
 # Checks for library functions.
-AC_PROG_GCC_TRADITIONAL
+AC_FUNC_FORK
+AC_FUNC_MALLOC
+AC_FUNC_REALLOC
 AC_CHECK_FUNCS([memset socket getopt_long])
 
 AC_CONFIG_FILES([
