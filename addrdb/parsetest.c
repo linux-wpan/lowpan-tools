@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 method2:
 	memcpy(gwa, "whack000", 8);
 testing:
-	addrdb_init();
+	addrdb_init(0, 0xfffd);
 	addrdb_parse(fname);
 	for (i = 0; i < 80; i++) {
 		gwa[0] = i;

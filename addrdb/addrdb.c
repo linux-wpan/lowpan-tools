@@ -76,8 +76,8 @@ int short_eq(const void *key1, const void *key2)
 	return addr1 - addr2;
 }
 
-static int last_addr = -1;
-extern int range_min, range_max;
+static uint16_t last_addr;
+static uint16_t range_min, range_max;
 uint16_t addrdb_alloc(uint8_t *hwa)
 {
 	struct lease *lease = shash_get(hwa_hash, hwa);
@@ -85,8 +85,6 @@ uint16_t addrdb_alloc(uint8_t *hwa)
 		lease->time = time(NULL);
 		return lease->short_addr;
 	}
-	if (last_addr == -1)
-		last_addr = range_min;
 
 	int addr = last_addr + 1;
 	if (addr > range_max)
@@ -142,8 +140,11 @@ void addrdb_free_short(uint16_t short_addr)
 	addrdb_free(lease);
 }
 
-void addrdb_init(/*uint8_t *hwa, uint16_t short_addr*/void)
+void addrdb_init(/*uint8_t *hwa, uint16_t short_addr, */ uint16_t min, uint16_t max)
 {
+	last_addr = range_min = min;
+	range_max = max;
+
 	hwa_hash = shash_new(hw_hash, hw_eq);
 	if (!hwa_hash) {
 		log_msg(0, "Error initialising hash\n");

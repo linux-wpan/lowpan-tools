@@ -286,7 +286,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	addrdb_init();
+	addrdb_init(range_min, range_max);
 	addrdb_parse(lease_file);
 
 	sa.sa_handler = dump_lease_handler;
