@@ -30,6 +30,9 @@
 #include <netlink/genl/genl.h>
 #include <netlink/genl/ctrl.h>
 #include <errno.h>
+#ifdef HAVE_LIMITS_H
+#include <limits.h>
+#endif
 
 #include <ieee802154.h>
 #define IEEE80215_NL_WANT_POLICY
