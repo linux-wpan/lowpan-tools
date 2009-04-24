@@ -3,7 +3,7 @@ include $(top_srcdir)/Makefile.common
 SUBDIRS = lib addrdb src tests test-serial
 
 include_HEADERS = include/ieee802154.h include/ieee80215-nl.h
-noinst_HEADERS = include/libcommon.h include/addrdb.h
+noinst_HEADERS = include/libcommon.h include/addrdb.h include/logging.h
 
 EXTRA_DIST = $(srcdir)/debian/changelog $(srcdir)/debian/compat $(srcdir)/debian/control $(srcdir)/debian/copyright \
 	     $(srcdir)/debian/rules $(srcdir)/debian/watch \
