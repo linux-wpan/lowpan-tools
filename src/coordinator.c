@@ -63,6 +63,29 @@ static void log_msg_nl_perror(char *s)
 		log_msg(0, "%s: %s", s, nl_geterror());
 }
 
+int mlme_start(uint16_t short_addr, uint16_t pan, uint8_t is_coordinator, const char * iface)
+{
+	struct nl_msg *msg = nlmsg_alloc();
+	log_msg(0, "mlme_start\n");
+	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_REQUEST, IEEE80215_START_REQ, /* vers */ 1);
+	nla_put_string(msg, IEEE80215_ATTR_DEV_NAME, iface);
+	nla_put_u16(msg, IEEE80215_ATTR_COORD_PAN_ID, pan);
+	nla_put_u16(msg, IEEE80215_ATTR_COORD_SHORT_ADDR, short_addr);
+#if 0
+	nla_put_u8(msg, IEEE80215_ATTR_CHANNEL, channel);
+	nla_put_u8(msg, IEEE80215_ATTR_BCN_ORD, bcn_ord);
+	nla_put_u8(msg, IEEE80215_ATTR_SF_ORD, sf_ord);
+#endif
+	nla_put_u8(msg, IEEE80215_ATTR_PAN_COORD, is_coordinator);
+#if 0
+	nla_put_u8(msg, IEEE80215_ATTR_BAT_EXT, battery_ext);
+	nla_put_u8(msg, IEEE80215_ATTR_COORD_REALIGN, coord_realign);
+#endif
+	nl_send_auto_complete(nl, msg);
+	log_msg_nl_perror("nl_send_auto_complete");
+	return 0;
+}
+
 static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 {
 	log_msg(0, "Associate requested\n");
@@ -203,6 +226,8 @@ void usage(char * name)
 		"\t-m range_min\t\t-- minimal new 16-bit address allocated\n"
 		"\t-n range_max\t\t-- maximal new 16-bit address allocated\n"
 		"\t-i iface\t\t-- interface to work with\n"
+		"\t-s addr\t\t-- 16-bit address of coordinator (hexadecimal)\n"
+		"\t-p addr\t\t-- 16-bit address of PAN (hexadecimal)\n"
 		"\t--help -h\t\t-- this usage information\n"
 	);
 }
@@ -219,6 +244,7 @@ int main(int argc, char **argv)
 {
 	struct sigaction sa;
 	int opt, debug, pid_fd, uid;
+	uint16_t pan = 0, short_addr = 0;
 	char pname[PATH_MAX];
 	char * p;
 
@@ -235,11 +261,11 @@ int main(int argc, char **argv)
 	strncpy(pname, argv[0], PATH_MAX);
 
 #ifndef HAVE_GETOPT_LONG
-	while ((opt = getopt(argc, argv, "l:d:m:n:i:")) != -1) {
+	while ((opt = getopt(argc, argv, "l:d:m:n:i:s:p")) != -1) {
 #else
 	while(1) {
 		int option_index = 0;
-		opt = getopt_long(argc, argv, "l:d:m:n:i:",
+		opt = getopt_long(argc, argv, "l:d:m:n:i:s:p:",
 				long_options, &option_index);
 		if (opt == -1)
 			break;
@@ -268,6 +294,12 @@ int main(int argc, char **argv)
 		case 'i':
 			iface = strdup(optarg);
 			break;
+		case 'p': /* PAN address */
+			pan = strtol(optarg, NULL, 16);
+			break;
+		case 's': /* 16-bit address */
+			short_addr = strtol(optarg, NULL, 16);
+			break;
 		case 'h':
 			usage(pname);
 			return 0;
@@ -275,6 +307,11 @@ int main(int argc, char **argv)
 			usage(pname);
 			return -1;
 		}
+	}
+	if (pan == 0 || short_addr == 0) {
+		fprintf(stderr, "PAN address and/or 16-bit address were not set\n");
+		usage(pname);
+		return -1;
 	}
 	lease_file[sizeof(lease_file)-1] = '\0';
 	if (debug > 1)
@@ -378,6 +415,7 @@ int main(int argc, char **argv)
 
 		close (pid_fd);
 	}
+	mlme_start(short_addr, pan, 1, iface);
 
 	while (!die_flag) {
 		nl_recvmsgs_default(nl);
