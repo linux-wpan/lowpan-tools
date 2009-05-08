@@ -219,22 +219,25 @@ void exit_handler(int t)
 
 void usage(char * name)
 {
-	printf("usage: %s [options] -i interface\n", name);
-	printf("\t-l lease_file\t\t-- where we store lease file\n"
-		"\t-d debug_level\t\t-- set debug level of application\n"
-		"\t\tWill not demonize on levels > 0\n"
-		"\t-m range_min\t\t-- minimal new 16-bit address allocated\n"
-		"\t-n range_max\t\t-- maximal new 16-bit address allocated\n"
-		"\t-i iface\t\t-- interface to work with\n"
-		"\t-s addr\t\t-- 16-bit address of coordinator (hexadecimal)\n"
-		"\t-p addr\t\t-- 16-bit address of PAN (hexadecimal)\n"
-		"\t--help -h\t\t-- this usage information\n"
+	printf("Usage: %s [OPTION]... -i IFACE\n", name);
+	printf("Provide a userspace part of IEEE 802.15.4 coordinator on specified IFACE.\n\n");
+	printf(	" -l lease_file      Where we store lease file.\n"
+		" -d debug_level     Set debug level of application.\n"
+		"                    Will not demonize on levels > 0.\n"
+		" -m range_min       Minimal new 16-bit address allocated.\n"
+		" -n range_max       Maximal new 16-bit address allocated.\n"
+		" -i iface           Interface to work with.\n"
+		" -s addr            16-bit address of coordinator (hexadecimal).\n"
+		" -p addr            16-bit address of PAN (hexadecimal).\n"
+		" -h, --help         This usage information.\n"
+		" -v, --version      Print version information.\n"
 	);
 }
 #ifdef HAVE_GETOPT_LONG
 static struct option long_options[] = {
 	{"help", 0, 0, 0},
-	{0, 0, 0, 0}
+	{"version", 0, 0, 1},
+	{0, 0, 0, -1}
 };
 #endif
 
@@ -261,24 +264,18 @@ int main(int argc, char **argv)
 	strncpy(pname, argv[0], PATH_MAX);
 
 #ifndef HAVE_GETOPT_LONG
-	while ((opt = getopt(argc, argv, "l:d:m:n:i:s:p")) != -1) {
+	while ((opt = getopt(argc, argv, "l:d:m:n:i:s:p:hv")) != -1) {
 #else
 	while(1) {
 		int option_index = 0;
-		opt = getopt_long(argc, argv, "l:d:m:n:i:s:p:",
+		opt = getopt_long(argc, argv, "l:d:m:n:i:s:p:hv",
 				long_options, &option_index);
+		fprintf(stderr, "Opt: %c (%hhx)\n", opt, opt);
 		if (opt == -1)
 			break;
 #endif
+		fprintf(stderr, "Opt: %c (%hhx)\n", opt, opt);
 		switch(opt) {
-#ifdef HAVE_GETOPT_LONG
-		case 0:
-			if (!strcmp(long_options[option_index].name, "help")) {
-				usage(pname);
-			}
-			return 0;
-			break;
-#endif
 		case 'l':
 			strncpy(lease_file, optarg, PATH_MAX);
 			break;
@@ -300,6 +297,11 @@ int main(int argc, char **argv)
 		case 's': /* 16-bit address */
 			short_addr = strtol(optarg, NULL, 16);
 			break;
+		case 1:
+		case 'v':
+			printf("izcoordinator %s\nCopyright (C) 2008, 2009 by authors team\n", VERSION);
+			return 0;
+		case 0:
 		case 'h':
 			usage(pname);
 			return 0;

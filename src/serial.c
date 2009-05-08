@@ -40,8 +40,17 @@ int main(int argc, char **argv) {
 	int fd, ret, s;
 	struct ifreq req;
 
-	if (argc != 3) {
-		fprintf(stderr, "usage: %s SERIAL_DEV master_dev\n", argv[0]);
+	if (argc == 2 && !strcmp(argv[1], "--version")) {
+		printf("izattach %s\nCopyright (C) 2008, 2009 by authors team\n", VERSION);
+		return 0;
+	}
+
+	if (argc != 3 || (argc >= 2 && !strcmp(argv[1], "--help"))) {
+		printf("Usage: %s SERIAL_DEV master_dev\n", argv[0]);
+		printf("Attach serial devices via UART to IEEE 802.15.4/ZigBee stack\n\n");
+		printf("  SERIAL_DEV  This specifies the serial device to attach.\n");
+		printf("  master_dev  This provides a name of the master WPAN device\n");
+		printf("              that this serial will become\n");
 		return 1;
 	}
 

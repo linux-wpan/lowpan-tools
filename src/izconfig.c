@@ -238,6 +238,11 @@ int main(int argc, char **argv) {
 
 	argv ++;
 
+	if(*argv && (!strcmp(*argv, "--version") || !strcmp(*argv, "version"))) {
+		printf("izconfig %s\nCopyright (C) 2008, 2009 by authors team\n", VERSION);
+		return 0;
+	}
+
 	if(*argv && (!strcmp(*argv, "--help") || !strcmp(*argv, "help")))
 		printf("Usage: %s { --help | [dev] iface { hw hwaddr | short shortaddr } }\n", prog);
 

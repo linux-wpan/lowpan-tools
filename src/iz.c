@@ -63,7 +63,7 @@ static int scan_confirmation(struct genlmsghdr *ghdr, struct nlattr **attrs)
 			nla_memcpy(edl, attrs[IEEE80215_ATTR_ED_LIST], 27);
 			printf("ED Scan results:\n");
 			for (i = 0; i < 27; i++)
-				printf("\tCh%2d --- ED = %02x\n", i, edl[i]);
+				printf("  Ch%2d --- ED = %02x\n", i, edl[i]);
 			return 0;
 
 		case IEEE80215_MAC_SCAN_ACTIVE:
@@ -465,10 +465,11 @@ struct {
 	{
 		.name = "assoc",
 		.usage = "PANid CoordAddr chan# [short]",
-		.usage_exp = "\t\tPANid = 16-bit hex PAN idi"
-				"\n\t\tCoordAddr - 16-bit hex coordinator address\n"
-				"\t\tchan# - radio channel no, from 0 to 26 (radio hardware dependant)\n"
-				"\t\tshort - add word 'short' to command line to get real address (not 0xfffe)\n",
+		.usage_exp =	"  associate with network\n"
+				"    PANid - 16-bit hex PAN id\n\n"
+				"    CoordAddr - 16-bit hex coordinator address\n\n"
+				"    chan# - radio channel no, from 0 to 26 (radio hardware dependant)\n\n"
+				"    short - add word 'short' to command line to get real address (not 0xfffe)\n\n",
 		.nl_cmd = IEEE80215_ASSOCIATE_REQ,
 		.nl_resp = IEEE80215_ASSOCIATE_CONF,
 		.fillmsg = associate,
@@ -476,7 +477,9 @@ struct {
 	{
 		.name = "disassoc",
 		.usage = "DestAddr reason",
-		.usage_exp = "\t\tDestAddr - destination address\n\t\treason - disassociation reason\n",
+		.usage_exp = "  disassociate from the network\n"
+				"    DestAddr - destination address\n\n"
+				"    reason - disassociation reason\n\n",
 		.nl_cmd = IEEE80215_DISASSOCIATE_REQ,
 		.nl_resp = IEEE80215_DISASSOCIATE_CONF,
 		.fillmsg = disassociate,
@@ -484,11 +487,12 @@ struct {
 	{
 		.name = "scan",
 		.usage = "[eapo] chans duration",
-		.usage_exp = "\t\tscan modes:\n"
-				"\t\t\te - ED scan\n"
-				"\t\t\ta - active scan\n"
-				"\t\t\tp - passive scan\n"
-				"\t\t\to - orphan scan\n",
+		.usage_exp = "  scan the network\n"
+				"   scan modes:\n\n"
+				"      e - ED scan\n\n"
+				"      a - active scan\n\n"
+				"      p - passive scan\n\n"
+				"      o - orphan scan\n\n",
 		.nl_cmd = IEEE80215_SCAN_REQ,
 		.nl_resp = IEEE80215_SCAN_CONF,
 		.fillmsg = scan,
@@ -496,13 +500,13 @@ struct {
 	{
 		.name = "show",
 		.usage = "",
-		.usage_exp = "\t\tshows interface configuration\n",
+		.usage_exp = "  show interface configuration\n",
 		.cb = show_dev,
 	},
 	{
 		.name = "hw",
 		.usage = "",
-		.usage_exp = "\t\tsets hw address\n",
+		.usage_exp = "  set hw address\n",
 		.cb = set_hw_addr,
 	},
 };
@@ -510,14 +514,14 @@ struct {
 static int usage(char **args) {
 	int i;
 	printf("Usage: %s iface cmd args...\n", args[0]);
-	printf("%s --help\n\n", args[0]);
-	printf("\tcmd is one of:\n");
+	printf("or: %s --help\n", args[0]);
+	printf("or: %s --version\n\n", args[0]);
+	printf("Command syntax:\n");
 	for (i = 0; i < sizeof(commands) / sizeof(commands[0]); i++) {
-		printf("\t%s%s%s\n", commands[i].name,
+		printf("  %s%s%s", commands[i].name,
 				commands[i].usage ? " " : "",
 				commands[i].usage ?: "");
-		if (commands[i].usage_exp)
-			printf("%s\n\n", commands[i].usage_exp);
+		printf("%s", commands[i].usage_exp);
 	}
 	printf("\n");
 	return 1;
@@ -528,9 +532,13 @@ int main(int argc, char **argv) {
 	int family;
 	struct nl_handle *nl;
 	int cmd;
-	if (argc == 1) {
+	if (argc == 2) {
 		if (!strcmp(argv[1], "--help"))
 			return usage(argv);
+		if (!strcmp(argv[1], "--version")) {
+			printf("izconfig %s\nCopyright (C) 2008, 2009 by authors team\n", VERSION);
+			return 0;
+		}
 	}
 
 	if (argc < 3) {

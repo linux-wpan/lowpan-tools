@@ -2,3 +2,4 @@ usr/bin
 usr/sbin
 usr/lib/zigbee
 usr/lib/python?.?
+usr/share/man/*/*
