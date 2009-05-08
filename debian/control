@@ -3,7 +3,7 @@ Section: net
 Priority: extra
 Maintainer: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
 Build-Depends: debhelper (>= 6), autotools-dev, python-central, libnl-dev
-Standards-Version: 3.8.0
+Standards-Version: 3.8.1
 Homepage: http://linux-zigbee.sourceforge.net/
 XS-Python-Version: all
 
