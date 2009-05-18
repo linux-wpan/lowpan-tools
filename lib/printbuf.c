@@ -1,8 +1,10 @@
 /*
  * Linux IEEE 802.15.4 userspace tools
  *
- * Copyright (C) 2008 Dmitry Eremin-Solenikov
- * Copyright (C) 2008 Sergey Lapin
+ * Copyright (C) 2008, 2009 Sismens AG
+ *
+ * Written-by: Dmitry Eremin-Solenikov
+ * Written-by: Sergey Lapin
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
