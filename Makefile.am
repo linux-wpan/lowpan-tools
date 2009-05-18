@@ -9,7 +9,6 @@ EXTRA_DIST = $(srcdir)/debian/changelog $(srcdir)/debian/compat $(srcdir)/debian
 	     $(srcdir)/debian/rules $(srcdir)/debian/watch \
 	     $(srcdir)/debian/dirs $(srcdir)/debian/docs $(srcdir)/debian/*.examples $(srcdir)/debian/*.install
 
-LIBTOOL_DEPS = @LIBTOOL_DEPS@
 libtool: $(LIBTOOL_DEPS)
 	$(SHELL) ./config.status --recheck
 
