@@ -51,6 +51,8 @@
 #define u64 uint64_t
 
 
+#define PID_BUF_LEN 32
+
 static int seq_expected;
 static int family;
 static struct nl_handle *nl;
@@ -214,9 +216,20 @@ void dump_lease_handler(int t)
 }
 
 int die_flag = 0;
+
+void cleanup(int ret)
+{
+	if(ret == 0)
+		addrdb_dump_leases(lease_file);
+	nl_close(nl);
+	unlink(PID_FILE);
+	exit(ret);	
+}
+
 void exit_handler(int t)
 {
 	die_flag = 1;
+	cleanup(0);
 }
 
 void usage(char * name)
@@ -386,8 +399,6 @@ int main(int argc, char **argv)
 		}
 	}
 #endif
-	#define PID_BUF_LEN 32
-	#define PID_FILE "/var/run/izcoordinator.pid" /* FIXME */
 	uid = getuid();
 	umask(022);
 
@@ -398,9 +409,11 @@ int main(int argc, char **argv)
 		setgroups(1, &gid);
 	}
 
-	if(daemon(0, 0) < 0) {
-		perror("daemon");
-		return 2;
+	if (debug <= 0) {
+		if (daemon(0, 0) < 0) {
+			perror("daemon");
+			return 2;
+		}
 	}
 	pid_fd = open (PID_FILE, O_WRONLY | O_CREAT, 0640);
 	if (pid_fd < 0) {
@@ -424,11 +437,8 @@ int main(int argc, char **argv)
 	while (!die_flag) {
 		nl_recvmsgs_default(nl);
 	}
-
-
-	nl_close(nl);
-
-	unlink(PID_FILE);
+	cleanup(0);
 
 	return 0;
 }
+

@@ -22,8 +22,13 @@
  */
 	#include <stdio.h>
 	#include <unistd.h>
+	#include <stdlib.h>
 	#include <string.h>
 	#include <stdint.h>
+	#include <sys/types.h>
+	#include <sys/stat.h>
+	#include <fcntl.h>
+	#include <errno.h>
 	#include <libcommon.h>
 	#include <time.h>
 	#include <addrdb.h>
@@ -167,8 +172,25 @@ int addrdb_parse(const char *fname)
 	int rc;
 	FILE *fin = fopen(fname, "r");
 	if (!fin) {
-		perror("fopen");
-		return -1;
+		if(errno == ENOENT) {
+			int fd;
+			/* Lease file does not exist. Tis is perfectly ok.
+			   But if we will not be able to write this file,
+			   we will not be able to dump leases, which
+			   might have catastrophic consequiences. */
+			fd = open(fname, O_CREAT | O_APPEND);
+			if (fd < 0) {
+				fprintf(stderr,
+					"ERROR: We were unable to open lease file %s\n",
+					fname);
+				fprintf(stderr,
+					"ERROR: Check that directory it locates in does exist\n");
+				perror("fopen");
+				exit(1);
+			}
+			close(fd);
+			return -1;
+		}
 	}
 
 	rc = addrdb_parser_init(&scanner, fname);
