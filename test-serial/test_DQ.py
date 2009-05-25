@@ -51,6 +51,7 @@ class DQ:
 			attrs[6][VMIN] = 1
 			tcflush(self.file, TCIFLUSH)
 			tcsetattr(self.file, TCSANOW, attrs)
+			tcflush(self.file, TCIFLUSH)
 		except IOError:
 			print "IOError in termios"
 			sys.exit(2)
