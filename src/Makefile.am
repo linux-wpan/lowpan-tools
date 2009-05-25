@@ -3,7 +3,12 @@ include $(top_srcdir)/Makefile.common
 sbin_PROGRAMS = izattach izconfig izcoordinator iz
 bin_PROGRAMS = izchat
 
-dist_man_MANS = izconfig.8 izcoordinator.8 iz.8 izattach.8
+if MANPAGES
+manpages = izconfig.8 izcoordinator.8 iz.8 izattach.8
+else
+manpages =
+endif
+dist_man_MANS = $(manpages)
 izattach_DESC = "attach a serial device to IEEE 802.15.4 stack"
 izcoordinator_DESC = "simple coordinator for IEEE 802.15.4 network"
 iz_DESC = "configure an IEEE 802.15.4 interface"

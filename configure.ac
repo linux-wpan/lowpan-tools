@@ -18,6 +18,13 @@ AC_ARG_WITH(leasefile, [  --with-leasefile	file for persistent lease storage],
 	    [leasefile=$withval],
 	    [leasefile='${localstatedir}/zigbee/izcoordinator.leases'])
 AC_SUBST(leasefile)
+AC_ARG_ENABLE([manpages],[AS_HELP_STRING([--disable-manpages],[disable manpages generation and installation])],
+	[case "${enableval}" in
+		yes | true) manpages=yes ;;
+		no | fale) manpages=no ;;
+		*) AC_MSG_ERROR([bad value ${enableval} for --enable-manpages]) ;;
+	esac], [manpages=yes])
+AM_CONDITIONAL([MANPAGES], [test x$manpages = xyes])
 
 # Checks for programs.
 AC_PROG_CC
