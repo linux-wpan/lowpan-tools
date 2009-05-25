@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([lowpan-utils],[0.2],[dbaryshkov@gmail.com])
+AC_INIT([lowpan-tools],[0.2],[dbaryshkov@gmail.com])
 AC_CONFIG_AUX_DIR([misc])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror gnu])
@@ -11,12 +11,12 @@ AC_CONFIG_HEADER([config.h])
 
 AC_ARG_WITH(zbtestdir, [  --with-zbtestdir	directory where all test programs will be installed],
 	    [zbtestdir=$withval],
-	    [zbtestdir='${libexecdir}/zigbee'])
+	    [zbtestdir='${libexecdir}/lowpan-tools'])
 AC_SUBST(zbtestdir)
 
 AC_ARG_WITH(leasefile, [  --with-leasefile	file for persistent lease storage],
 	    [leasefile=$withval],
-	    [leasefile='${localstatedir}/zigbee/izcoordinator.leases'])
+	    [leasefile='${localstatedir}/lib/lowpan-tools/izcoordinator.leases'])
 AC_SUBST(leasefile)
 AC_ARG_ENABLE([manpages],[AS_HELP_STRING([--disable-manpages],[disable manpages generation and installation])],
 	[case "${enableval}" in
@@ -25,6 +25,11 @@ AC_ARG_ENABLE([manpages],[AS_HELP_STRING([--disable-manpages],[disable manpages 
 		*) AC_MSG_ERROR([bad value ${enableval} for --enable-manpages]) ;;
 	esac], [manpages=yes])
 AM_CONDITIONAL([MANPAGES], [test x$manpages = xyes])
+
+AC_ARG_WITH(pidfile, [  --with-pidfile	pid file location],
+	    [pidfile=$withval],
+	    [pidfile='${localstatedir}/run/izcoordinator.pid'])
+AC_SUBST(pidfile)
 
 # Checks for programs.
 AC_PROG_CC
