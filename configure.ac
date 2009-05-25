@@ -67,9 +67,7 @@ AC_CHECK_TYPE(struct sockaddr_ieee80215,
 
 # Checks for library functions.
 AC_FUNC_FORK
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
-AC_CHECK_FUNCS([memset socket getopt_long select strdup strtol])
+AC_CHECK_FUNCS([malloc realloc memset socket getopt_long select strdup strtol])
 
 AC_CONFIG_FILES([
 	Makefile
