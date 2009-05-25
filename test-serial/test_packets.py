@@ -27,10 +27,10 @@ saddr = "\xde\xad\xbe\xaf\xca\xfe\xba\xbe"
 daddr = "\x6D\x77\x70\x61\x6E\x31\x00\x00"
 panaddr = "\xff\xff"
 
-packet = "\x21\x88\xa5\x00\x00"
-packet += saddr
+packet = "\x21\xcc\xa5"
 packet += panaddr
 packet += daddr
+packet += saddr
 packet += "\x01\x80\xa5\x5a\x42\x7c"
 
 if len(sys.argv) < 3:
