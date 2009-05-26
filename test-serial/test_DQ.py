@@ -54,7 +54,7 @@ class DQ:
 		except IOError:
 			print "IOError in termios"
 			sys.exit(2)
-	def parse_status(self):
+	def __parse_status(self):
 		if self.status == 0:
 			self.strstatus = "SUCCESS"
 		elif self.status == 1:
@@ -75,11 +75,11 @@ class DQ:
 			self.strstatus = "ERR"
 
 
-	def write(self, string):
+	def __write(self, string):
 		print "Writing "+string
 		os.write(self.file, string)
 
-	def read(self, num):
+	def __read(self, num):
 		v =  os.read(self.file, num)
 		if (num == 1) :
 			print "Reading %s %02x" %(v, ord(v))
@@ -87,10 +87,10 @@ class DQ:
 			print "Got %s" %v
 		return v
 
-	def response(self):
+	def __response(self):
 		state = 1
 		while 1:
-			val = self.read(1)
+			val = self.__read(1)
 			print val
 			if state == 1:
 				if val == 'z':
@@ -109,24 +109,24 @@ class DQ:
 			elif state == 3:
 				id = ord(val)
 				if id == 0x85:
-					self.status = ord(self.read(1))
-					self.data = self.read(1)
+					self.status = ord(self.__read(1))
+					self.data = self.__read(1)
 				elif id == 0x8b:
 					self.status = 0
-					self.lqi = ord(self.read(1))
-					len = ord(self.read(1))
-					self.data = self.read(len)
+					self.lqi = ord(self.__read(1))
+					len = ord(self.__read(1))
+					self.data = self.__read(len)
 				else:
-					self.status = ord(self.read(1))
+					self.status = ord(self.__read(1))
 					self.data = None
-				self.parse_status()
+				self.__parse_status()
 				print self.strstatus
 				return id
 
-	def send_cmd(self, cmd):
-		self.write(cmd)
+	def __send_cmd(self, cmd):
+		self.__write(cmd)
 		while 1:
-			v = self.response()
+			v = self.__response()
 			if (v != ord(cmd[2]) | 0x80) :
 				print "Returned invalid id value %x" % (v)
 			else:
@@ -134,23 +134,23 @@ class DQ:
 		return self.status
 
 	def open(self):
-		return self.send_cmd(cmd_open)
+		return self.__send_cmd(cmd_open)
 
 	def close(self):
-		return self.send_cmd(cmd_close)
+		return self.__send_cmd(cmd_close)
 
 	def ed(self):
-		return self.send_cmd(cmd_ed)
+		return self.__send_cmd(cmd_ed)
 
 	def cca(self):
-		return self.send_cmd(cmd_cca)
+		return self.__send_cmd(cmd_cca)
 
 	def set_channel(self, channel):
-		return self.send_cmd(cmd_set_channel + chr(channel))
+		return self.__send_cmd(cmd_set_channel + chr(channel))
 
 	def set_state(self, mode):
-		return self.send_cmd(cmd_set_state+chr(mode))
+		return self.__send_cmd(cmd_set_state+chr(mode))
 
 	def send_block(self, data):
-		return self.send_cmd(data_xmit_block+chr(len(data))+data)
+		return self.__send_cmd(data_xmit_block+chr(len(data))+data)
 
