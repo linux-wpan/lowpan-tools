@@ -158,3 +158,12 @@ class DQ:
 	def send_block(self, data):
 		return self.__send_cmd(data_xmit_block+chr(len(data))+data)
 
+	def recv_block(self):
+		while 1:
+			v = self.__response()
+			if (v != 0x8b) :
+				print "Returned invalid id value %x" % (v)
+			else:
+				break
+		return self.status
+
