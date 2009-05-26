@@ -80,12 +80,16 @@ class DQ:
 		os.write(self.file, string)
 
 	def __read(self, num):
-		v =  os.read(self.file, num)
-		if (num == 1) :
-			print "Reading %s %02x" %(v, ord(v))
-		else :
-			print "Got %s" %v
-		return v
+		result = '';
+		while num > 0:
+			v =  os.read(self.file, num)
+			if (len(v) == 1) :
+				print "Reading %s %02x" %(v, ord(v))
+			else :
+				print "Got %s" %v
+			result += v
+			num -= len(v)
+		return result
 
 	def __response(self):
 		state = 1
