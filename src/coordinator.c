@@ -37,7 +37,6 @@
 #endif
 
 #include <ieee802154.h>
-#define IEEE802154_NL_WANT_POLICY
 #include <nl802154.h>
 #include <libcommon.h>
 #include <signal.h>

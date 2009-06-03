@@ -31,7 +31,6 @@
 #include <unistd.h>
 
 #include <ieee802154.h>
-#define IEEE802154_NL_WANT_POLICY
 #define u64 uint64_t
 #include <nl802154.h>
 #include <libcommon.h>
