@@ -23,6 +23,7 @@
 
 #define IEEE802154_NL_NAME "802.15.4 MAC"
 #define IEEE802154_MCAST_COORD_NAME "coordinator"
+#define IEEE802154_MCAST_BEACON_NAME "beacon"
 
 enum {
 	__IEEE802154_ATTR_INVALID,
@@ -50,7 +51,7 @@ enum {
 	IEEE802154_ATTR_DEST_HW_ADDR,
 	IEEE802154_ATTR_DEST_PAN_ID,
 
-	IEEE802154_ATTR_CAPABILITY, // FIXME: this is association
+	IEEE802154_ATTR_CAPABILITY, /* FIXME: this is association */
 	IEEE802154_ATTR_REASON,
 	IEEE802154_ATTR_SCAN_TYPE,
 	IEEE802154_ATTR_CHANNELS,
@@ -117,12 +118,8 @@ enum {
 	IEEE802154_DISASSOCIATE_CONF,
 	IEEE802154_GET_REQ,
 	IEEE802154_GET_CONF,
-//	IEEE802154_GTS_REQ,
-//	IEEE802154_GTS_CONF,
 	IEEE802154_RESET_REQ,
 	IEEE802154_RESET_CONF,
-//	IEEE802154_RX_ENABLE_REQ,
-//	IEEE802154_RX_ENABLE_CONF,
 	IEEE802154_SCAN_REQ,
 	IEEE802154_SCAN_CONF,
 	IEEE802154_SET_REQ,
@@ -137,11 +134,16 @@ enum {
 	IEEE802154_ASSOCIATE_RESP,
 	IEEE802154_DISASSOCIATE_INDIC,
 	IEEE802154_BEACON_NOTIFY_INDIC,
-//	IEEE802154_GTS_INDIC,
 	IEEE802154_ORPHAN_INDIC,
 	IEEE802154_ORPHAN_RESP,
 	IEEE802154_COMM_STATUS_INDIC,
 	IEEE802154_SYNC_LOSS_INDIC,
+
+	IEEE802154_GTS_REQ, /* Not supported yet */
+	IEEE802154_GTS_INDIC, /* Not supported yet */
+	IEEE802154_GTS_CONF, /* Not supported yet */
+	IEEE802154_RX_ENABLE_REQ, /* Not supported yet */
+	IEEE802154_RX_ENABLE_CONF, /* Not supported yet */
 
 	__IEEE802154_CMD_MAX,
 };
@@ -150,8 +152,7 @@ enum {
 
 
 #ifdef __KERNEL__
-int ieee802154_nl_init(void);
-void ieee802154_nl_exit(void);
+struct net_device;
 
 int ieee802154_nl_assoc_indic(struct net_device *dev, struct ieee802154_addr *addr, u8 cap);
 int ieee802154_nl_assoc_confirm(struct net_device *dev, u16 short_addr, u8 status);
@@ -159,6 +160,7 @@ int ieee802154_nl_disassoc_indic(struct net_device *dev, struct ieee802154_addr 
 int ieee802154_nl_disassoc_confirm(struct net_device *dev, u8 status);
 int ieee802154_nl_scan_confirm(struct net_device *dev, u8 status, u8 scan_type, u32 unscanned,
 		u8 *edl/*, struct list_head *pan_desc_list */);
+int ieee802154_nl_beacon_indic(struct net_device *dev, u16 panid, u16 coord_addr); /* TODO */
 #endif
 
 #endif
