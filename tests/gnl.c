@@ -26,7 +26,7 @@
 
 #include <ieee802154.h>
 #define IEEE802154_NL_WANT_POLICY
-#include <ieee802154-nl.h>
+#include <nl802154.h>
 
 static int parse_cb(struct nl_msg *msg, void *arg)
 {
