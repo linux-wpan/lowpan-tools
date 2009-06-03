@@ -169,7 +169,7 @@ static int associate(struct nl_msg *msg, char **args) {
 			return ret;
 		}
 
-		NLA_PUT_HW_ADDR(msg, IEEE802154_ATTR_COORD_HW_ADDR, hwa);
+		NLA_PUT(msg, IEEE802154_ATTR_COORD_HW_ADDR, IEEE802154_ADDR_LEN, hwa);
 	} else {
 		coord_short_addr = strtol(args[2], &dummy, 16);
 		if (*dummy) {
@@ -223,7 +223,7 @@ static int disassociate(struct nl_msg *msg, char **args) {
 			return ret;
 		}
 
-		NLA_PUT_HW_ADDR(msg, IEEE802154_ATTR_DEST_HW_ADDR, hwa);
+		NLA_PUT(msg, IEEE802154_ATTR_DEST_HW_ADDR, IEEE802154_ADDR_LEN, hwa);
 	} else {
 		short_addr = strtol(args[1], &dummy, 16);
 		if (*dummy) {

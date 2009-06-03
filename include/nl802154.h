@@ -72,9 +72,6 @@ enum {
 };
 
 #define IEEE802154_ATTR_MAX (__IEEE802154_ATTR_MAX - 1)
-#define NLA_HW_ADDR	NLA_U64
-#define NLA_GET_HW_ADDR(attr, addr) do { u64 _temp = nla_get_u64(attr); memcpy(addr, &_temp, 8); } while (0)
-#define NLA_PUT_HW_ADDR(msg, attr, addr) do { u64 _temp; memcpy(&_temp, addr, 8); NLA_PUT_U64(msg, attr, _temp); } while (0)
 
 extern struct nla_policy ieee802154_policy[];
 

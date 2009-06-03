@@ -31,6 +31,8 @@
 #include <nl802154.h>
 #endif
 
+#define NLA_HW_ADDR NLA_U64
+
 struct nla_policy ieee802154_policy[IEEE802154_ATTR_MAX + 1] = {
 	[IEEE802154_ATTR_DEV_NAME] = { .type = NLA_STRING, },
 	[IEEE802154_ATTR_DEV_INDEX] = { .type = NLA_U32, },

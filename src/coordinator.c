@@ -108,7 +108,7 @@ static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 
 	if (cap & (1 << 7)) { /* FIXME: constant */
 		uint8_t hwa[IEEE802154_ADDR_LEN];
-		NLA_GET_HW_ADDR(attrs[IEEE802154_ATTR_SRC_HW_ADDR], hwa);
+		nla_memcpy(hwa, attrs[IEEE802154_ATTR_SRC_HW_ADDR], IEEE802154_ADDR_LEN);
 		shaddr = addrdb_alloc(hwa);
 		addrdb_dump_leases(lease_file);
 	}
@@ -137,7 +137,7 @@ static int coordinator_disassociate(struct genlmsghdr *ghdr, struct nlattr **att
 	// FIXME: checks!!!
 	if (attrs[IEEE802154_ATTR_SRC_HW_ADDR]) {
 		uint8_t hwa[IEEE802154_ADDR_LEN];
-		NLA_GET_HW_ADDR(attrs[IEEE802154_ATTR_SRC_HW_ADDR], hwa);
+		nla_memcpy(hwa, attrs[IEEE802154_ATTR_SRC_HW_ADDR], IEEE802154_ADDR_LEN);
 		addrdb_free_hw(hwa);
 	} else {
 		uint16_t short_addr = nla_get_u16(attrs[IEEE802154_ATTR_SRC_SHORT_ADDR]);
