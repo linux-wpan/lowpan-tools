@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
 	struct ifreq req = {};
 
 	char buf[] = {0x01, 0x80, 0xa5, 0x5a};
-	int sd = socket(PF_IEEE80215, SOCK_DGRAM, 0);
+	int sd = socket(PF_IEEE802154, SOCK_DGRAM, 0);
 	if (sd < 0) {
 		perror("socket");
 		return 1;
@@ -52,11 +52,11 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	ret = bind(sd, &req.ifr_addr, sizeof(struct sockaddr_ieee80215));
+	ret = bind(sd, &req.ifr_addr, sizeof(struct sockaddr_ieee802154));
 	if (ret < 0)
 		perror("bind");
 
-	ret = connect(sd, &req.ifr_addr, sizeof(struct sockaddr_ieee80215));
+	ret = connect(sd, &req.ifr_addr, sizeof(struct sockaddr_ieee802154));
 	if (ret < 0)
 		perror("connect");
 

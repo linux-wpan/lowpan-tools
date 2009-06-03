@@ -39,21 +39,21 @@
 int main(int argc, char **argv) {
 	int sd;
 	int ret;
-	struct sockaddr_ieee80215 a;
+	struct sockaddr_ieee802154 a;
 
 	if (argc != 4) {
 		printf("Usage: %s PANid sourceAddr destAddr\n", argv[0]);
 		return 1;
 	}
 
-	sd = socket(PF_IEEE80215, SOCK_DGRAM, 0);
+	sd = socket(PF_IEEE802154, SOCK_DGRAM, 0);
 	if (sd < 0) {
 		perror("socket");
 		return 1;
 	}
 
-	a.family = AF_IEEE80215;
-	a.addr.addr_type = IEEE80215_ADDR_SHORT;
+	a.family = AF_IEEE802154;
+	a.addr.addr_type = IEEE802154_ADDR_SHORT;
 
 	a.addr.pan_id = strtol(argv[1], NULL, 16);
 

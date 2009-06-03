@@ -52,7 +52,7 @@ int printinfo(const char *ifname) {
 	unsigned is_mac;
 	int sd;
 
-	sd = socket(PF_IEEE80215, SOCK_RAW, 0);
+	sd = socket(PF_IEEE802154, SOCK_RAW, 0);
 	if (sd < 0) {
 		perror("socket");
 		goto out_noclose;
@@ -65,10 +65,10 @@ int printinfo(const char *ifname) {
 		goto out;
 	}
 
-	if (req.ifr_hwaddr.sa_family == ARPHRD_IEEE80215_PHY) {
+	if (req.ifr_hwaddr.sa_family == ARPHRD_IEEE802154_PHY) {
 		is_mac = 0;
 		printf("%-8s  IEEE 802.15.4 master (PHY) interface", req.ifr_name);
-	} else if (req.ifr_hwaddr.sa_family == ARPHRD_IEEE80215) {
+	} else if (req.ifr_hwaddr.sa_family == ARPHRD_IEEE802154) {
 		unsigned char *addr = (unsigned char *)(req.ifr_hwaddr.sa_data);
 		is_mac = 1;
 		printf("%-8s  IEEE 802.15.4 MAC interface", req.ifr_name);
@@ -115,7 +115,7 @@ int printinfo(const char *ifname) {
 			else
 				perror("SIOCGIFADDR");
 		} else {
-			struct sockaddr_ieee80215 *sa = (struct sockaddr_ieee80215 *)&req.ifr_addr;
+			struct sockaddr_ieee802154 *sa = (struct sockaddr_ieee802154 *)&req.ifr_addr;
 			printf("  PAN ID: %04x  Addr: %04x\n", sa->addr.pan_id, sa->addr.short_addr);
 		}
 	}
@@ -142,7 +142,7 @@ int do_set_hw(const char *ifname, const char *hw) {
 
 	ret = parse_hw_addr(hw, buf);
 
-	int sd = socket(PF_IEEE80215, SOCK_RAW, 0);
+	int sd = socket(PF_IEEE802154, SOCK_RAW, 0);
 	if (sd < 0) {
 		perror("socket");
 		goto out_noclose;
@@ -150,7 +150,7 @@ int do_set_hw(const char *ifname, const char *hw) {
 
 	strcpy(req.ifr_name, ifname);
 
-	req.ifr_hwaddr.sa_family = ARPHRD_IEEE80215;
+	req.ifr_hwaddr.sa_family = ARPHRD_IEEE802154;
 	memcpy(req.ifr_hwaddr.sa_data, buf, 8);
 	ret = ioctl(sd, SIOCSIFHWADDR, &req);
 	if (ret != 0) {
@@ -168,10 +168,10 @@ out_noclose:
 int do_set_short(const char *ifname, const char *hw) {
 	struct ifreq req;
 	int ret;
-	struct sockaddr_ieee80215 *sa = (struct sockaddr_ieee80215 *)&req.ifr_addr;
+	struct sockaddr_ieee802154 *sa = (struct sockaddr_ieee802154 *)&req.ifr_addr;
 
-	sa->family = AF_IEEE80215;
-	sa->addr.addr_type = IEEE80215_ADDR_SHORT;
+	sa->family = AF_IEEE802154;
+	sa->addr.addr_type = IEEE802154_ADDR_SHORT;
 
 	strcpy(req.ifr_name, ifname);
 
@@ -189,7 +189,7 @@ int do_set_short(const char *ifname, const char *hw) {
 		goto out_noclose;
 	}
 
-	int sd = socket(PF_IEEE80215, SOCK_RAW, 0);
+	int sd = socket(PF_IEEE802154, SOCK_RAW, 0);
 	if (sd < 0) {
 		perror("socket");
 		goto out_noclose;
@@ -211,18 +211,18 @@ out_noclose:
 int do_scan(const char * iface)
 {
 	int ret;
-	struct ieee80215_user_data req;
+	struct ieee802154_user_data req;
 	int sd;
 	strcpy(req.ifr_name, iface);
 	req.channels = 0xffffffff;
-	sd = socket(PF_IEEE80215, SOCK_DGRAM, 0);
+	sd = socket(PF_IEEE802154, SOCK_DGRAM, 0);
 	if (sd < 0) {
 		perror("socket");
 		ret = sd;
 		goto out_noclose;
 	}
 	req.cmd = 0;
-	ret = ioctl(sd, IEEE80215_SIOC_MAC_CMD, &req);
+	ret = ioctl(sd, IEEE802154_SIOC_MAC_CMD, &req);
 	if (ret < 0) {
 		perror("ioctl");
 		goto out_noclose;

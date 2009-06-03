@@ -109,14 +109,14 @@ int main(int argc, char **argv) {
 	}
 #endif
 	int arg;
-	arg = N_IEEE80215;
+	arg = N_IEEE802154;
 	ret = ioctl(fd, TIOCSETD, &arg);
 	if (ret < 0) {
 		perror("ioctl: TIOCSETD");
 		return 6;
 	}
 
-	s = socket(PF_IEEE80215, SOCK_RAW, 0);
+	s = socket(PF_IEEE802154, SOCK_RAW, 0);
 	if (ret < 0) {
 		perror("socket");
 		return 7;
@@ -124,9 +124,9 @@ int main(int argc, char **argv) {
 	strcpy(req.ifr_name, argv[2]);
 	memset(&req.ifr_hwaddr.sa_data, 0, sizeof(req.ifr_hwaddr.sa_data));
 	strcpy(req.ifr_hwaddr.sa_data, argv[2]);
-	ret = ioctl(s, IEEE80215_SIOC_ADD_SLAVE, &req);
+	ret = ioctl(s, IEEE802154_SIOC_ADD_SLAVE, &req);
 	if (ret < 0) {
-		perror("ioctl: IEEE80215_SIOC_ADD_SLAVE");
+		perror("ioctl: IEEE802154_SIOC_ADD_SLAVE");
 		return 8;
 	}
 	close(s);

@@ -39,7 +39,7 @@
 #include <logging.h>
 
 struct lease {
-	uint8_t hwaddr[IEEE80215_ADDR_LEN];
+	uint8_t hwaddr[IEEE802154_ADDR_LEN];
 	uint16_t short_addr;
 	time_t time;
 };
@@ -53,7 +53,7 @@ unsigned int hw_hash(const void *key)
 	int i;
 	unsigned int val = 0;
 
-	for (i = 0; i < IEEE80215_ADDR_LEN; i++) {
+	for (i = 0; i < IEEE802154_ADDR_LEN; i++) {
 		val = (val * 31) | hwa[i];
 	}
 
@@ -62,7 +62,7 @@ unsigned int hw_hash(const void *key)
 
 int hw_eq(const void *key1, const void *key2)
 {
-	return memcmp(key1, key2, IEEE80215_ADDR_LEN);
+	return memcmp(key1, key2, IEEE802154_ADDR_LEN);
 }
 
 unsigned int short_hash(const void *key)
@@ -101,7 +101,7 @@ uint16_t addrdb_alloc(uint8_t *hwa)
 	}
 
 	lease = calloc(1, sizeof(*lease));
-	memcpy(lease->hwaddr, hwa, IEEE80215_ADDR_LEN);
+	memcpy(lease->hwaddr, hwa, IEEE802154_ADDR_LEN);
 	lease->short_addr = addr;
 	lease->time = time(NULL);
 
@@ -204,7 +204,7 @@ void addrdb_insert(uint8_t *hwaddr, uint16_t short_addr, time_t stamp)
 	} else {
 		log_msg(0, "Adding lease\n");
 		lease = calloc(1, sizeof(*lease));
-		memcpy(lease->hwaddr, hwaddr, IEEE80215_ADDR_LEN);
+		memcpy(lease->hwaddr, hwaddr, IEEE802154_ADDR_LEN);
 		lease->short_addr = short_addr;
 		lease->time = stamp;
 		shash_insert(hwa_hash, lease->hwaddr, lease);

@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
 	char *iface = argv[1] ?: "mwpan0";
 
 	char buf[] = {0x40, 0x00, 0x56};
-	int sd = socket(PF_IEEE80215, SOCK_RAW, 0);
+	int sd = socket(PF_IEEE802154, SOCK_RAW, 0);
 	if (sd < 0) {
 		perror("socket");
 		return 1;

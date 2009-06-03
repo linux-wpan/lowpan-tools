@@ -37,8 +37,8 @@
 #endif
 
 #include <ieee802154.h>
-#define IEEE80215_NL_WANT_POLICY
-#include <ieee80215-nl.h>
+#define IEEE802154_NL_WANT_POLICY
+#include <ieee802154-nl.h>
 #include <libcommon.h>
 #include <signal.h>
 #include <getopt.h>
@@ -71,19 +71,19 @@ int mlme_start(uint16_t short_addr, uint16_t pan, uint8_t is_coordinator, const 
 {
 	struct nl_msg *msg = nlmsg_alloc();
 	log_msg(0, "mlme_start\n");
-	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_REQUEST, IEEE80215_START_REQ, /* vers */ 1);
-	nla_put_string(msg, IEEE80215_ATTR_DEV_NAME, iface);
-	nla_put_u16(msg, IEEE80215_ATTR_COORD_PAN_ID, pan);
-	nla_put_u16(msg, IEEE80215_ATTR_COORD_SHORT_ADDR, short_addr);
+	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_REQUEST, IEEE802154_START_REQ, /* vers */ 1);
+	nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, iface);
+	nla_put_u16(msg, IEEE802154_ATTR_COORD_PAN_ID, pan);
+	nla_put_u16(msg, IEEE802154_ATTR_COORD_SHORT_ADDR, short_addr);
 #if 0
-	nla_put_u8(msg, IEEE80215_ATTR_CHANNEL, channel);
-	nla_put_u8(msg, IEEE80215_ATTR_BCN_ORD, bcn_ord);
-	nla_put_u8(msg, IEEE80215_ATTR_SF_ORD, sf_ord);
+	nla_put_u8(msg, IEEE802154_ATTR_CHANNEL, channel);
+	nla_put_u8(msg, IEEE802154_ATTR_BCN_ORD, bcn_ord);
+	nla_put_u8(msg, IEEE802154_ATTR_SF_ORD, sf_ord);
 #endif
-	nla_put_u8(msg, IEEE80215_ATTR_PAN_COORD, is_coordinator);
+	nla_put_u8(msg, IEEE802154_ATTR_PAN_COORD, is_coordinator);
 #if 0
-	nla_put_u8(msg, IEEE80215_ATTR_BAT_EXT, battery_ext);
-	nla_put_u8(msg, IEEE80215_ATTR_COORD_REALIGN, coord_realign);
+	nla_put_u8(msg, IEEE802154_ATTR_BAT_EXT, battery_ext);
+	nla_put_u8(msg, IEEE802154_ATTR_COORD_REALIGN, coord_realign);
 #endif
 	nl_send_auto_complete(nl, msg);
 	log_msg_nl_perror("nl_send_auto_complete");
@@ -94,30 +94,30 @@ static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 {
 	log_msg(0, "Associate requested\n");
 
-	if (!attrs[IEEE80215_ATTR_DEV_INDEX] ||
-	    !attrs[IEEE80215_ATTR_SRC_HW_ADDR] ||
-	    !attrs[IEEE80215_ATTR_CAPABILITY])
+	if (!attrs[IEEE802154_ATTR_DEV_INDEX] ||
+	    !attrs[IEEE802154_ATTR_SRC_HW_ADDR] ||
+	    !attrs[IEEE802154_ATTR_CAPABILITY])
 		return -EINVAL;
 
 	// FIXME: checks!!!
 
 	struct nl_msg *msg = nlmsg_alloc();
-	uint8_t cap = nla_get_u8(attrs[IEEE80215_ATTR_CAPABILITY]);
+	uint8_t cap = nla_get_u8(attrs[IEEE802154_ATTR_CAPABILITY]);
 	uint16_t shaddr = 0xfffe;
 
-	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_REQUEST, IEEE80215_ASSOCIATE_RESP, /* vers */ 1);
+	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_REQUEST, IEEE802154_ASSOCIATE_RESP, /* vers */ 1);
 
 	if (cap & (1 << 7)) { /* FIXME: constant */
-		uint8_t hwa[IEEE80215_ADDR_LEN];
-		NLA_GET_HW_ADDR(attrs[IEEE80215_ATTR_SRC_HW_ADDR], hwa);
+		uint8_t hwa[IEEE802154_ADDR_LEN];
+		NLA_GET_HW_ADDR(attrs[IEEE802154_ATTR_SRC_HW_ADDR], hwa);
 		shaddr = addrdb_alloc(hwa);
 		addrdb_dump_leases(lease_file);
 	}
 
-	nla_put_u32(msg, IEEE80215_ATTR_DEV_INDEX, nla_get_u32(attrs[IEEE80215_ATTR_DEV_INDEX]));
-	nla_put_u32(msg, IEEE80215_ATTR_STATUS, (shaddr != 0xffff) ? 0x0: 0x01);
-	nla_put_u64(msg, IEEE80215_ATTR_DEST_HW_ADDR, nla_get_u64(attrs[IEEE80215_ATTR_SRC_HW_ADDR]));
-	nla_put_u16(msg, IEEE80215_ATTR_DEST_SHORT_ADDR, shaddr);
+	nla_put_u32(msg, IEEE802154_ATTR_DEV_INDEX, nla_get_u32(attrs[IEEE802154_ATTR_DEV_INDEX]));
+	nla_put_u32(msg, IEEE802154_ATTR_STATUS, (shaddr != 0xffff) ? 0x0: 0x01);
+	nla_put_u64(msg, IEEE802154_ATTR_DEST_HW_ADDR, nla_get_u64(attrs[IEEE802154_ATTR_SRC_HW_ADDR]));
+	nla_put_u16(msg, IEEE802154_ATTR_DEST_SHORT_ADDR, shaddr);
 
 	nl_send_auto_complete(nl, msg);
 
@@ -130,18 +130,18 @@ static int coordinator_disassociate(struct genlmsghdr *ghdr, struct nlattr **att
 {
 	log_msg(0, "Disassociate requested\n");
 
-	if (!attrs[IEEE80215_ATTR_DEV_INDEX] ||
-	    !attrs[IEEE80215_ATTR_REASON] ||
-	    (!attrs[IEEE80215_ATTR_SRC_HW_ADDR] && !attrs[IEEE80215_ATTR_SRC_SHORT_ADDR]))
+	if (!attrs[IEEE802154_ATTR_DEV_INDEX] ||
+	    !attrs[IEEE802154_ATTR_REASON] ||
+	    (!attrs[IEEE802154_ATTR_SRC_HW_ADDR] && !attrs[IEEE802154_ATTR_SRC_SHORT_ADDR]))
 		return -EINVAL;
 
 	// FIXME: checks!!!
-	if (attrs[IEEE80215_ATTR_SRC_HW_ADDR]) {
-		uint8_t hwa[IEEE80215_ADDR_LEN];
-		NLA_GET_HW_ADDR(attrs[IEEE80215_ATTR_SRC_HW_ADDR], hwa);
+	if (attrs[IEEE802154_ATTR_SRC_HW_ADDR]) {
+		uint8_t hwa[IEEE802154_ADDR_LEN];
+		NLA_GET_HW_ADDR(attrs[IEEE802154_ATTR_SRC_HW_ADDR], hwa);
 		addrdb_free_hw(hwa);
 	} else {
-		uint16_t short_addr = nla_get_u16(attrs[IEEE80215_ATTR_SRC_SHORT_ADDR]);
+		uint16_t short_addr = nla_get_u16(attrs[IEEE802154_ATTR_SRC_SHORT_ADDR]);
 		addrdb_free_short(short_addr);
 	}
 	addrdb_dump_leases(lease_file);
@@ -152,42 +152,42 @@ static int coordinator_disassociate(struct genlmsghdr *ghdr, struct nlattr **att
 static int parse_cb(struct nl_msg *msg, void *arg)
 {
 	struct nlmsghdr *nlh = nlmsg_hdr(msg);
-	struct nlattr *attrs[IEEE80215_ATTR_MAX+1];
+	struct nlattr *attrs[IEEE802154_ATTR_MAX+1];
         struct genlmsghdr *ghdr;
 	const char *name;
 
 	// Validate message and parse attributes
-	genlmsg_parse(nlh, 0, attrs, IEEE80215_ATTR_MAX, ieee80215_policy);
+	genlmsg_parse(nlh, 0, attrs, IEEE802154_ATTR_MAX, ieee802154_policy);
 
         ghdr = nlmsg_data(nlh);
 
-	if (!attrs[IEEE80215_ATTR_DEV_NAME])
+	if (!attrs[IEEE802154_ATTR_DEV_NAME])
 		return -EINVAL;
 
-	name = nla_get_string(attrs[IEEE80215_ATTR_DEV_NAME]);
+	name = nla_get_string(attrs[IEEE802154_ATTR_DEV_NAME]);
 	log_msg(0, "Received command %d (%d) for interface %s\n", ghdr->cmd, ghdr->version, name);
 
-	name = nla_get_string(attrs[IEEE80215_ATTR_DEV_NAME]);
+	name = nla_get_string(attrs[IEEE802154_ATTR_DEV_NAME]);
 	if (strcmp(name, iface)) {
 		return 0;
 	}
 
 	switch (ghdr->cmd) {
-		case IEEE80215_ASSOCIATE_INDIC:
+		case IEEE802154_ASSOCIATE_INDIC:
 			return coordinator_associate(ghdr, attrs);
-		case IEEE80215_DISASSOCIATE_INDIC:
+		case IEEE802154_DISASSOCIATE_INDIC:
 			return coordinator_disassociate(ghdr, attrs);
 	}
 
-	if (!attrs[IEEE80215_ATTR_HW_ADDR])
+	if (!attrs[IEEE802154_ATTR_HW_ADDR])
 		return -EINVAL;
 
-	uint64_t addr = nla_get_u64(attrs[IEEE80215_ATTR_HW_ADDR]);
+	uint64_t addr = nla_get_u64(attrs[IEEE802154_ATTR_HW_ADDR]);
 	uint8_t buf[8];
 	memcpy(buf, &addr, 8);
 
 	log_msg(0, "Addr for %s is %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
-			nla_get_string(attrs[IEEE80215_ATTR_DEV_NAME]),
+			nla_get_string(attrs[IEEE802154_ATTR_DEV_NAME]),
 			buf[0], buf[1],	buf[2], buf[3],
 			buf[4], buf[5],	buf[6], buf[7]);
 
@@ -373,10 +373,10 @@ int main(int argc, char **argv)
 	genl_connect(nl);
 	log_msg_nl_perror("genl_connect");
 
-	family = genl_ctrl_resolve(nl, IEEE80215_NL_NAME);
+	family = genl_ctrl_resolve(nl, IEEE802154_NL_NAME);
 	log_msg_nl_perror("genl_ctrl_resolve");
 
-	nl_socket_add_membership(nl, nl_get_multicast_id(nl, IEEE80215_NL_NAME, IEEE80215_MCAST_COORD_NAME));
+	nl_socket_add_membership(nl, nl_get_multicast_id(nl, IEEE802154_NL_NAME, IEEE802154_MCAST_COORD_NAME));
 
 	seq_expected = nl_socket_use_seq(nl) + 1;
 

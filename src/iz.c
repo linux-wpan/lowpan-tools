@@ -31,9 +31,9 @@
 #include <unistd.h>
 
 #include <ieee802154.h>
-#define IEEE80215_NL_WANT_POLICY
+#define IEEE802154_NL_WANT_POLICY
 #define u64 uint64_t
-#include <ieee80215-nl.h>
+#include <ieee802154-nl.h>
 #include <libcommon.h>
 
 static int last_cmd = -1;
@@ -46,29 +46,29 @@ static int scan_confirmation(struct genlmsghdr *ghdr, struct nlattr **attrs)
 	int i;
 	uint8_t edl[27];
 
-	if (!attrs[IEEE80215_ATTR_DEV_INDEX] ||
-	    !attrs[IEEE80215_ATTR_STATUS] ||
-	    !attrs[IEEE80215_ATTR_SCAN_TYPE])
+	if (!attrs[IEEE802154_ATTR_DEV_INDEX] ||
+	    !attrs[IEEE802154_ATTR_STATUS] ||
+	    !attrs[IEEE802154_ATTR_SCAN_TYPE])
 		return -EINVAL;
 
-	status = nla_get_u8(attrs[IEEE80215_ATTR_STATUS]);
+	status = nla_get_u8(attrs[IEEE802154_ATTR_STATUS]);
 	if (status != 0)
 		printf("Scan failed: %02x\n", status);
 
-	type = nla_get_u8(attrs[IEEE80215_ATTR_SCAN_TYPE]);
+	type = nla_get_u8(attrs[IEEE802154_ATTR_SCAN_TYPE]);
 
 	switch (type) {
-		case IEEE80215_MAC_SCAN_ED:
-			if (!attrs[IEEE80215_ATTR_ED_LIST])
+		case IEEE802154_MAC_SCAN_ED:
+			if (!attrs[IEEE802154_ATTR_ED_LIST])
 				return -EINVAL;
 
-			nla_memcpy(edl, attrs[IEEE80215_ATTR_ED_LIST], 27);
+			nla_memcpy(edl, attrs[IEEE802154_ATTR_ED_LIST], 27);
 			printf("ED Scan results:\n");
 			for (i = 0; i < 27; i++)
 				printf("  Ch%2d --- ED = %02x\n", i, edl[i]);
 			return 0;
 
-		case IEEE80215_MAC_SCAN_ACTIVE:
+		case IEEE802154_MAC_SCAN_ACTIVE:
 			printf("Started active scan. Will catch beacons from now\n");
 			return 0;
 		default:
@@ -82,8 +82,8 @@ static int scan_confirmation(struct genlmsghdr *ghdr, struct nlattr **attrs)
 
 static int beacon_indication(struct genlmsghdr *ghdr, struct nlattr **attrs)
 {
-	if (!attrs[IEEE80215_ATTR_DEV_INDEX] ||
-	    !attrs[IEEE80215_ATTR_STATUS])
+	if (!attrs[IEEE802154_ATTR_DEV_INDEX] ||
+	    !attrs[IEEE802154_ATTR_STATUS])
 	    	return -EINVAL;
 	printf("Got a beacon\n");
 	return 0;
@@ -92,32 +92,32 @@ static int beacon_indication(struct genlmsghdr *ghdr, struct nlattr **attrs)
 static int parse_cb(struct nl_msg *msg, void *arg)
 {
 	struct nlmsghdr *nlh = nlmsg_hdr(msg);
-	struct nlattr *attrs[IEEE80215_ATTR_MAX+1];
+	struct nlattr *attrs[IEEE802154_ATTR_MAX+1];
         struct genlmsghdr *ghdr;
 	const char *name;
 
 	// Validate message and parse attributes
-	genlmsg_parse(nlh, 0, attrs, IEEE80215_ATTR_MAX, ieee80215_policy);
+	genlmsg_parse(nlh, 0, attrs, IEEE802154_ATTR_MAX, ieee802154_policy);
 
         ghdr = nlmsg_data(nlh);
 
-	if (!attrs[IEEE80215_ATTR_DEV_NAME])
+	if (!attrs[IEEE802154_ATTR_DEV_NAME])
 		return -EINVAL;
 
-	name = nla_get_string(attrs[IEEE80215_ATTR_DEV_NAME]);
+	name = nla_get_string(attrs[IEEE802154_ATTR_DEV_NAME]);
 	printf("Received command %d (%d) for interface %s\n", ghdr->cmd, ghdr->version, name);
 	if (strcmp(iface, name))
 		return 0;
 
 	last_cmd = ghdr->cmd;
 
-	if (ghdr->cmd == IEEE80215_ASSOCIATE_CONF ) {
+	if (ghdr->cmd == IEEE802154_ASSOCIATE_CONF ) {
 		printf("Received short address %04hx, status %02hhx\n",
-			nla_get_u16(attrs[IEEE80215_ATTR_SHORT_ADDR]),
-			nla_get_u8(attrs[IEEE80215_ATTR_STATUS]));
-	} else if (ghdr->cmd == IEEE80215_SCAN_CONF) {
+			nla_get_u16(attrs[IEEE802154_ATTR_SHORT_ADDR]),
+			nla_get_u8(attrs[IEEE802154_ATTR_STATUS]));
+	} else if (ghdr->cmd == IEEE802154_SCAN_CONF) {
 		return scan_confirmation(ghdr, attrs);
-	} else if (ghdr->cmd == IEEE80215_BEACON_NOTIFY_INDIC) {
+	} else if (ghdr->cmd == IEEE802154_BEACON_NOTIFY_INDIC) {
 		return beacon_indication(ghdr, attrs);
 	}
 
@@ -144,7 +144,7 @@ static int associate(struct nl_msg *msg, char **args) {
 	char *dummy;
 	uint16_t pan_id, coord_short_addr;
 	uint8_t chan;
-	unsigned char hwa[IEEE80215_ADDR_LEN];
+	unsigned char hwa[IEEE802154_ADDR_LEN];
 	int ret;
 	uint8_t cap =  0
 			| (1 << 1) /* FFD */
@@ -170,14 +170,14 @@ static int associate(struct nl_msg *msg, char **args) {
 			return ret;
 		}
 
-		NLA_PUT_HW_ADDR(msg, IEEE80215_ATTR_COORD_HW_ADDR, hwa);
+		NLA_PUT_HW_ADDR(msg, IEEE802154_ATTR_COORD_HW_ADDR, hwa);
 	} else {
 		coord_short_addr = strtol(args[2], &dummy, 16);
 		if (*dummy) {
 			printf("Bad CoordAddr\n");
 			return -EINVAL;
 		}
-		NLA_PUT_U16(msg, IEEE80215_ATTR_COORD_SHORT_ADDR, coord_short_addr);
+		NLA_PUT_U16(msg, IEEE802154_ATTR_COORD_SHORT_ADDR, coord_short_addr);
 	}
 
 
@@ -197,9 +197,9 @@ static int associate(struct nl_msg *msg, char **args) {
 			cap |= 1 << 7; /* Request short addr */
 	}
 
-	NLA_PUT_U8(msg, IEEE80215_ATTR_CHANNEL, chan);
-	NLA_PUT_U16(msg, IEEE80215_ATTR_COORD_PAN_ID, pan_id);
-	NLA_PUT_U8(msg, IEEE80215_ATTR_CAPABILITY, cap);
+	NLA_PUT_U8(msg, IEEE802154_ATTR_CHANNEL, chan);
+	NLA_PUT_U16(msg, IEEE802154_ATTR_COORD_PAN_ID, pan_id);
+	NLA_PUT_U8(msg, IEEE802154_ATTR_CAPABILITY, cap);
 
 	return 0;
 
@@ -210,7 +210,7 @@ nla_put_failure:
 static int disassociate(struct nl_msg *msg, char **args) {
 	char *dummy;
 	uint8_t reason;
-	unsigned char hwa[IEEE80215_ADDR_LEN];
+	unsigned char hwa[IEEE802154_ADDR_LEN];
 	uint16_t  short_addr;
 	int ret;
 
@@ -224,14 +224,14 @@ static int disassociate(struct nl_msg *msg, char **args) {
 			return ret;
 		}
 
-		NLA_PUT_HW_ADDR(msg, IEEE80215_ATTR_DEST_HW_ADDR, hwa);
+		NLA_PUT_HW_ADDR(msg, IEEE802154_ATTR_DEST_HW_ADDR, hwa);
 	} else {
 		short_addr = strtol(args[1], &dummy, 16);
 		if (*dummy) {
 			printf("Bad DestAddr\n");
 			return -EINVAL;
 		}
-		NLA_PUT_U16(msg, IEEE80215_ATTR_DEST_SHORT_ADDR, short_addr);
+		NLA_PUT_U16(msg, IEEE802154_ATTR_DEST_SHORT_ADDR, short_addr);
 	}
 
 	if (!args[2])
@@ -245,7 +245,7 @@ static int disassociate(struct nl_msg *msg, char **args) {
 	if (args[3])
 		return -EINVAL;
 
-	NLA_PUT_U8(msg, IEEE80215_ATTR_REASON, reason);
+	NLA_PUT_U8(msg, IEEE802154_ATTR_REASON, reason);
 
 	return 0;
 
@@ -264,16 +264,16 @@ static int scan(struct nl_msg *msg, char **args) {
 
 	switch (*args[1]) {
 		case 'e':
-			type = IEEE80215_MAC_SCAN_ED;
+			type = IEEE802154_MAC_SCAN_ED;
 			break;
 		case 'a':
-			type = IEEE80215_MAC_SCAN_ACTIVE;
+			type = IEEE802154_MAC_SCAN_ACTIVE;
 			break;
 		case 'p':
-			type = IEEE80215_MAC_SCAN_PASSIVE;
+			type = IEEE802154_MAC_SCAN_PASSIVE;
 			break;
 		case 'o':
-			type = IEEE80215_MAC_SCAN_ORPHAN;
+			type = IEEE802154_MAC_SCAN_ORPHAN;
 			break;
 		default:
 			printf("Invalid type\n");
@@ -299,9 +299,9 @@ static int scan(struct nl_msg *msg, char **args) {
 	if (args[4])
 		return -EINVAL;
 
-	NLA_PUT_U8(msg, IEEE80215_ATTR_SCAN_TYPE, type);
-	NLA_PUT_U32(msg, IEEE80215_ATTR_CHANNELS, channels);
-	NLA_PUT_U8(msg, IEEE80215_ATTR_DURATION, duration);
+	NLA_PUT_U8(msg, IEEE802154_ATTR_SCAN_TYPE, type);
+	NLA_PUT_U32(msg, IEEE802154_ATTR_CHANNELS, channels);
+	NLA_PUT_U8(msg, IEEE802154_ATTR_DURATION, duration);
 
 	return 0;
 
@@ -326,7 +326,7 @@ int printinfo(const char *ifname) {
 	unsigned is_mac;
 	int sd;
 
-	sd = socket(PF_IEEE80215, SOCK_RAW, 0);
+	sd = socket(PF_IEEE802154, SOCK_RAW, 0);
 	if (sd < 0) {
 		perror("socket");
 		goto out_noclose;
@@ -339,10 +339,10 @@ int printinfo(const char *ifname) {
 		goto out;
 	}
 
-	if (req.ifr_hwaddr.sa_family == ARPHRD_IEEE80215_PHY) {
+	if (req.ifr_hwaddr.sa_family == ARPHRD_IEEE802154_PHY) {
 		is_mac = 0;
 		printf("%-8s  IEEE 802.15.4 master (PHY) interface", req.ifr_name);
-	} else if (req.ifr_hwaddr.sa_family == ARPHRD_IEEE80215) {
+	} else if (req.ifr_hwaddr.sa_family == ARPHRD_IEEE802154) {
 		unsigned char *addr = (unsigned char *)(req.ifr_hwaddr.sa_data);
 		is_mac = 1;
 		printf("%-8s  IEEE 802.15.4 MAC interface", req.ifr_name);
@@ -389,7 +389,7 @@ int printinfo(const char *ifname) {
 			else
 				perror("SIOCGIFADDR");
 		} else {
-			struct sockaddr_ieee80215 *sa = (struct sockaddr_ieee80215 *)&req.ifr_addr;
+			struct sockaddr_ieee802154 *sa = (struct sockaddr_ieee802154 *)&req.ifr_addr;
 			printf("  PAN ID: %04x  Addr: %04x\n", sa->addr.pan_id, sa->addr.short_addr);
 		}
 	}
@@ -416,7 +416,7 @@ int do_set_hw(const char *ifname, const char *hw) {
 
 	ret = parse_hw_addr(hw, buf);
 
-	int sd = socket(PF_IEEE80215, SOCK_RAW, 0);
+	int sd = socket(PF_IEEE802154, SOCK_RAW, 0);
 	if (sd < 0) {
 		perror("socket");
 		goto out_noclose;
@@ -424,7 +424,7 @@ int do_set_hw(const char *ifname, const char *hw) {
 
 	strcpy(req.ifr_name, ifname);
 
-	req.ifr_hwaddr.sa_family = ARPHRD_IEEE80215;
+	req.ifr_hwaddr.sa_family = ARPHRD_IEEE802154;
 	memcpy(req.ifr_hwaddr.sa_data, buf, 8);
 	ret = ioctl(sd, SIOCSIFHWADDR, &req);
 	if (ret != 0) {
@@ -472,8 +472,8 @@ struct {
 				"    CoordAddr - 16-bit hex coordinator address\n\n"
 				"    chan# - radio channel no, from 0 to 26 (radio hardware dependant)\n\n"
 				"    short - add word 'short' to command line to get real address (not 0xfffe)\n\n",
-		.nl_cmd = IEEE80215_ASSOCIATE_REQ,
-		.nl_resp = IEEE80215_ASSOCIATE_CONF,
+		.nl_cmd = IEEE802154_ASSOCIATE_REQ,
+		.nl_resp = IEEE802154_ASSOCIATE_CONF,
 		.fillmsg = associate,
 	},
 	{
@@ -482,8 +482,8 @@ struct {
 		.usage_exp = "  disassociate from the network\n"
 				"    DestAddr - destination address\n\n"
 				"    reason - disassociation reason\n\n",
-		.nl_cmd = IEEE80215_DISASSOCIATE_REQ,
-		.nl_resp = IEEE80215_DISASSOCIATE_CONF,
+		.nl_cmd = IEEE802154_DISASSOCIATE_REQ,
+		.nl_resp = IEEE802154_DISASSOCIATE_CONF,
 		.fillmsg = disassociate,
 	},
 	{
@@ -495,8 +495,8 @@ struct {
 				"      a - active scan\n\n"
 				"      p - passive scan\n\n"
 				"      o - orphan scan\n\n",
-		.nl_cmd = IEEE80215_SCAN_REQ,
-		.nl_resp = IEEE80215_SCAN_CONF,
+		.nl_cmd = IEEE802154_SCAN_REQ,
+		.nl_resp = IEEE802154_SCAN_CONF,
 		.fillmsg = scan,
 	},
 	{
@@ -574,10 +574,10 @@ int main(int argc, char **argv) {
 	genl_connect(nl);
 	nl_perror("genl_connect");
 
-	family = genl_ctrl_resolve(nl, IEEE80215_NL_NAME);
+	family = genl_ctrl_resolve(nl, IEEE802154_NL_NAME);
 	nl_perror("genl_ctrl_resolve");
 
-	nl_socket_add_membership(nl, nl_get_multicast_id(nl, IEEE80215_NL_NAME, IEEE80215_MCAST_COORD_NAME));
+	nl_socket_add_membership(nl, nl_get_multicast_id(nl, IEEE802154_NL_NAME, IEEE802154_MCAST_COORD_NAME));
 
 	seq_expected = nl_socket_use_seq(nl) + 1;
 
@@ -588,7 +588,7 @@ int main(int argc, char **argv) {
 	nl_perror("nlmsg_alloc");
 	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_REQUEST, commands[cmd].nl_cmd, /* vers */ 1);
 
-	nla_put_string(msg, IEEE80215_ATTR_DEV_NAME, iface);
+	nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, iface);
 
 	int err = commands[cmd].fillmsg(msg, argv);
 	if (err)

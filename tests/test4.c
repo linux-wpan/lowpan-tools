@@ -36,11 +36,11 @@
 
 int main(int argc, char **argv) {
 	int ret;
-	struct sockaddr_ieee80215 sa = {};
+	struct sockaddr_ieee802154 sa = {};
 	struct ifreq req = {};
 
 	char buf[] = {0x01, 0x80, 0xa5, 0x5a};
-	int sd = socket(PF_IEEE80215, SOCK_DGRAM, 0);
+	int sd = socket(PF_IEEE802154, SOCK_DGRAM, 0);
 	if (sd < 0) {
 		perror("socket");
 		return 1;
@@ -51,16 +51,16 @@ int main(int argc, char **argv) {
 	if (ret < 0)
 		perror("ioctl: SIOCGIFHWADDR");
 
-	sa.family = AF_IEEE80215;
-	sa.addr.addr_type = IEEE80215_ADDR_LONG;
+	sa.family = AF_IEEE802154;
+	sa.addr.addr_type = IEEE802154_ADDR_LONG;
 	memcpy(sa.addr.hwaddr, req.ifr_hwaddr.sa_data, sizeof(sa.addr.hwaddr));
 	ret = bind(sd, (struct sockaddr*)&sa, sizeof(sa));
 	if (ret < 0)
 		perror("bind");
 
-	sa.addr.addr_type = IEEE80215_ADDR_LONG;
+	sa.addr.addr_type = IEEE802154_ADDR_LONG;
 	sa.addr.pan_id = 0xffff;
-	memcpy(sa.addr.hwaddr, (unsigned char[8]){0x67, 0x45, 0x23, 0x01, 0x67, 0x45, 0x23, 0x01}, IEEE80215_ADDR_LEN);
+	memcpy(sa.addr.hwaddr, (unsigned char[8]){0x67, 0x45, 0x23, 0x01, 0x67, 0x45, 0x23, 0x01}, IEEE802154_ADDR_LEN);
 	ret = connect(sd, (struct sockaddr*)&sa, sizeof(sa));
 	if (ret < 0)
 		perror("connect");

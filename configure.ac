@@ -52,7 +52,7 @@ PKG_CHECK_MODULES([NL], [libnl-1])
 AC_HEADER_STDC
 AC_FUNC_ALLOCA
 AC_CHECK_HEADERS([arpa/inet.h fcntl.h inttypes.h libintl.h limits.h malloc.h stddef.h stdint.h stdlib.h string.h sys/ioctl.h sys/socket.h sys/time.h syslog.h termios.h unistd.h])
-AC_CHECK_HEADERS([net/ieee80215.h net/af_ieee80215.h])
+AC_CHECK_HEADERS([net/ieee802154.h net/af_ieee802154.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -65,15 +65,15 @@ AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
-AC_CHECK_TYPE(struct sockaddr_ieee80215,
-	      [AC_DEFINE([HAVE_STRUCT_SOCKADDR_IEEE80215],[],[Define to 1 if you have struct sockaddr_ieee80215])],[],
+AC_CHECK_TYPE(struct sockaddr_ieee802154,
+	      [AC_DEFINE([HAVE_STRUCT_SOCKADDR_IEEE802154],[],[Define to 1 if you have struct sockaddr_ieee802154])],[],
 	      [#include <sys/types.h>
 	       #include <sys/socket.h>
-	       #ifdef HAVE_NET_IEEE80215_H
-	       #include <net/ieee80215.h>
+	       #ifdef HAVE_NET_IEEE802154_H
+	       #include <net/ieee802154.h>
 	       #endif
-	       #ifdef HAVE_NET_AF_IEEE80215_H
-	       #include <net/af_ieee80215.h>
+	       #ifdef HAVE_NET_AF_IEEE802154_H
+	       #include <net/af_ieee802154.h>
 	       #endif
 	       ])
 
