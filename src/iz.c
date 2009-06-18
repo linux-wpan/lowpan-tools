@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
+#include <net/if.h>
 
 #include <ieee802154.h>
 #define u64 uint64_t

@@ -29,6 +29,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
+#include <net/if.h>
 
 #include "ieee802154.h"
 #include "libcommon.h"
@@ -45,7 +46,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	strncpy(req.ifr_name, argv[1], IF_NAMESIZE);
+	strncpy(req.ifr_name, argv[1], IFNAMSIZ);
 	ret = ioctl(sd, SIOCGIFHWADDR, &req);
 	if (ret < 0)
 		perror("ioctl: SIOCGIFHWADDR");

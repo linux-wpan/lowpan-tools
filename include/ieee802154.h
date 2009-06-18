@@ -100,7 +100,10 @@ struct sockaddr_ieee802154 {
 #endif
 
 #ifndef HAVE_STRUCT_USER_DATA
-#include <net/if.h>
+#ifndef IFNAMSIZ
+#define IFNAMSIZ 16
+#endif
+
 struct ieee802154_user_data {
 	/* This is used as ifr_name */
 	union

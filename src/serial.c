@@ -35,6 +35,8 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include <net/if.h>
+
 #include "ieee802154.h"
 #define N_ZB 19
 
