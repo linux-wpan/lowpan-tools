@@ -178,7 +178,7 @@ int addrdb_parse(const char *fname)
 			   But if we will not be able to write this file,
 			   we will not be able to dump leases, which
 			   might have catastrophic consequiences. */
-			fd = open(fname, O_CREAT | O_APPEND);
+			fd = open(fname, O_CREAT | O_APPEND, S_IWUSR | S_IRUSR);
 			if (fd < 0) {
 				fprintf(stderr,
 					"ERROR: We were unable to open lease file %s\n",

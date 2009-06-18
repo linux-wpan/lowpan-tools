@@ -93,7 +93,9 @@ int main(int argc, char **argv) {
 		} else if (FD_ISSET(sd, &rs)) {
 			r = sd;
 			w = 1;
-			write(w, "> ", 2);
+			ret = write(w, "> ", 2);
+			if (ret < 0)
+				perror("write");
 		} else {
 			printf("Something bad happened!\n");
 			continue;
@@ -103,7 +105,9 @@ int main(int argc, char **argv) {
 		if (ret < 0) {
 			perror("read");
 		} else if (ret > 0) {
-			write(w, &buf, ret);
+			ret = write(w, &buf, ret);
+			if (ret < 0)
+				perror("write");
 		}
 	}
 	return 0;
