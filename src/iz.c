@@ -23,13 +23,13 @@
 #include <config.h>
 #endif
 
-#include <netlink/netlink.h>
-#include <netlink/genl/genl.h>
-#include <netlink/genl/ctrl.h>
 #include <errno.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include <net/if.h>
+#include <netlink/netlink.h>
+#include <netlink/genl/genl.h>
+#include <netlink/genl/ctrl.h>
 
 #include <ieee802154.h>
 #define u64 uint64_t
