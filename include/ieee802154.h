@@ -98,10 +98,9 @@ struct sockaddr_ieee802154 {
 #ifndef ETH_P_IEEE802154
 #define ETH_P_IEEE802154 0x00F6		/* IEEE802.15.4 frame		*/
 #endif
+
 #ifndef HAVE_STRUCT_USER_DATA
-#ifndef IFNAMSIZE
 #include <net/if.h>
-#endif
 struct ieee802154_user_data {
 	/* This is used as ifr_name */
 	union
