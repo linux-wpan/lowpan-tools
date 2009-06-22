@@ -20,6 +20,8 @@
 #ifndef IPLINK_H
 #define IPLINK_H
 
+extern const char *ll_addr_n2a(unsigned char *addr, int alen, int type, char *buf, int blen);
+
 struct link_util {
 	struct link_util *next;
 	const char *id;
@@ -27,7 +29,7 @@ struct link_util {
 	int (*parse_opt)(struct link_util *, int, char **,
 			struct nlmsghdr *);
 	void (*print_opt)(struct link_util *, FILE *,
-			struct nlmsghdr *);
+			struct rtattr *[]);
 	void (*print_xstats)(struct link_util *, FILE *,
 			struct rtattr *);
 };
