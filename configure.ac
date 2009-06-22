@@ -9,17 +9,17 @@ AM_INIT_AUTOMAKE([-Wall -Werror gnu])
 AC_CONFIG_SRCDIR([src/serial.c])
 AC_CONFIG_HEADER([config.h])
 
-AC_ARG_WITH(zbtestdir, [  --with-zbtestdir	directory where all test programs will be installed],
+AC_ARG_WITH(zbtestdir, [AC_HELP_STRING([--with-zbtestdir],[directory where all test programs will be installed])],
 	    [zbtestdir=$withval],
 	    [zbtestdir='${libexecdir}/lowpan-tools'])
 AC_SUBST(zbtestdir)
 
-AC_ARG_WITH(iproutedir, [  --with-iproutedir	directory where iproute2 plugins will be installed],
+AC_ARG_WITH(iproutedir, [AC_HELP_STRING([--with-iproutedir],[directory where iproute2 plugins will be installed])],
 	    [iproutedir=$withval],
 	    [iproutedir='${libdir}/ip'])
 AC_SUBST(iproutedir)
 
-AC_ARG_WITH(leasefile, [  --with-leasefile	file for persistent lease storage],
+AC_ARG_WITH(leasefile, [AC_HELP_STRING([--with-leasefile],[file for persistent lease storage])],
 	    [leasefile=$withval],
 	    [leasefile='${localstatedir}/lib/lowpan-tools/izcoordinator.leases'])
 AC_SUBST(leasefile)
@@ -31,7 +31,7 @@ AC_ARG_ENABLE([manpages],[AS_HELP_STRING([--disable-manpages],[disable manpages 
 	esac], [manpages=yes])
 AM_CONDITIONAL([MANPAGES], [test x$manpages = xyes])
 
-AC_ARG_WITH(pidfile, [  --with-pidfile	pid file location],
+AC_ARG_WITH(pidfile, [AC_HELP_STRING([--with-pidfile],[pid file location])],
 	    [pidfile=$withval],
 	    [pidfile='${localstatedir}/run/izcoordinator.pid'])
 AC_SUBST(pidfile)
