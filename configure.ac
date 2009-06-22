@@ -14,6 +14,11 @@ AC_ARG_WITH(zbtestdir, [  --with-zbtestdir	directory where all test programs wil
 	    [zbtestdir='${libexecdir}/lowpan-tools'])
 AC_SUBST(zbtestdir)
 
+AC_ARG_WITH(iproutedir, [  --with-iproutedir	directory where iproute2 plugins will be installed],
+	    [iproutedir=$withval],
+	    [iproutedir='${libdir}/ip'])
+AC_SUBST(iproutedir)
+
 AC_ARG_WITH(leasefile, [  --with-leasefile	file for persistent lease storage],
 	    [leasefile=$withval],
 	    [leasefile='${localstatedir}/lib/lowpan-tools/izcoordinator.leases'])
@@ -86,6 +91,7 @@ AC_CONFIG_FILES([
 	lib/Makefile
 	addrdb/Makefile
 	src/Makefile
+	iplink/Makefile
 	tests/Makefile
 	test-serial/Makefile
 ])
