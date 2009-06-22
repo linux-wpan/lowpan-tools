@@ -37,7 +37,7 @@ static void wpan_print_opt(struct link_util *lu, FILE *f,
 
 	if (tb[IFLA_WPAN_CHANNEL]) {
 		uint16_t *chan = RTA_DATA(tb[IFLA_WPAN_CHANNEL]);
-		fprintf(f, "chan %d", *chan);
+		fprintf(f, "chan %d ", *chan);
 	}
 
 	if (tb[IFLA_WPAN_PAN_ID]) {
