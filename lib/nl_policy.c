@@ -49,4 +49,6 @@ struct nla_policy ieee802154_policy[IEEE802154_ATTR_MAX + 1] = {
 	[IEEE802154_ATTR_CHANNELS] = { .type = NLA_U32, },
 	[IEEE802154_ATTR_DURATION] = { .type = NLA_U8, },
 	[IEEE802154_ATTR_ED_LIST] = { .minlen = 27, .maxlen = 27 },
+
+	[IEEE802154_ATTR_DEV_TYPE] = { .type = NLA_U16, },
 };
