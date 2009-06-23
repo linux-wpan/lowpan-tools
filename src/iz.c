@@ -24,9 +24,6 @@
 #endif
 
 #include <errno.h>
-#include <sys/ioctl.h>
-#include <unistd.h>
-#include <net/if.h>
 #include <netlink/netlink.h>
 #include <netlink/genl/genl.h>
 #include <netlink/genl/ctrl.h>
@@ -309,151 +306,6 @@ nla_put_failure:
 	return -1;
 }
 
-/* I know it IS UGLY. I know it should be gone. I try
- * as this requires implementing some NetLink stuff LARGER
- * than one for START and I'm implementing it. Stay tuned.
-*/
-
-#define IOREQ(cmd)			\
-	ret = ioctl(sd, cmd, &req);	\
-	if (ret)			\
-		perror( #cmd );		\
-	else
-
-int printinfo(const char *ifname) {
-	struct ifreq req;
-	int ret;
-	unsigned is_mac;
-	int sd;
-
-	sd = socket(PF_IEEE802154, SOCK_RAW, 0);
-	if (sd < 0) {
-		perror("socket");
-		goto out_noclose;
-	}
-
-	strcpy(req.ifr_name, ifname);
-	ret = ioctl(sd, SIOCGIFHWADDR, &req);
-	if (ret) {
-		perror("SIOCGIFHWADDR");
-		goto out;
-	}
-
-	if (req.ifr_hwaddr.sa_family == ARPHRD_IEEE802154_PHY) {
-		is_mac = 0;
-		printf("%-8s  IEEE 802.15.4 master (PHY) interface", req.ifr_name);
-	} else if (req.ifr_hwaddr.sa_family == ARPHRD_IEEE802154) {
-		unsigned char *addr = (unsigned char *)(req.ifr_hwaddr.sa_data);
-		is_mac = 1;
-		printf("%-8s  IEEE 802.15.4 MAC interface", req.ifr_name);
-		printf("\n        ");
-		printf("  HwAddr: %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
-				addr[0], addr[1], addr[2], addr[3],
-				addr[4], addr[5], addr[6], addr[7]
-				);
-	} else {
-		printf("%-8s  not a IEEE 802.15.4 interface\n", req.ifr_name);
-		goto out;
-	}
-
-	printf("\n        ");
-	IOREQ(SIOCGIFFLAGS)
-		printf("  Flags:%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s ",
-			(req.ifr_flags & IFF_UP) ? " up" : "",
-			(req.ifr_flags & IFF_BROADCAST) ? " broadcast" : "",
-			(req.ifr_flags & IFF_DEBUG) ? " debug" : "",
-			(req.ifr_flags & IFF_LOOPBACK) ? " loopback" : "",
-			(req.ifr_flags & IFF_POINTOPOINT) ? " pointopoint" : "",
-			(req.ifr_flags & IFF_NOTRAILERS) ? " notrailers" : "",
-			(req.ifr_flags & IFF_RUNNING) ? " running" : "",
-			(req.ifr_flags & IFF_NOARP) ? " noarp" : "",
-			(req.ifr_flags & IFF_PROMISC) ? " promisc" : "",
-			(req.ifr_flags & IFF_ALLMULTI) ? " allmulti" : "",
-			(req.ifr_flags & IFF_MASTER) ? " master" : "",
-			(req.ifr_flags & IFF_SLAVE) ? " slave" : "",
-			(req.ifr_flags & IFF_MULTICAST) ? " multicast" : "",
-			(req.ifr_flags & IFF_PORTSEL) ? " portsel" : "",
-			(req.ifr_flags & IFF_AUTOMEDIA) ? " automedia" : "",
-			(req.ifr_flags & IFF_DYNAMIC) ? " dynamic" : ""
-		      );
-	printf("\n        ");
-	IOREQ(SIOCGIFMTU)
-		printf("  MTU: %d", req.ifr_mtu);
-	IOREQ(SIOCGIFTXQLEN)
-		printf("  TxQueue: %d", req.ifr_mtu);
-	if (is_mac) {
-		ret = ioctl(sd, SIOCGIFADDR, &req);
-		if (ret) {
-			if (errno == EADDRNOTAVAIL)
-				printf("  Not Associated");
-			else
-				perror("SIOCGIFADDR");
-		} else {
-			struct sockaddr_ieee802154 *sa = (struct sockaddr_ieee802154 *)&req.ifr_addr;
-			printf("  PAN ID: %04x  Addr: %04x\n", sa->addr.pan_id, sa->addr.short_addr);
-		}
-	}
-	printf("\n\n");
-
-	ret = close(sd);
-	if (ret != 0) {
-		perror("close");
-		goto out_noclose;
-	}
-
-	return 0;
-
-out:
-	close(sd);
-out_noclose:
-	return 1;
-}
-
-int do_set_hw(const char *ifname, const char *hw) {
-	unsigned char buf[8] = {};
-	struct ifreq req;
-	int ret;
-
-	ret = parse_hw_addr(hw, buf);
-
-	int sd = socket(PF_IEEE802154, SOCK_RAW, 0);
-	if (sd < 0) {
-		perror("socket");
-		goto out_noclose;
-	}
-
-	strcpy(req.ifr_name, ifname);
-
-	req.ifr_hwaddr.sa_family = ARPHRD_IEEE802154;
-	memcpy(req.ifr_hwaddr.sa_data, buf, 8);
-	ret = ioctl(sd, SIOCSIFHWADDR, &req);
-	if (ret != 0) {
-		perror("ioctl: SIOCGIFHWADDR");
-		goto out;
-	}
-
-	return 0;
-out:
-	close(sd);
-out_noclose:
-	return 1;
-}
-
-
-int show_dev(int argc, char **argv)
-{
-	if (argc == 1)
-		return printinfo(iface);
-	return -1;
-}
-
-int set_hw_addr(int argc, char **argv)
-{
-	if (argc == 2)
-		return do_set_hw(iface, argv[1]);
-	return -1;
-}
-
 struct {
 	const char *name;
 	const char *usage;
@@ -461,7 +313,6 @@ struct {
 	int nl_cmd;
 	int nl_resp;
 	int (*fillmsg)(struct nl_msg *msg, char **args);
-	int (*cb)(int argc, char **argv);
 	int (*response)(void);
 } commands[] = {
 	{
@@ -498,18 +349,6 @@ struct {
 		.nl_cmd = IEEE802154_SCAN_REQ,
 		.nl_resp = IEEE802154_SCAN_CONF,
 		.fillmsg = scan,
-	},
-	{
-		.name = "show",
-		.usage = "",
-		.usage_exp = "  show interface configuration\n",
-		.cb = show_dev,
-	},
-	{
-		.name = "hw",
-		.usage = "",
-		.usage_exp = "  set hw address\n",
-		.cb = set_hw_addr,
 	},
 };
 
@@ -557,12 +396,6 @@ int main(int argc, char **argv) {
 	argv[2] = argv[0];
 	argv += 2;
 	argc -= 2;
-
-	/* We do this as hack before we port everything to netlink interface */
-	if (commands[cmd].cb) {
-		commands[cmd].cb(argc, argv);
-		return 0;
-	}
 
 	nl = nl_handle_alloc();
 
