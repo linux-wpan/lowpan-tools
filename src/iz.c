@@ -306,7 +306,7 @@ nla_put_failure:
 	return -1;
 }
 
-struct {
+static struct {
 	const char *name;
 	const char *usage;
 	const char *usage_exp;
