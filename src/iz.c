@@ -49,7 +49,7 @@ struct iz_cmd;
 
 static int iz_cb_seq_check(struct nl_msg *msg, void *arg);
 static int iz_cb_valid(struct nl_msg *msg, void *arg);
-static void iz_help(void);
+static void iz_help(const char *pname);
 
 /* Command specific declarations */
 
@@ -65,10 +65,6 @@ static int list_response(struct genlmsghdr *ghdr, struct nlattr **attrs);
 /* EVENT */
 static int event_parse(struct iz_cmd *cmd, int argc, char **argv);
 static int event_response(struct genlmsghdr *ghdr, struct nlattr **attrs);
-
-/* TODO: ADD */
-
-/* TODO: DEL */
 
 /* SCAN */
 static int scan_parse(struct iz_cmd *cmd, int argc, char **argv);
@@ -135,34 +131,12 @@ struct iz_cmd_type {
 	const char * doc;
 };
 
-/* Version */
-const char *iz_version = "iz 0.3; Copyright (C) 2008, 2009 Siemens AG";
-
-/* Options description */
 static const struct option iz_long_opts[] = {
-	{
-			.name = "debug",
-			.has_arg = 2,
-			.flag = NULL,
-			.val = 0,
-	},
-	{
-			.name = "version",
-			.has_arg = 0,
-			.flag = NULL,
-			.val = 0,
-	},
-	{
-			.name = "help",
-			.has_arg = 0,
-			.flag = NULL,
-			.val = 0,
-	},
-	{ 0, 0, 0, 0 }
+	{ "debug", optional_argument, NULL, 'd' },
+	{ "version", no_argument, NULL, 'v' },
+	{ "help", no_argument, NULL, 'h' },
+	{ NULL, 0, NULL, 0 },
 };
-#define DEBUG_NUM	0
-#define VERSION_NUM	1
-#define HELP_NUM	2
 
 /* Expected sequence number */
 static int iz_seq = 0;
@@ -263,18 +237,10 @@ static struct iz_cmd_type iz_types[] = {
 		.type 	= IZ_C_COMMON,
 		.doc	= "Common commands",
 	},
-	/*{
-		.type	= IZ_C_PHY,
-		.doc	= "IEEE 802.15.4 PHY specific commands",
-	},*/
 	{
 		.type	= IZ_C_MAC,
 		.doc	= "IEEE 802.15.4 MAC specific commands",
 	},
-	/*{
-		.type	= IZ_C_ZB,
-		.doc	= "ZigBee specific commands",
-	}*/
 };
 #define IZ_TYPES_NUM (sizeof(iz_types) / sizeof(iz_types[0]))
 
@@ -339,33 +305,34 @@ int main(int argc, char **argv)
 	char *dummy = NULL;
 
 	/* Parse options */
-	opt_idx = 1;
-	c = -1;
-	while(1) {
-		c = getopt_long_only(argc, argv, "", iz_long_opts, &opt_idx);
-		if (c == -1) break;
+	opt_idx = -1;
+	while (1) {
+		c = getopt_long(argc, argv, "d::vh", iz_long_opts, &opt_idx);
+		if (c == -1)
+			break;
+
 		switch(c) {
-		case 0:
-			switch(opt_idx) {
-			case DEBUG_NUM:
-				iz_debug = nl_debug = 1;
-				if (optarg) {
-					i = strtol(optarg, &dummy, 10);
-					if (*dummy == '\0')
-						iz_debug = nl_debug = i;
-				}
-				break;
-			case VERSION_NUM:
-				printf("%s\n", iz_version);
-				return 0;
-			case HELP_NUM:
-				iz_help();
-				return 0;
+		case 'd':
+			iz_debug = nl_debug = 1;
+			if (optarg) {
+				i = strtol(optarg, &dummy, 10);
+				if (*dummy == '\0')
+					iz_debug = nl_debug = i;
 			}
+			break;
+		case 'v':
+			printf("iz %s\nCopyright (C) 2008, 2009 by authors team\n", VERSION);
+			return 0;
+		case 'h':
+			iz_help(argv[0]);
+			return 0;
+		default:
+			iz_help(argv[0]);
+			return 1;
 		}
 	}
-	if (opt_idx >= argc) {
-		printf("%s\n", iz_version);
+	if (optind >= argc) {
+		printf("iz %s\nCopyright (C) 2008, 2009 by authors team\n", VERSION);
 		printf("Usage: iz [options] [command]\n");
 		return 1;
 	}
@@ -448,18 +415,17 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-static void iz_help(void)
+static void iz_help(const char *pname)
 {
 	int i, j;
 
-	printf("%s\n\n", iz_version);
-	printf("Usage:\n");
-	printf("  iz [options] [command]\n");
+	printf("Usage: %s [options] [command]\n", pname);
+	printf("Manage IEEE 802.15.4 network interfaces\n\n");
 
-	printf("\nOptions:\n");
-	printf("  --debug[=N] - print netlink messages and other debug information\n");
-	printf("  --version - print version\n");
-	printf("  --help - print help\n");
+	printf("Options:\n");
+	printf("  -d, --debug[=N]                print netlink messages and other debug information\n");
+	printf("  -v, --version                  print version\n");
+	printf("  -h, --help                      print help\n");
 
 	/* Print short help for available commands */
 	for (i = 0; i < IZ_TYPES_NUM; i++) {
@@ -551,7 +517,7 @@ static int help_parse(struct iz_cmd *cmd, int argc, char **argv)
 		printf("Too many arguments!\n");
 		return IZ_STOP_ERR;
 	} else if (argc == cmd->argn + 1) {
-		iz_help();
+		iz_help("iz");
 		return IZ_STOP_OK;
 	}
 
