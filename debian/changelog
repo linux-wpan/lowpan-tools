@@ -2,8 +2,10 @@ lowpan-tools (0.2-1) unstable; urgency=low
 
   * New upstream release.
   * Add an sf url to the watchile for uscan(1).
+  * Add build-dependancy on bison (patch by Henning Glawe) and flex,
+    as git versions of the package require them.
 
- -- Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>  Mon, 25 May 2009 11:57:30 +0400
+ -- Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>  Sun, 02 Aug 2009 04:02:31 +0400
 
 lowpan-tools (0.1-3) unstable; urgency=low
 
