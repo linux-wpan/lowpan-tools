@@ -134,6 +134,12 @@ static int iz_seq = 0;
 /* Parsed options */
 static int iz_debug = 0;
 
+#define dprintf(lvl, fmt...)			\
+	do {					\
+		if (iz_debug >= lvl)		\
+			printf(fmt);		\
+	} while(0)
+
 /* Command classes (device types) */
 #define IZ_C_COMMON	0x01
 #define IZ_C_PHY	0x02
@@ -394,10 +400,10 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		if (iz_debug) printf("nl_send_auto_complete\n");
+		dprintf(1, "nl_send_auto_complete\n");
 		nl_send_auto_complete(nl, msg);
 
-		if (iz_debug) printf("nlmsg_free\n");
+		dprintf(1, "nlmsg_free\n");
 		nlmsg_free(msg);
 	}
 
@@ -476,8 +482,7 @@ static int iz_cb_valid(struct nl_msg *msg, void *arg)
 
         ghdr = nlmsg_data(nlh);
 
-	if (iz_debug)
-		printf("Received command %d (%d) for interface\n",
+	dprintf(1, "Received command %d (%d) for interface\n",
 			ghdr->cmd, ghdr->version);
 
 	if (cmd->listener) {
