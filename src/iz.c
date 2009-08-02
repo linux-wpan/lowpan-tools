@@ -431,14 +431,14 @@ static void iz_help(const char *pname)
 	/* Print short help for available commands */
 	printf("\nCommon commands:\n");
 	for (i = 0; i < IZ_COMMANDS_NUM; i++) {
-		printf("  %s %s\n\t%s\n", iz_commands[i].name,
+		printf("  %s  %s\n     %s\n\n", iz_commands[i].name,
 			iz_commands[i].usage,
 			iz_commands[i].doc);
 	}
 
 	printf("\nMAC 802.15.4 commands:\n");
 	for (i = 0; i < MAC_COMMANDS_NUM; i++) {
-		printf("  %s %s\n\t%s\n", mac_commands[i].name,
+		printf("  %s  %s\n     %s\n\n", mac_commands[i].name,
 			mac_commands[i].usage,
 			mac_commands[i].doc);
 	}
