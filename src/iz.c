@@ -161,7 +161,7 @@ static struct iz_cmd_desc iz_commands[] = {
 	},
 	{
 		.name		= "event",
-		.usage		= "",
+		.usage		= "[iface]",
 		.doc		= "Monitor events from the kernel (^C to stop).",
 		.parse		= event_parse,
 		.request	= NULL,
@@ -710,15 +710,28 @@ static int event_parse(struct iz_cmd *cmd)
 
 	cmd->listener = cmd->desc;
 
+	if (cmd->argc > 2) {
+		printf("Too many arguments!\n");
+		return IZ_STOP_ERR;
+	}
+
 	return IZ_CONT_OK;
 }
 
 static int event_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs)
 {
+	const char *iface = nla_get_string(attrs[IEEE802154_ATTR_DEV_NAME]);
+
+	if (cmd->argv[1] && (!iface || strcmp(cmd->argv[1], iface)))
+		return IZ_CONT_OK;
+
+	if (!iface)
+		iface = "?????";
+
 	if (ghdr->cmd < __IEEE802154_CMD_MAX)
-		fprintf(stdout, "%s (%i)\n", iz_cmd_names[ghdr->cmd], ghdr->cmd);
+		fprintf(stdout, "%s: %s (%i)\n", iface, iz_cmd_names[ghdr->cmd], ghdr->cmd);
 	else
-		fprintf(stdout, "UNKNOWN (%i)\n", ghdr->cmd);
+		fprintf(stdout, "%s: UNKNOWN (%i)\n", iface, ghdr->cmd);
 
 	fflush(stdout);
 
