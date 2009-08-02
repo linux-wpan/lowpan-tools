@@ -47,8 +47,7 @@
 
 #include "addrdb.h"
 
-#define u64 uint64_t
-
+#define IEEE802154_SUCCESS 0x0
 
 #define PID_BUF_LEN 32
 
@@ -57,16 +56,22 @@ static int family;
 static struct nl_handle *nl;
 static const char *iface;
 static char lease_file[PATH_MAX];
+static int die_flag = 0;
+
 
 extern int yydebug;
 
+void cleanup(int ret);
+
 static void log_msg_nl_perror(char *s)
 {
-	if (nl_get_errno())
+	if (nl_get_errno()) {
 		log_msg(0, "%s: %s", s, nl_geterror());
+		cleanup(1);
+	}
 }
 
-int mlme_start(uint16_t short_addr, uint16_t pan, uint8_t is_coordinator, const char * iface)
+int mlme_start(uint16_t short_addr, uint16_t pan, uint8_t channel, uint8_t is_coordinator, const char * iface)
 {
 	struct nl_msg *msg = nlmsg_alloc();
 	log_msg(0, "mlme_start\n");
@@ -74,15 +79,18 @@ int mlme_start(uint16_t short_addr, uint16_t pan, uint8_t is_coordinator, const 
 	nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, iface);
 	nla_put_u16(msg, IEEE802154_ATTR_COORD_PAN_ID, pan);
 	nla_put_u16(msg, IEEE802154_ATTR_COORD_SHORT_ADDR, short_addr);
-#if 0
 	nla_put_u8(msg, IEEE802154_ATTR_CHANNEL, channel);
-	nla_put_u8(msg, IEEE802154_ATTR_BCN_ORD, bcn_ord);
-	nla_put_u8(msg, IEEE802154_ATTR_SF_ORD, sf_ord);
-#endif
 	nla_put_u8(msg, IEEE802154_ATTR_PAN_COORD, is_coordinator);
 #if 0
+	nla_put_u8(msg, IEEE802154_ATTR_BCN_ORD, bcn_ord);
+	nla_put_u8(msg, IEEE802154_ATTR_SF_ORD, sf_ord);
 	nla_put_u8(msg, IEEE802154_ATTR_BAT_EXT, battery_ext);
 	nla_put_u8(msg, IEEE802154_ATTR_COORD_REALIGN, coord_realign);
+#else
+	nla_put_u8(msg, IEEE802154_ATTR_BCN_ORD, 15);
+	nla_put_u8(msg, IEEE802154_ATTR_SF_ORD, 15);
+	nla_put_u8(msg, IEEE802154_ATTR_BAT_EXT, 0);
+	nla_put_u8(msg, IEEE802154_ATTR_COORD_REALIGN, 0);
 #endif
 	nl_send_auto_complete(nl, msg);
 	log_msg_nl_perror("nl_send_auto_complete");
@@ -114,7 +122,7 @@ static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 	}
 
 	nla_put_u32(msg, IEEE802154_ATTR_DEV_INDEX, nla_get_u32(attrs[IEEE802154_ATTR_DEV_INDEX]));
-	nla_put_u32(msg, IEEE802154_ATTR_STATUS, (shaddr != 0xffff) ? 0x0: 0x01);
+	nla_put_u8(msg, IEEE802154_ATTR_STATUS, (shaddr != 0xffff) ? 0x0: 0x01);
 	nla_put_u64(msg, IEEE802154_ATTR_DEST_HW_ADDR, nla_get_u64(attrs[IEEE802154_ATTR_SRC_HW_ADDR]));
 	nla_put_u16(msg, IEEE802154_ATTR_DEST_SHORT_ADDR, shaddr);
 
@@ -148,6 +156,23 @@ static int coordinator_disassociate(struct genlmsghdr *ghdr, struct nlattr **att
 	return 0;
 }
 
+static int coordinator_start_confirm(struct genlmsghdr *ghdr, struct nlattr **attrs)
+{
+	log_msg(0, "Start confirmation\n");
+
+	if (!attrs[IEEE802154_ATTR_STATUS])
+		return -EINVAL;
+
+	uint8_t status = nla_get_u8(attrs[IEEE802154_ATTR_STATUS]);
+
+	if (status != IEEE802154_SUCCESS) {
+		log_msg(0, "START failed!\n");
+		die_flag = 1;
+	}
+
+	return 0;
+}
+
 static int parse_cb(struct nl_msg *msg, void *arg)
 {
 	struct nlmsghdr *nlh = nlmsg_hdr(msg);
@@ -176,19 +201,9 @@ static int parse_cb(struct nl_msg *msg, void *arg)
 			return coordinator_associate(ghdr, attrs);
 		case IEEE802154_DISASSOCIATE_INDIC:
 			return coordinator_disassociate(ghdr, attrs);
+		case IEEE802154_START_CONF:
+			return coordinator_start_confirm(ghdr, attrs);
 	}
-
-	if (!attrs[IEEE802154_ATTR_HW_ADDR])
-		return -EINVAL;
-
-	uint64_t addr = nla_get_u64(attrs[IEEE802154_ATTR_HW_ADDR]);
-	uint8_t buf[8];
-	memcpy(buf, &addr, 8);
-
-	log_msg(0, "Addr for %s is %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x\n",
-			nla_get_string(attrs[IEEE802154_ATTR_DEV_NAME]),
-			buf[0], buf[1],	buf[2], buf[3],
-			buf[4], buf[5],	buf[6], buf[7]);
 
 	return 0;
 }
@@ -213,8 +228,6 @@ void dump_lease_handler(int t)
 {
 	addrdb_dump_leases(lease_file);
 }
-
-int die_flag = 0;
 
 void cleanup(int ret)
 {
@@ -242,7 +255,8 @@ void usage(char * name)
 		" -n range_max       Maximal new 16-bit address allocated.\n"
 		" -i iface           Interface to work with.\n"
 		" -s addr            16-bit address of coordinator (hexadecimal).\n"
-		" -p addr            16-bit address of PAN (hexadecimal).\n"
+		" -p addr            16-bit PAN ID (hexadecimal).\n"
+		" -c chan            number of channel to use.\n"
 		" -h, --help         This usage information.\n"
 		" -v, --version      Print version information.\n"
 	);
@@ -261,9 +275,10 @@ int main(int argc, char **argv)
 {
 	struct sigaction sa;
 	int opt, debug, pid_fd, uid;
-	uint16_t pan = 0, short_addr = 0;
+	uint16_t pan = 0xffff, short_addr = 0xffff;
 	char pname[PATH_MAX];
 	char * p;
+	uint8_t channel = 0;
 
 	debug = 0;
 	range_min = 0x8000;
@@ -278,11 +293,11 @@ int main(int argc, char **argv)
 	strncpy(pname, argv[0], PATH_MAX);
 
 #ifndef HAVE_GETOPT_LONG
-	while ((opt = getopt(argc, argv, "l:d:m:n:i:s:p:hv")) != -1) {
+	while ((opt = getopt(argc, argv, "l:d:m:n:i:s:p:c:hv")) != -1) {
 #else
 	while(1) {
 		int option_index = 0;
-		opt = getopt_long(argc, argv, "l:d:m:n:i:s:p:hv",
+		opt = getopt_long(argc, argv, "l:d:m:n:i:s:p:c:hv",
 				long_options, &option_index);
 		fprintf(stderr, "Opt: %c (%hhx)\n", opt, opt);
 		if (opt == -1)
@@ -310,6 +325,9 @@ int main(int argc, char **argv)
 			break;
 		case 's': /* 16-bit address */
 			short_addr = strtol(optarg, NULL, 16);
+			break;
+		case 'c': /* channel */
+			channel = strtol(optarg, NULL, 0);
 			break;
 		case 1:
 		case 'v':
@@ -431,10 +449,11 @@ int main(int argc, char **argv)
 
 		close (pid_fd);
 	}
-	mlme_start(short_addr, pan, 1, iface);
+	mlme_start(short_addr, pan, channel, 1, iface);
 
 	while (!die_flag) {
 		nl_recvmsgs_default(nl);
+		log_msg_nl_perror("nl_recvmsgs");
 	}
 	cleanup(0);
 
