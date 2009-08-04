@@ -42,19 +42,16 @@
 
 int main(int argc, char **argv) {
 	int fd, ret, s;
-	struct ifreq req;
 
-	if (argc == 2 && !strcmp(argv[1], "--version")) {
+	if (argc == 1 && !strcmp(argv[1], "--version")) {
 		printf("izattach %s\nCopyright (C) 2008, 2009 by authors team\n", VERSION);
 		return 0;
 	}
 
 	if (argc != 3 || (argc >= 2 && !strcmp(argv[1], "--help"))) {
-		printf("Usage: %s SERIAL_DEV master_dev\n", argv[0]);
+		printf("Usage: %s SERIAL_DEV\n", argv[0]);
 		printf("Attach serial devices via UART to IEEE 802.15.4/ZigBee stack\n\n");
 		printf("  SERIAL_DEV  This specifies the serial device to attach.\n");
-		printf("  master_dev  This provides a name of the master WPAN device\n");
-		printf("              that this serial will become\n");
 		return 1;
 	}
 
@@ -123,15 +120,6 @@ int main(int argc, char **argv) {
 		perror("socket");
 		return 7;
 	}
-	strcpy(req.ifr_name, argv[2]);
-	memset(&req.ifr_hwaddr.sa_data, 0, sizeof(req.ifr_hwaddr.sa_data));
-	strcpy(req.ifr_hwaddr.sa_data, argv[2]);
-	ret = ioctl(s, IEEE802154_SIOC_ADD_SLAVE, &req);
-	if (ret < 0) {
-		perror("ioctl: IEEE802154_SIOC_ADD_SLAVE");
-		return 8;
-	}
-	close(s);
 
 	if (daemon(0, 0) < 0) {
 		perror("daemon");
