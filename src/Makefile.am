@@ -25,18 +25,18 @@ izcoordinator_LDADD = ../addrdb/libaddrdb.la $(LDADD) $(NL_LIBS) $(LEXLIB)
 iz_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS)
 iz_LDADD = $(LDADD) $(NL_LIBS)
 
-izattach.8: $(izattach_SOURCES)
-	-$(HELP2MAN) -o $@ -s 8 -N -n $(izattach_DESC)  ./`basename $@ .8`
+izattach.8: $(izattach_SOURCES) $(top_srcdir)/configure.ac
+	-$(HELP2MAN) -o $@ -s 8 -N -n $(izattach_DESC) $(builddir)/izattach
 
-izconfig.8: $(izconfig_SOURCES)
-	-$(HELP2MAN) -o $@ -s 8 -N -n $(izconfig_DESC)  ./`basename $@ .8`
+izconfig.8: $(izconfig_SOURCES) $(top_srcdir)/configure.ac
+	-$(HELP2MAN) -o $@ -s 8 -N -n $(izconfig_DESC) $(builddir)/izconfig
 
-izcoordinator.8: $(izcoordinator_SOURCES)
-	-$(HELP2MAN) -o $@ -s 8 -N -n $(izcoordinator_DESC)  ./`basename $@ .8`
+izcoordinator.8: $(izcoordinator_SOURCES) $(top_srcdir)/configure.ac
+	-$(HELP2MAN) -o $@ -s 8 -N -n $(izcoordinator_DESC) $(builddir)/izcoordinator
 
-iz.8: $(iz_SOURCES)
-	-$(HELP2MAN) -o $@ -s 8 -N -n $(iz_DESC)  ./`basename $@ .8`
+iz.8: $(iz_SOURCES) $(top_srcdir)/configure.ac
+	-$(HELP2MAN) -o $@ -s 8 -N -n $(iz_DESC) $(builddir)/iz
 
-izchat.1: $(izchat_SOURCES)
-	-$(HELP2MAN) -o $@ -s 1 -N -n $(izchat_DESC)  ./`basename $@ .1`
+izchat.1: $(izchat_SOURCES) $(top_srcdir)/configure.ac
+	-$(HELP2MAN) -o $@ -s 1 -N -n $(izchat_DESC) $(builddir)/izchat
 
