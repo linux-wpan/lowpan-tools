@@ -3,16 +3,25 @@ Section: net
 Priority: extra
 Maintainer: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
 Build-Depends: debhelper (>= 6), autotools-dev, python-central, libnl-dev, bison, flex
-Standards-Version: 3.8.1
+Standards-Version: 3.8.2
 Homepage: http://linux-zigbee.sourceforge.net/
 XS-Python-Version: all
 
-Package: lowpan-tools
+Package: lowpan-test-tools
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 XB-Python-Version: ${python:Version}
 Provides: ${python:Provides}
 Recommends: python
+Description: Testing programs for LoWPAN stack in Linux
+ This package provides several programs for testing various aspects of
+ Linux IEEE 802.15.4 stack.
+ .
+ Normal users don't need to install this package.
+
+Package: lowpan-tools
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Base programs for LoWPAN in Linux, the net-tools for LoWPAN
  This package provides all basic prorgrams needed for setting up, monitoring
  and tuning LoWPAN networks.
@@ -20,7 +29,7 @@ Description: Base programs for LoWPAN in Linux, the net-tools for LoWPAN
  Notice that upstream still flags these tools as experimental software and
  says that there is still a number of known bugs and issues. The
  software is, however, in productive use at a number of sites and is
-  working reliably
+ working reliably.
 
 Package: liblowpan-dev
 Architecture: all

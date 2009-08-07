@@ -1,6 +1,5 @@
 usr/bin
 usr/sbin
-usr/lib/lowpan-tools
-usr/lib/python?.?
+usr/lib/ip
 usr/share/man/*/*
 /var/lib
