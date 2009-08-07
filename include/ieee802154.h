@@ -88,28 +88,14 @@ struct sockaddr_ieee802154 {
 #define ETH_P_IEEE802154 0x00F6		/* IEEE802.15.4 frame		*/
 #endif
 
-#ifndef HAVE_STRUCT_USER_DATA
-#ifndef IFNAMSIZ
-#define IFNAMSIZ 16
+/* get/setsockopt */
+#ifndef SOL_IEEE802154
+#define SOL_IEEE802154	0
 #endif
 
-struct ieee802154_user_data {
-	/* This is used as ifr_name */
-	union
-	{
-		char	ifrn_name[IFNAMSIZ];		/* if name, e.g. "en0" */
-	} ifr_ifrn;
-	int channels;
-	int channel;
-	int duration;
-	int rejoin;
-	int rxon;
-	int as_router;
-	int power;
-	int mac_security;
-	int16_t panid;
-	int cmd;
-//	struct ieee802154_dev_address addr; /**< Peer address */
-};
+#ifndef WPAN_WANTACK
+#define WPAN_WANTACK	0
 #endif
+
+
 #endif
