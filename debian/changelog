@@ -1,4 +1,4 @@
-lowpan-tools (0.2-1) unstable; urgency=low
+lowpan-tools (0.2~rc1-1) unstable; urgency=low
 
   * New upstream release.
   * Add an sf url to the watchile for uscan(1).

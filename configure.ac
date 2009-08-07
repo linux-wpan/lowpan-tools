@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([lowpan-tools],[0.2],[dbaryshkov@gmail.com])
+AC_INIT([lowpan-tools],[0.2-rc1],[dbaryshkov@gmail.com])
 AC_CONFIG_AUX_DIR([misc])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror gnu])
