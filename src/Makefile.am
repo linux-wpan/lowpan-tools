@@ -4,7 +4,7 @@ sbin_PROGRAMS = izattach izconfig izcoordinator iz
 bin_PROGRAMS = izchat
 
 if MANPAGES
-manpages = izconfig.8 izcoordinator.8 iz.8 izattach.8
+manpages = izconfig.8 izcoordinator.8 iz.8 izattach.8 izchat.1
 else
 manpages =
 endif
@@ -13,6 +13,7 @@ izattach_DESC = "attach a serial device to IEEE 802.15.4 stack"
 izcoordinator_DESC = "simple coordinator for IEEE 802.15.4 network"
 iz_DESC = "configure an IEEE 802.15.4 interface"
 izconfig_DESC = "configure an IEEE 802.15.4 interface"
+izchat_DESC = "simple chat program using IEEE 802.15.4"
 
 izattach_SOURCES = serial.c
 
@@ -35,4 +36,7 @@ izcoordinator.8: $(izcoordinator_SOURCES)
 
 iz.8: $(iz_SOURCES)
 	-$(HELP2MAN) -o $@ -s 8 -N -n $(iz_DESC)  ./`basename $@ .8`
+
+izchat.1: $(izchat_SOURCES)
+	-$(HELP2MAN) -o $@ -s 1 -N -n $(izchat_DESC)  ./`basename $@ .1`
 

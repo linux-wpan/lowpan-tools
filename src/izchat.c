@@ -41,9 +41,18 @@ int main(int argc, char **argv) {
 	int ret;
 	struct sockaddr_ieee802154 a;
 
-	if (argc != 4) {
+	if (argv[1] && !strcmp(argv[1], "--version")) {
+		printf("izchat %s\nCopyright (C) 2008, 2009 by authors team\n", VERSION);
+		return 0;
+	}
+
+	if (!argv[1] || !strcmp(argv[1], "--help") || argc != 4) {
 		printf("Usage: %s PANid sourceAddr destAddr\n", argv[0]);
-		return 1;
+		printf("  or:  %s --help\n", argv[0]);
+		printf("  or:  %s --version\n", argv[0]);
+		printf("\n\nStarts chat session on net PANid, using addr sourceAddr talking with destAddr.\n");
+		printf("\nCurrently all addresses should be short (16-bit) and specified in hex form.\n");
+		return 0;
 	}
 
 	sd = socket(PF_IEEE802154, SOCK_DGRAM, 0);
