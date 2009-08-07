@@ -1,10 +1,10 @@
 include $(top_srcdir)/Makefile.common
 
-sbin_PROGRAMS = izattach izconfig izcoordinator iz
+sbin_PROGRAMS = izattach izcoordinator iz
 bin_PROGRAMS = izchat
 
 if MANPAGES
-manpages = izconfig.8 izcoordinator.8 iz.8 izattach.8 izchat.1
+manpages = izcoordinator.8 iz.8 izattach.8 izchat.1
 else
 manpages =
 endif
@@ -12,7 +12,6 @@ dist_man_MANS = $(manpages)
 izattach_DESC = "attach a serial device to IEEE 802.15.4 stack"
 izcoordinator_DESC = "simple coordinator for IEEE 802.15.4 network"
 iz_DESC = "configure an IEEE 802.15.4 interface"
-izconfig_DESC = "configure an IEEE 802.15.4 interface"
 izchat_DESC = "simple chat program using IEEE 802.15.4"
 
 izattach_SOURCES = serial.c
@@ -27,9 +26,6 @@ iz_LDADD = $(LDADD) $(NL_LIBS)
 
 izattach.8: $(izattach_SOURCES) $(top_srcdir)/configure.ac
 	-$(HELP2MAN) -o $@ -s 8 -N -n $(izattach_DESC) $(builddir)/izattach
-
-izconfig.8: $(izconfig_SOURCES) $(top_srcdir)/configure.ac
-	-$(HELP2MAN) -o $@ -s 8 -N -n $(izconfig_DESC) $(builddir)/izconfig
 
 izcoordinator.8: $(izcoordinator_SOURCES) $(top_srcdir)/configure.ac
 	-$(HELP2MAN) -o $@ -s 8 -N -n $(izcoordinator_DESC) $(builddir)/izcoordinator
