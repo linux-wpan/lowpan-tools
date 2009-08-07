@@ -13,6 +13,7 @@ Depends: ${shlibs:Depends}, ${misc:Depends}
 XB-Python-Version: ${python:Version}
 Provides: ${python:Provides}
 Recommends: python
+Replaces: lowpan-tools (<< 0.2)
 Description: Testing programs for LoWPAN stack in Linux
  This package provides several programs for testing various aspects of
  Linux IEEE 802.15.4 stack.
