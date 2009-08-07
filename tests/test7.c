@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 
 	int opt;
 	socklen_t size = sizeof(opt);
-	ret = getsockopt(sd, 0, 0, &opt, &size);
+	ret = getsockopt(sd, SOL_IEEE802154, WPAN_WANTACK, &opt, &size);
 	if (ret)
 		perror("getsockopt");
 
