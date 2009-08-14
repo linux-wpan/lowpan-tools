@@ -21,6 +21,17 @@
 #define IPLINK_H
 
 extern const char *ll_addr_n2a(unsigned char *addr, int alen, int type, char *buf, int blen);
+extern int matches(const char *arg, const char *pattern);
+
+extern int addattr32(struct nlmsghdr *n, int maxlen, int type, __u32 data);
+extern int addattr_l(struct nlmsghdr *n, int maxlen, int type, const void *data, int alen);
+
+extern void incomplete_command(void) __attribute__((noreturn));
+
+#define NEXT_ARG() do { argv++; if (--argc <= 0) incomplete_command(); } while(0)
+#define NEXT_ARG_OK() (argc - 1 > 0)
+#define PREV_ARG() do { argv--; argc++; } while(0)
+
 
 struct link_util {
 	struct link_util *next;

@@ -22,6 +22,7 @@
 #endif
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <ieee802154.h>
 
 #include <netlink/netlink.h>
@@ -29,11 +30,24 @@
 #include <linux/mac802154.h>
 #include "iplink.h"
 
+static void explain(void)
+{
+	fprintf(stderr,
+		"Usage: ... wpan phy PHY\n"
+	       );
+}
+
 static void wpan_print_opt(struct link_util *lu, FILE *f,
 			struct rtattr *tb[])
 {
 	if (!tb)
 		return;
+
+	if (tb[IFLA_WPAN_PHY]) {
+		char *phy = RTA_DATA(tb[IFLA_WPAN_PHY]);
+		phy[RTA_PAYLOAD(tb[IFLA_WPAN_PHY]) - 1] = '\0';
+		fprintf(f, "phy %s ", phy);
+	}
 
 	if (tb[IFLA_WPAN_CHANNEL]) {
 		uint16_t *chan = RTA_DATA(tb[IFLA_WPAN_CHANNEL]);
@@ -64,9 +78,31 @@ static void wpan_print_opt(struct link_util *lu, FILE *f,
 	}
 }
 
+static int wpan_parse_opt(struct link_util *lu, int argc, char **argv,
+			  struct nlmsghdr *n)
+{
+	while (argc > 0) {
+		if (matches(*argv, "phy") == 0) {
+			NEXT_ARG();
+			addattr_l(n, 1024, IFLA_WPAN_PHY, *argv, strlen(*argv) + 1);
+		} else if (matches(*argv, "help") == 0) {
+			explain();
+			return -1;
+		} else {
+			fprintf(stderr, "vlan: what is \"%s\"?\n", *argv);
+			explain();
+			return -1;
+		}
+		argc--; argv++;
+	}
+
+	return 0;
+}
+
 struct link_util wpan_link_util = {
 	.id		= "wpan",
 	.maxattr	= IFLA_WPAN_MAX,
 	.print_opt	= wpan_print_opt,
+	.parse_opt	= wpan_parse_opt,
 };
 
