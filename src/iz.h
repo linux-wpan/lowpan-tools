@@ -51,13 +51,14 @@ struct iz_cmd_desc {
 	iz_res_t (*parse)(struct iz_cmd *cmd);
 
 	/* Prepare an outgoing netlink message */
-	/* Returns 0 in case of success, in other case error */
 	/* If request is not defined, we go to receive wo sending message */
 	iz_res_t (*request)(struct iz_cmd *cmd, struct nl_msg *msg);
 
 	/* Handle an incoming netlink message */
-	/* Returns 1 to stop with error, -1 to stop with Ok; 0 to continue */
 	iz_res_t (*response)(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs);
+
+	/* Handle the end of multipart message */
+	iz_res_t (*finish)(struct iz_cmd *cmd);
 };
 
 /* Parsed command results */
@@ -70,6 +71,9 @@ struct iz_cmd {
 	/* Fields below are prepared by parse function */
 	int flags;	/* NL message flags */
 	char *iface;	/* Interface for a command */
+
+	/* Filled before calling response */
+	uint32_t seq;
 };
 
 extern struct iz_cmd_desc mac_commands[];

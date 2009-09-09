@@ -43,6 +43,7 @@
 
 static int iz_cb_seq_check(struct nl_msg *msg, void *arg);
 static int iz_cb_valid(struct nl_msg *msg, void *arg);
+static int iz_cb_finish(struct nl_msg *msg, void *arg);
 static void iz_help(const char *pname);
 
 /* Command specific declarations */
@@ -53,6 +54,7 @@ static iz_res_t help_parse(struct iz_cmd *cmd);
 /* EVENT */
 static iz_res_t event_parse(struct iz_cmd *cmd);
 static iz_res_t event_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs);
+static iz_res_t event_finish(struct iz_cmd *cmd);
 
 
 static const struct option iz_long_opts[] = {
@@ -89,6 +91,7 @@ static struct iz_cmd_desc iz_commands[] = {
 		.doc		= "Monitor events from the kernel (^C to stop).",
 		.parse		= event_parse,
 		.response	= event_response,
+		.finish		= event_finish,
 		.listener	= 1,
 	},
 	{}
@@ -242,6 +245,8 @@ int main(int argc, char **argv)
 	iz_seq = nl_socket_use_seq(nl) + 1;
 	nl_socket_modify_cb(nl, NL_CB_VALID, NL_CB_CUSTOM,
 		iz_cb_valid, (void*)&cmd);
+	nl_socket_modify_cb(nl, NL_CB_FINISH, NL_CB_CUSTOM,
+		iz_cb_finish, (void*)&cmd);
 	nl_socket_modify_cb(nl, NL_CB_SEQ_CHECK, NL_CB_CUSTOM,
 		iz_cb_seq_check, (void*)&cmd);
 
@@ -262,13 +267,14 @@ int main(int argc, char **argv)
 
 		dprintf(1, "nl_send_auto_complete\n");
 		nl_send_auto_complete(nl, msg);
+		cmd.seq = nlmsg_hdr(msg)->nlmsg_seq;
 
 		dprintf(1, "nlmsg_free\n");
 		nlmsg_free(msg);
 	}
 
 	/* Received message handling loop */
-	while (!iz_exit) {
+	while (iz_exit == IZ_CONT_OK) {
 		if(nl_recvmsgs_default(nl)) {
 			nl_perror("Receive failed");
 			return 1;
@@ -325,7 +331,7 @@ static int iz_cb_seq_check(struct nl_msg *msg, void *arg)
 		return NL_OK;
 	}
 	printf("Sequence number mismatch (%i, %i)!", seq, iz_seq);
-	return NL_OK;
+	return NL_SKIP;
 }
 
 /* Callback for received valid messages */
@@ -344,8 +350,27 @@ static int iz_cb_valid(struct nl_msg *msg, void *arg)
 	dprintf(1, "Received command %d (%d) for interface\n",
 			ghdr->cmd, ghdr->version);
 
-	if (cmd->desc->listener || cmd->desc->nl_resp == ghdr->cmd)
+	if (cmd->desc->listener || cmd->desc->nl_resp == ghdr->cmd) {
 		iz_exit = cmd->desc->response(cmd, ghdr, attrs);
+	}
+
+	return 0;
+}
+
+/* Callback for the end of the multipart message */
+static int iz_cb_finish(struct nl_msg *msg, void *arg)
+{
+	struct nlmsghdr *nlh = nlmsg_hdr(msg);
+	struct iz_cmd *cmd = arg;
+
+	dprintf(1, "Received finish for interface\n");
+
+	if (cmd->seq == nlh->nlmsg_seq) {
+		if (cmd->desc->finish)
+			iz_exit = cmd->desc->finish(cmd);
+		else
+			iz_exit = IZ_STOP_ERR;
+	}
 
 	return 0;
 }
@@ -412,6 +437,11 @@ static iz_res_t event_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, stru
 
 	fflush(stdout);
 
+	return IZ_CONT_OK;
+}
+
+static iz_res_t event_finish(struct iz_cmd *cmd)
+{
 	return IZ_CONT_OK;
 }
 
