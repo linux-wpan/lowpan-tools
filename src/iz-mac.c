@@ -385,7 +385,6 @@ struct iz_cmd_desc mac_commands[] = {
 		.parse		= scan_parse,
 		.request	= scan_request,
 		.response	= scan_response,
-		.help		= NULL,
 	},
 	{
 		.name		= "assoc",
@@ -396,7 +395,6 @@ struct iz_cmd_desc mac_commands[] = {
 		.parse		= assoc_parse,
 		.request	= assoc_request,
 		.response	= assoc_response,
-		.help		= NULL,
 	},
 	{
 		.name		= "disassoc",
@@ -407,7 +405,6 @@ struct iz_cmd_desc mac_commands[] = {
 		.parse		= disassoc_parse,
 		.request	= disassoc_request,
 		.response	= disassoc_response,
-		.help		= NULL,
 	},
 	{
 		.name		= "list",
@@ -418,7 +415,6 @@ struct iz_cmd_desc mac_commands[] = {
 		.parse		= list_parse,
 		.request	= list_request,
 		.response	= list_response,
-		.help		= NULL,
 	},
 	{}
 };

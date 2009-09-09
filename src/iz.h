@@ -57,9 +57,6 @@ struct iz_cmd_desc {
 	/* Handle an incoming netlink message */
 	/* Returns 1 to stop with error, -1 to stop with Ok; 0 to continue */
 	iz_res_t (*response)(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs);
-
-	/* Print detailed help information */
-	void (*help)(void);
 };
 
 /* Parsed command results */

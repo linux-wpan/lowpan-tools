@@ -90,7 +90,6 @@ static struct iz_cmd_desc iz_commands[] = {
 		.parse		= event_parse,
 		.request	= NULL,
 		.response	= event_response,
-		.help		= NULL,
 	},
 	{}
 };
@@ -404,10 +403,6 @@ static iz_res_t help_parse(struct iz_cmd *cmd)
 		printf("%s %s\n\t%s\n\n", desc->name,
 			desc->usage,
 			desc->doc);
-		if (desc->help)
-			desc->help();
-		else
-			printf("Detailed help is not available.\n");
 	}
 	return IZ_STOP_OK;
 }
