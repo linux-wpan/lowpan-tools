@@ -88,8 +88,8 @@ static struct iz_cmd_desc iz_commands[] = {
 		.usage		= "[iface]",
 		.doc		= "Monitor events from the kernel (^C to stop).",
 		.parse		= event_parse,
-		.request	= NULL,
 		.response	= event_response,
+		.listener	= 1,
 	},
 	{}
 };
@@ -155,26 +155,6 @@ struct iz_cmd_desc *get_cmd(const char *name)
 
 	return NULL;
 }
-
-struct iz_cmd_desc *get_resp(unsigned char nl_resp)
-{
-	int i;
-
-	for (i = 0; iz_commands[i].name; i++) {
-		if (iz_commands[i].nl_resp == nl_resp) {
-			return &iz_commands[i];
-		}
-	}
-
-	for (i = 0; mac_commands[i].name; i++) {
-		if (mac_commands[i].nl_resp == nl_resp) {
-			return &mac_commands[i];
-		}
-	}
-
-	return NULL;
-}
-
 
 int main(int argc, char **argv)
 {
@@ -354,7 +334,6 @@ static int iz_cb_valid(struct nl_msg *msg, void *arg)
 	struct nlmsghdr *nlh = nlmsg_hdr(msg);
 	struct nlattr *attrs[IEEE802154_ATTR_MAX+1];
         struct genlmsghdr *ghdr;
-	struct iz_cmd_desc *desc;
 	struct iz_cmd *cmd = arg;
 
 	/* Validate message and parse attributes */
@@ -365,15 +344,8 @@ static int iz_cb_valid(struct nl_msg *msg, void *arg)
 	dprintf(1, "Received command %d (%d) for interface\n",
 			ghdr->cmd, ghdr->version);
 
-	if (cmd->listener) {
-		/* Process response if we don't know nl_resp */
-		desc = cmd->listener;
-	} else {
-		/* Handle known nl_resp'onces */
-		desc = get_resp(ghdr->cmd);
-	}
-	if (desc && desc->response)
-		iz_exit = desc->response(cmd, ghdr, attrs);
+	if (cmd->desc->listener || cmd->desc->nl_resp == ghdr->cmd)
+		iz_exit = cmd->desc->response(cmd, ghdr, attrs);
 
 	return 0;
 }
@@ -414,8 +386,6 @@ static iz_res_t help_parse(struct iz_cmd *cmd)
 static iz_res_t event_parse(struct iz_cmd *cmd)
 {
 	cmd->flags = 0;
-
-	cmd->listener = cmd->desc;
 
 	if (cmd->argc > 2) {
 		printf("Too many arguments!\n");

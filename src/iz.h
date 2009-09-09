@@ -44,6 +44,7 @@ struct iz_cmd_desc {
 	const char *doc;	/* One line command description */
 	unsigned char nl_cmd;	/* NL command ID */
 	unsigned char nl_resp;	/* NL command response ID (optional) */
+	unsigned listener : 1;	/* Listen for all events */
 
 	/* Parse command line, fill in iz_cmd struct. */
 	/* You must set cmd->flags here! */
@@ -67,9 +68,7 @@ struct iz_cmd {
 	struct iz_cmd_desc *desc;
 
 	/* Fields below are prepared by parse function */
-	struct iz_cmd_desc *listener;	/* Do not look at nl_resp, listen for all messages */
 	int flags;	/* NL message flags */
-	int cmd;	/* NL command ID */
 	char *iface;	/* Interface for a command */
 };
 
