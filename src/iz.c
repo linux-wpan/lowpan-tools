@@ -292,7 +292,7 @@ static void iz_help(const char *pname)
 	printf("Options:\n");
 	printf("  -d, --debug[=N]                print netlink messages and other debug information\n");
 	printf("  -v, --version                  print version\n");
-	printf("  -h, --help                      print help\n");
+	printf("  -h, --help                     print help\n");
 
 	/* Print short help for available commands */
 	printf("\nCommon commands:\n");
