@@ -61,7 +61,7 @@ static int die_flag = 0;
 
 extern int yydebug;
 
-void cleanup(int ret);
+static void cleanup(int ret);
 
 static void log_msg_nl_perror(char *s)
 {
@@ -71,7 +71,7 @@ static void log_msg_nl_perror(char *s)
 	}
 }
 
-int mlme_start(uint16_t short_addr, uint16_t pan, uint8_t channel, uint8_t is_coordinator, const char * iface)
+static int mlme_start(uint16_t short_addr, uint16_t pan, uint8_t channel, uint8_t is_coordinator, const char * iface)
 {
 	struct nl_msg *msg = nlmsg_alloc();
 	log_msg(0, "mlme_start\n");
@@ -224,12 +224,12 @@ static int seq_check(struct nl_msg *msg, void *arg) {
 	return NL_SKIP;
 }
 
-void dump_lease_handler(int t)
+static void dump_lease_handler(int t)
 {
 	addrdb_dump_leases(lease_file);
 }
 
-void cleanup(int ret)
+static void cleanup(int ret)
 {
 	if(ret == 0)
 		addrdb_dump_leases(lease_file);
@@ -238,13 +238,13 @@ void cleanup(int ret)
 	exit(ret);	
 }
 
-void exit_handler(int t)
+static void exit_handler(int t)
 {
 	die_flag = 1;
 	cleanup(0);
 }
 
-void usage(char * name)
+static void usage(char * name)
 {
 	printf("Usage: %s [OPTION]... -i IFACE\n", name);
 	printf("Provide a userspace part of IEEE 802.15.4 coordinator on specified IFACE.\n\n");
@@ -269,7 +269,7 @@ static struct option long_options[] = {
 };
 #endif
 
-int range_min, range_max;
+static int range_min, range_max;
 
 int main(int argc, char **argv)
 {
