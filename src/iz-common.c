@@ -43,7 +43,7 @@
 
 static iz_res_t help_parse(struct iz_cmd *cmd)
 {
-	struct iz_cmd_desc *desc;
+	const struct iz_cmd_desc *desc;
 
 	if (cmd->argc > 2) {
 		printf("Too many arguments!\n");
@@ -149,7 +149,7 @@ static iz_res_t event_finish(struct iz_cmd *cmd)
 
 
 /* Command descriptors */
-struct iz_cmd_desc iz_commands[] = {
+const struct iz_cmd_desc iz_commands[] = {
 	{
 		.name		= "help",
 		.usage		= "[command]",

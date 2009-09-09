@@ -66,7 +66,7 @@ struct iz_cmd {
 	int argc;	/* number of arguments to the command */
 	char **argv;	/* NULL-terminated arrays of arguments */
 
-	struct iz_cmd_desc *desc;
+	const struct iz_cmd_desc *desc;
 
 	/* Fields below are prepared by parse function */
 	int flags;	/* NL message flags */
@@ -76,10 +76,10 @@ struct iz_cmd {
 	uint32_t seq;
 };
 
-extern struct iz_cmd_desc iz_commands[];
-extern struct iz_cmd_desc mac_commands[];
+extern const struct iz_cmd_desc iz_commands[];
+extern const struct iz_cmd_desc mac_commands[];
 
 void iz_help(const char *pname);
-struct iz_cmd_desc *get_cmd(const char *name);
+const struct iz_cmd_desc *get_cmd(const char *name);
 
 #endif

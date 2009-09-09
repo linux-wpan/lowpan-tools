@@ -44,10 +44,10 @@ struct lease {
 	time_t time;
 };
 
-struct simple_hash *hwa_hash;
-struct simple_hash *shorta_hash;
+static struct simple_hash *hwa_hash;
+static struct simple_hash *shorta_hash;
 
-unsigned int hw_hash(const void *key)
+static unsigned int hw_hash(const void *key)
 {
 	const uint8_t *hwa = key;
 	int i;
@@ -60,19 +60,19 @@ unsigned int hw_hash(const void *key)
 	return val;
 }
 
-int hw_eq(const void *key1, const void *key2)
+static int hw_eq(const void *key1, const void *key2)
 {
 	return memcmp(key1, key2, IEEE802154_ADDR_LEN);
 }
 
-unsigned int short_hash(const void *key)
+static unsigned int short_hash(const void *key)
 {
 	const uint16_t *addr = key;
 
 	return *addr;
 }
 
-int short_eq(const void *key1, const void *key2)
+static int short_eq(const void *key1, const void *key2)
 {
 	const uint16_t addr1 = *(uint16_t *) key1, addr2 = *(uint16_t *) key2;
 	return addr1 - addr2;

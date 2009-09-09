@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-int log_level = 0;
+static int log_level = 0;
 
 static void log_string(int level, char *s)
 {

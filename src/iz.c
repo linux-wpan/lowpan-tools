@@ -68,7 +68,7 @@ static int iz_debug = 0;
 /* Exit from receive loop (set from receive callback) */
 static int iz_exit = 0;
 
-struct iz_cmd_desc *get_cmd(const char *name)
+const struct iz_cmd_desc *get_cmd(const char *name)
 {
 	int i;
 

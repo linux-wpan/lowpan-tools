@@ -379,7 +379,7 @@ static iz_res_t disassoc_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, s
 	return IZ_STOP_OK;
 }
 
-struct iz_cmd_desc mac_commands[] = {
+const struct iz_cmd_desc mac_commands[] = {
 	{
 		.name		= "scan",
 		.usage		= "<iface> <ed|active|passive|orphan> <channels> <duration>",
