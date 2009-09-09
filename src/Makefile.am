@@ -16,6 +16,9 @@ izchat_DESC = "simple chat program using IEEE 802.15.4"
 
 izattach_SOURCES = serial.c
 
+iz_SOURCES = iz.c iz-mac.c
+noinst_HEADERS = iz.h
+
 izcoordinator_SOURCES = coordinator.c
 izcoordinator_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS) -DLEASE_FILE=\"$(leasefile)\"
 izcoordinator_CFLAGS += -DPID_FILE=\"$(pidfile)\"
