@@ -207,8 +207,12 @@ static iz_res_t list_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struc
 			hw_addr[4], hw_addr[5], hw_addr[6], hw_addr[7]);
 	printf(" pan 0x%04hx short 0x%04hx\n", pan_id, short_addr);
 
-	return IZ_STOP_OK;
+	return (cmd->flags & NLM_F_MULTI) ? IZ_CONT_OK : IZ_STOP_OK;
+}
 
+static iz_res_t list_finish(struct iz_cmd *cmd)
+{
+	return IZ_STOP_OK;
 }
 
 /************************/
@@ -415,6 +419,7 @@ struct iz_cmd_desc mac_commands[] = {
 		.parse		= list_parse,
 		.request	= list_request,
 		.response	= list_response,
+		.finish		= list_finish,
 	},
 	{}
 };
