@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT([Userspace tools for Linux IEEE 802.15.4 stack],
-	[0.2-rc1],[linux-zigbee-devel@lists.sourceforge.net],
+	[0.2-rc2],[linux-zigbee-devel@lists.sourceforge.net],
 	[lowpan-tools], [http://linux-zigbee.sourceforge.net/])
 AC_CONFIG_AUX_DIR([misc])
 AC_CONFIG_MACRO_DIR([m4])

@@ -1,3 +1,9 @@
+lowpan-tools (0.2~rc2-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>  Thu, 10 Sep 2009 16:39:25 +0400
+
 lowpan-tools (0.2~rc1-1) unstable; urgency=low
 
   * New upstream release.
