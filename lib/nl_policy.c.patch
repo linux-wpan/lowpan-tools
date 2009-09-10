@@ -1,8 +1,6 @@
-diff --git a/lib/nl_policy.c b/lib/nl_policy.c
-index c7d71d1..669f468 100644
---- a/lib/nl_policy.c
-+++ b/lib/nl_policy.c
-@@ -18,9 +18,9 @@
+--- nl_policy.c	2009-08-19 23:08:22.711712612 +0400
++++ lib/nl_policy.c	2009-09-10 16:30:16.393251028 +0400
+@@ -18,13 +18,13 @@
   *
   */
  
@@ -15,10 +13,16 @@ index c7d71d1..669f468 100644
  
  #define NLA_HW_ADDR NLA_U64
  
-@@ -48,5 +48,5 @@ struct nla_policy ieee802154_policy[IEEE802154_ATTR_MAX + 1] = {
+-const struct nla_policy ieee802154_policy[IEEE802154_ATTR_MAX + 1] = {
++struct nla_policy ieee802154_policy[IEEE802154_ATTR_MAX + 1] = {
+ 	[IEEE802154_ATTR_DEV_NAME] = { .type = NLA_STRING, },
+ 	[IEEE802154_ATTR_DEV_INDEX] = { .type = NLA_U32, },
+ 
+@@ -49,6 +49,6 @@
  	[IEEE802154_ATTR_SCAN_TYPE] = { .type = NLA_U8, },
  	[IEEE802154_ATTR_CHANNELS] = { .type = NLA_U32, },
  	[IEEE802154_ATTR_DURATION] = { .type = NLA_U8, },
 -	[IEEE802154_ATTR_ED_LIST] = { .len = 27 },
 +	[IEEE802154_ATTR_ED_LIST] = { .minlen = 27, .maxlen = 27 },
  };
+ 
