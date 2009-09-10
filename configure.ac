@@ -6,6 +6,7 @@ AC_INIT([lowpan-tools],[0.2-rc1],[dbaryshkov@gmail.com])
 AC_CONFIG_AUX_DIR([misc])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror gnu])
+AM_MAINTAINER_MODE([enable])
 AC_CONFIG_SRCDIR([src/serial.c])
 AC_CONFIG_HEADER([config.h])
 
@@ -23,6 +24,7 @@ AC_ARG_WITH(leasefile, [AC_HELP_STRING([--with-leasefile],[file for persistent l
 	    [leasefile=$withval],
 	    [leasefile='${localstatedir}/lib/lowpan-tools/izcoordinator.leases'])
 AC_SUBST(leasefile)
+
 AC_ARG_ENABLE([manpages],[AS_HELP_STRING([--disable-manpages],[disable manpages generation and installation])],
 	[case "${enableval}" in
 		yes | true) manpages=yes ;;
