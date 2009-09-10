@@ -42,7 +42,13 @@ int main(int argc, char **argv) {
 	struct sockaddr_ieee802154 a;
 
 	if (argv[1] && !strcmp(argv[1], "--version")) {
-		printf("izchat %s\nCopyright (C) 2008, 2009 by authors team\n", VERSION);
+		printf(	"izchat " VERSION "\n"
+			"Copyright (C) 2008, 2009 by Siemens AG\n"
+			"License GPLv2 GNU GPL version 2 <http://gnu.org/licenses/gpl.html>.\n"
+			"This is free software: you are free to change and redistribute it.\n"
+			"There is NO WARRANTY, to the extent permitted by law.\n"
+			"\n"
+			"Written by Dmitry Eremin-Solenikov, Sergey Lapin and Maxim Osipov\n");
 		return 0;
 	}
 
@@ -52,6 +58,8 @@ int main(int argc, char **argv) {
 		printf("  or:  %s --version\n", argv[0]);
 		printf("\n\nStarts chat session on net PANid, using addr sourceAddr talking with destAddr.\n");
 		printf("\nCurrently all addresses should be short (16-bit) and specified in hex form.\n");
+		printf("Report bugs to " PACKAGE_BUGREPORT "\n\n");
+		printf(PACKAGE_NAME " homepage <" PACKAGE_URL ">\n");
 		return 0;
 	}
 

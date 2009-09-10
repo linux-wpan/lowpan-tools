@@ -122,7 +122,13 @@ int main(int argc, char **argv)
 				iz_debug = nl_debug = 1;
 			break;
 		case 'v':
-			printf("iz %s\nCopyright (C) 2008, 2009 by authors team\n", VERSION);
+			printf(	"iz " VERSION "\n"
+				"Copyright (C) 2008, 2009 by Siemens AG\n"
+				"License GPLv2 GNU GPL version 2 <http://gnu.org/licenses/gpl.html>.\n"
+				"This is free software: you are free to change and redistribute it.\n"
+				"There is NO WARRANTY, to the extent permitted by law.\n"
+				"\n"
+				"Written by Dmitry Eremin-Solenikov, Sergey Lapin and Maxim Osipov\n");
 			return 0;
 		case 'h':
 			iz_help(argv[0]);
@@ -133,9 +139,7 @@ int main(int argc, char **argv)
 		}
 	}
 	if (optind >= argc) {
-		printf("iz %s\nCopyright (C) 2008, 2009 by authors team\n", VERSION);
-		printf("Usage: iz [options] [command]\n");
-		return 1;
+		iz_help(argv[0]);
 	}
 
 	memset(&cmd, 0, sizeof(cmd));
@@ -242,6 +246,10 @@ void iz_help(const char *pname)
 			mac_commands[i].usage,
 			mac_commands[i].doc);
 	}
+
+	printf("\n");
+	printf("Report bugs to " PACKAGE_BUGREPORT "\n\n");
+	printf(PACKAGE_NAME " homepage <" PACKAGE_URL ">\n");
 }
 
 /* Callback for sequence number check */
