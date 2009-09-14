@@ -52,5 +52,6 @@ debian/*.substvars
 debian/liblowpan-dev
 debian/tmp
 debian/lowpan-tools
+debian/lowpan-test-tools
 debian/files
 
