@@ -84,6 +84,12 @@ const struct iz_cmd_desc *get_cmd(const char *name)
 		}
 	}
 
+	for (i = 0; phy_commands[i].name; i++) {
+		if (!strcmp(name, phy_commands[i].name)) {
+			return &phy_commands[i];
+		}
+	}
+
 	return NULL;
 }
 
@@ -238,6 +244,13 @@ void iz_help(const char *pname)
 		printf("  %s  %s\n     %s\n\n", iz_commands[i].name,
 			iz_commands[i].usage,
 			iz_commands[i].doc);
+	}
+
+	printf("\nPHY 802.15.4 commands:\n");
+	for (i = 0; phy_commands[i].name; i++) {
+		printf("  %s  %s\n     %s\n\n", phy_commands[i].name,
+			phy_commands[i].usage,
+			phy_commands[i].doc);
 	}
 
 	printf("\nMAC 802.15.4 commands:\n");

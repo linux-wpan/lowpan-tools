@@ -16,7 +16,7 @@ izchat_DESC = "simple chat program using IEEE 802.15.4"
 
 izattach_SOURCES = serial.c
 
-iz_SOURCES = iz.c iz-common.c iz-mac.c
+iz_SOURCES = iz.c iz-common.c iz-mac.c iz-phy.c
 noinst_HEADERS = iz.h
 
 izcoordinator_SOURCES = coordinator.c
