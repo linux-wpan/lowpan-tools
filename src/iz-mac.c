@@ -275,7 +275,7 @@ static iz_res_t assoc_request(struct iz_cmd *cmd, struct nl_msg *msg)
 
 	if (!cmd->argv[4])
 		return IZ_STOP_ERR;
-	chan = strtol(cmd->argv[4], &dummy, 16);
+	chan = strtol(cmd->argv[4], &dummy, 10);
 	if (*dummy) {
 		printf("Bad channel number!\n");
 		return IZ_STOP_ERR;
