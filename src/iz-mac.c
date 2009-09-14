@@ -186,7 +186,9 @@ static iz_res_t list_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struc
 	/* Check for mandatory attributes */
 	if (!attrs[IEEE802154_ATTR_DEV_NAME]     ||
 	    !attrs[IEEE802154_ATTR_DEV_INDEX]    ||
-	    !attrs[IEEE802154_ATTR_HW_ADDR]      )
+	    !attrs[IEEE802154_ATTR_HW_ADDR]      ||
+	    !attrs[IEEE802154_ATTR_SHORT_ADDR]   ||
+	    !attrs[IEEE802154_ATTR_PAN_ID])
 		return IZ_STOP_ERR;
 
 	/* Get attribute values from the message */
