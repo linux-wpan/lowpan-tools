@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 		return 0;
 	}
 
-	if (argc != 3 || (argc >= 2 && !strcmp(argv[1], "--help"))) {
+	if (argc != 2 || (argc >= 1 && !strcmp(argv[1], "--help"))) {
 		printf("Usage: %s SERIAL_DEV\n", argv[0]);
 		printf("Attach serial devices via UART to IEEE 802.15.4/ZigBee stack\n\n");
 		printf("  SERIAL_DEV  This specifies the serial device to attach.\n");
