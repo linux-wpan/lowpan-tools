@@ -89,6 +89,7 @@ static iz_res_t list_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, s
 	printf("    page: %d  channel: %d\n",
 			nla_get_u8(attrs[IEEE802154_ATTR_PAGE]),
 			nla_get_u8(attrs[IEEE802154_ATTR_CHANNEL]));
+	printf("\n");
 
 	return (cmd->flags & NLM_F_MULTI) ? IZ_CONT_OK : IZ_STOP_OK;
 }
