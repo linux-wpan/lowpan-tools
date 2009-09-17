@@ -5,6 +5,10 @@ AC_PREREQ(2.61)
 AC_INIT([Userspace tools for Linux IEEE 802.15.4 stack],
 	[0.2-rc2],[linux-zigbee-devel@lists.sourceforge.net],
 	[lowpan-tools], [http://linux-zigbee.sourceforge.net/])
+m4_ifndef([AC_PACKAGE_URL],
+	  [AC_SUBST([PACKAGE_URL], [http://linux-zigbee.sourceforge.net/])
+	  AC_DEFINE_UNQUOTED([PACKAGE_URL], ["$PACKAGE_URL"],
+			     [Define to the home page for this package.])])
 AC_CONFIG_AUX_DIR([misc])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall -Werror gnu])
