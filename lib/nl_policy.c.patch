@@ -25,6 +25,6 @@
 -	[IEEE802154_ATTR_ED_LIST] = { .len = 27 },
 -	[IEEE802154_ATTR_CHANNEL_PAGE_LIST] = { .len = 32 * 4, },
 +	[IEEE802154_ATTR_ED_LIST] = { .minlen = 27, .maxlen = 27, },
-+	[IEEE802154_ATTR_CHANNEL_PAGE_LIST] = { .minlen = 32 * 4, .maxlen = 32 * 4, },
++	[IEEE802154_ATTR_CHANNEL_PAGE_LIST] = { .minlen = 0, .maxlen = 32 * 4, },
  };
  
