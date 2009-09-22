@@ -1,5 +1,5 @@
 --- nl_policy.c	2009-08-19 23:08:22.711712612 +0400
-+++ lib/nl_policy.c	2009-09-10 16:30:16.393251028 +0400
++++ lib/nl_policy.c	2009-09-22 15:09:13.565855170 +0400
 @@ -18,13 +18,13 @@
   *
   */
@@ -18,11 +18,13 @@
  	[IEEE802154_ATTR_DEV_NAME] = { .type = NLA_STRING, },
  	[IEEE802154_ATTR_DEV_INDEX] = { .type = NLA_U32, },
  
-@@ -49,6 +49,6 @@
+@@ -49,7 +49,7 @@
  	[IEEE802154_ATTR_SCAN_TYPE] = { .type = NLA_U8, },
  	[IEEE802154_ATTR_CHANNELS] = { .type = NLA_U32, },
  	[IEEE802154_ATTR_DURATION] = { .type = NLA_U8, },
 -	[IEEE802154_ATTR_ED_LIST] = { .len = 27 },
-+	[IEEE802154_ATTR_ED_LIST] = { .minlen = 27, .maxlen = 27 },
+-	[IEEE802154_ATTR_CHANNEL_PAGE_LIST] = { .len = 32 * 4, },
++	[IEEE802154_ATTR_ED_LIST] = { .minlen = 27, .maxlen = 27, },
++	[IEEE802154_ATTR_CHANNEL_PAGE_LIST] = { .minlen = 32 * 4, .maxlen = 32 * 4, },
  };
  
