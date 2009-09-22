@@ -89,6 +89,25 @@ static iz_res_t list_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, s
 	printf("    page: %d  channel: %d\n",
 			nla_get_u8(attrs[IEEE802154_ATTR_PAGE]),
 			nla_get_u8(attrs[IEEE802154_ATTR_CHANNEL]));
+	if (attrs[IEEE802154_ATTR_CHANNEL_PAGE_LIST]) {
+		int len = nla_len(attrs[IEEE802154_ATTR_CHANNEL_PAGE_LIST]);
+		int i, j;
+		uint32_t *data = nla_data(attrs[IEEE802154_ATTR_CHANNEL_PAGE_LIST]);
+		if (len % 4 != 0) {
+			printf("    Error in PAGE LIST\n");
+			return IZ_STOP_ERR;
+		}
+
+		for (i = 0; i < len / 4; i++) {
+			printf("    channels on page %d:", data[i] >> 27);
+			for (j = 0; j < 27; j++) {
+				if (data[i] & (1 << j))
+					printf(" %d", j);
+			}
+
+			printf("\n");
+		}
+	}
 	printf("\n");
 
 	return (cmd->flags & NLM_F_MULTI) ? IZ_CONT_OK : IZ_STOP_OK;
