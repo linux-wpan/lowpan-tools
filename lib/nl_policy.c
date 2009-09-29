@@ -27,6 +27,7 @@
 struct nla_policy ieee802154_policy[IEEE802154_ATTR_MAX + 1] = {
 	[IEEE802154_ATTR_DEV_NAME] = { .type = NLA_STRING, },
 	[IEEE802154_ATTR_DEV_INDEX] = { .type = NLA_U32, },
+	[IEEE802154_ATTR_PHY_NAME] = { .type = NLA_STRING, },
 
 	[IEEE802154_ATTR_STATUS] = { .type = NLA_U8, },
 	[IEEE802154_ATTR_SHORT_ADDR] = { .type = NLA_U16, },
