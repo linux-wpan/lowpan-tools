@@ -66,7 +66,7 @@ static iz_res_t list_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
 {
 	/* List single interface */
 	if (cmd->iface)
-		nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, cmd->iface);
+		nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->iface);
 
 	return IZ_CONT_OK;
 }
@@ -76,13 +76,13 @@ static iz_res_t list_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, s
 	char * dev_name;
 
 	/* Check for mandatory attributes */
-	if (!attrs[IEEE802154_ATTR_DEV_NAME] ||
+	if (!attrs[IEEE802154_ATTR_PHY_NAME] ||
 	    !attrs[IEEE802154_ATTR_CHANNEL] ||
 	    !attrs[IEEE802154_ATTR_PAGE])
 		return IZ_STOP_ERR;
 
 	/* Get attribute values from the message */
-	dev_name = nla_get_string(attrs[IEEE802154_ATTR_DEV_NAME]);
+	dev_name = nla_get_string(attrs[IEEE802154_ATTR_PHY_NAME]);
 
 	/* Display information about interface */
 	printf("%-10s IEEE 802.15.4 PHY object\n", dev_name);
