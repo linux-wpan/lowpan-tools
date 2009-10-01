@@ -38,9 +38,9 @@
 #include "iz.h"
 
 
-/******************/
-/* LIST handling  */
-/******************/
+/******************
+ * LIST handling  *
+ ******************/
 
 static iz_res_t list_phy_parse(struct iz_cmd *cmd)
 {
@@ -118,6 +118,43 @@ static iz_res_t list_phy_finish(struct iz_cmd *cmd)
 	return IZ_STOP_OK;
 }
 
+/******************
+ *  ADD handling  *
+ ******************/
+
+static iz_res_t add_phy_parse(struct iz_cmd *cmd)
+{
+	if (cmd->argc != 2) {
+		printf("Incorrect number of arguments!\n");
+		return IZ_STOP_ERR;
+	}
+
+	cmd->iface = cmd->argv[1];
+
+	return IZ_CONT_OK;
+}
+
+static iz_res_t add_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
+{
+	/* add single interface */
+	if (cmd->iface)
+		nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->iface);
+
+	return IZ_CONT_OK;
+}
+
+static iz_res_t add_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs)
+{
+	if (!attrs[IEEE802154_ATTR_DEV_NAME] ||
+	    !attrs[IEEE802154_ATTR_PHY_NAME])
+		return IZ_STOP_ERR;
+
+	printf("Registered new device ('%s') on phy %s\n",
+			nla_get_string(attrs[IEEE802154_ATTR_DEV_NAME]),
+			nla_get_string(attrs[IEEE802154_ATTR_PHY_NAME]));
+
+	return IZ_STOP_OK;
+}
 
 const struct iz_cmd_desc phy_commands[] = {
 	{
@@ -130,6 +167,16 @@ const struct iz_cmd_desc phy_commands[] = {
 		.request	= list_phy_request,
 		.response	= list_phy_response,
 		.finish		= list_phy_finish,
+	},
+	{
+		.name		= "add",
+		.usage		= "[phy]",
+		.doc		= "Add an interface attached to specified phy.",
+		.nl_cmd		= IEEE802154_ADD_IFACE,
+		.nl_resp	= IEEE802154_ADD_IFACE,
+		.parse		= add_phy_parse,
+		.request	= add_phy_request,
+		.response	= add_phy_response,
 	},
 	{}
 };
