@@ -146,6 +146,7 @@ int main(int argc, char **argv)
 	}
 	if (optind >= argc) {
 		iz_help(argv[0]);
+		return 1;
 	}
 
 	memset(&cmd, 0, sizeof(cmd));
