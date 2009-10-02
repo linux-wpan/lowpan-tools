@@ -21,6 +21,7 @@ TAGS
 *.o
 *.la
 *.lo
+*.orig
 *.pyc
 *.so
 *.swp
