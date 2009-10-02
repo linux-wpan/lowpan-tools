@@ -49,6 +49,11 @@ static void wpan_print_opt(struct link_util *lu, FILE *f,
 		fprintf(f, "phy %s ", phy);
 	}
 
+	if (tb[IFLA_WPAN_PAGE]) {
+		uint8_t *page = RTA_DATA(tb[IFLA_WPAN_PAGE]);
+		fprintf(f, "page %d ", *page);
+	}
+
 	if (tb[IFLA_WPAN_CHANNEL]) {
 		uint16_t *chan = RTA_DATA(tb[IFLA_WPAN_CHANNEL]);
 		fprintf(f, "chan %d ", *chan);
@@ -89,7 +94,7 @@ static int wpan_parse_opt(struct link_util *lu, int argc, char **argv,
 			explain();
 			return -1;
 		} else {
-			fprintf(stderr, "vlan: what is \"%s\"?\n", *argv);
+			fprintf(stderr, "wpan: what is \"%s\"?\n", *argv);
 			explain();
 			return -1;
 		}
