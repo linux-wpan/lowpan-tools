@@ -155,6 +155,45 @@ static iz_res_t add_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, st
 	return IZ_STOP_OK;
 }
 
+/******************
+ *  DEL handling  *
+ ******************/
+
+static iz_res_t del_phy_parse(struct iz_cmd *cmd)
+{
+	if (cmd->argc != 2 && cmd->argc != 3) {
+		printf("Incorrect number of arguments!\n");
+		return IZ_STOP_ERR;
+	}
+
+	cmd->iface = cmd->argv[1];
+
+	return IZ_CONT_OK;
+}
+
+static iz_res_t del_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
+{
+	/* add single interface */
+	nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, cmd->iface);
+	if (cmd->argv[2])
+		nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->argv[2]);
+
+	return IZ_CONT_OK;
+}
+
+static iz_res_t del_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs)
+{
+	if (!attrs[IEEE802154_ATTR_DEV_NAME] ||
+	    !attrs[IEEE802154_ATTR_PHY_NAME])
+		return IZ_STOP_ERR;
+
+	printf("Removed device ('%s') from phy %s\n",
+			nla_get_string(attrs[IEEE802154_ATTR_DEV_NAME]),
+			nla_get_string(attrs[IEEE802154_ATTR_PHY_NAME]));
+
+	return IZ_STOP_OK;
+}
+
 const struct iz_cmd_desc phy_commands[] = {
 	{
 		.name		= "listphy",
@@ -176,6 +215,16 @@ const struct iz_cmd_desc phy_commands[] = {
 		.parse		= add_phy_parse,
 		.request	= add_phy_request,
 		.response	= add_phy_response,
+	},
+	{
+		.name		= "del",
+		.usage		= "iface [phy]",
+		.doc		= "Delete the specified interface.",
+		.nl_cmd		= IEEE802154_DEL_IFACE,
+		.nl_resp	= IEEE802154_DEL_IFACE,
+		.parse		= del_phy_parse,
+		.request	= del_phy_request,
+		.response	= del_phy_response,
 	},
 	{}
 };
