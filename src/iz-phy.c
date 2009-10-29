@@ -137,8 +137,7 @@ static iz_res_t add_phy_parse(struct iz_cmd *cmd)
 static iz_res_t add_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
 {
 	/* add single interface */
-	if (cmd->iface)
-		nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->iface);
+	nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->iface);
 
 	return IZ_CONT_OK;
 }
@@ -170,7 +169,7 @@ const struct iz_cmd_desc phy_commands[] = {
 	},
 	{
 		.name		= "add",
-		.usage		= "[phy]",
+		.usage		= "phy",
 		.doc		= "Add an interface attached to specified phy.",
 		.nl_cmd		= IEEE802154_ADD_IFACE,
 		.nl_resp	= IEEE802154_ADD_IFACE,
