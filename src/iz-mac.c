@@ -177,6 +177,7 @@ static iz_res_t list_request(struct iz_cmd *cmd, struct nl_msg *msg)
 static iz_res_t list_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs)
 {
 	char * dev_name;
+	char * phy_name = NULL;
 	uint32_t dev_index;
 	unsigned char hw_addr[IEEE802154_ADDR_LEN];
 	uint16_t short_addr;
@@ -199,10 +200,15 @@ static iz_res_t list_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struc
 	short_addr = nla_get_u16(attrs[IEEE802154_ATTR_SHORT_ADDR]);
 	pan_id = nla_get_u16(attrs[IEEE802154_ATTR_PAN_ID]);
 
+	if (attrs[IEEE802154_ATTR_PHY_NAME])
+		phy_name = nla_get_string(attrs[IEEE802154_ATTR_PHY_NAME]);
+
 	/* Display information about interface */
 	printf("%s\n", dev_name);
 	dev_type_str = "IEEE 802.15.4 MAC interface";
 	printf("    link: %s\n", dev_type_str);
+	if (phy_name)
+		printf("    phy %s\n", phy_name);
 
 	printf("    hw %02x:%02x:%02x:%02x:%02x:%02x:%02x:%02x",
 			hw_addr[0], hw_addr[1], hw_addr[2], hw_addr[3],
