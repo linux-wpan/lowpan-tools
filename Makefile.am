@@ -17,7 +17,6 @@ libtool: $(LIBTOOL_DEPS)
 
 resync:
 	if [ -z "$(KDIR)" ] ; then echo "please set KDIR variable" ; exit 1 ; fi
-	cp $(KDIR)/include/linux/mac802154.h include/linux
 	cp $(KDIR)/include/linux/nl802154.h include/
 	patch include/nl802154.h include/nl802154.h.patch
 	cp $(KDIR)/net/ieee802154/nl_policy.c lib/
