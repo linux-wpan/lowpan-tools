@@ -71,6 +71,7 @@ struct iz_cmd {
 	/* Fields below are prepared by parse function */
 	int flags;	/* NL message flags */
 	char *iface;	/* Interface for a command */
+	char *phy;	/* Phy for a command */
 
 	/* Filled before calling response */
 	uint32_t seq;

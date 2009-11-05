@@ -51,11 +51,11 @@ static iz_res_t list_phy_parse(struct iz_cmd *cmd)
 
 	/* iz list wpan0 */
 	if (cmd->argc == 2) {
-		cmd->iface = cmd->argv[1];
+		cmd->phy = cmd->argv[1];
 		cmd->flags = NLM_F_REQUEST;
 	} else {
 		/* iz list */
-		cmd->iface = NULL;
+		cmd->phy = NULL;
 		cmd->flags = NLM_F_REQUEST | NLM_F_DUMP;
 	}
 
@@ -65,8 +65,8 @@ static iz_res_t list_phy_parse(struct iz_cmd *cmd)
 static iz_res_t list_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
 {
 	/* List single interface */
-	if (cmd->iface)
-		nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->iface);
+	if (cmd->phy)
+		nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->phy);
 
 	return IZ_CONT_OK;
 }
@@ -124,12 +124,13 @@ static iz_res_t list_phy_finish(struct iz_cmd *cmd)
 
 static iz_res_t add_phy_parse(struct iz_cmd *cmd)
 {
-	if (cmd->argc != 2) {
+	if (cmd->argc != 2 && cmd->argc != 3) {
 		printf("Incorrect number of arguments!\n");
 		return IZ_STOP_ERR;
 	}
 
-	cmd->iface = cmd->argv[1];
+	cmd->phy = cmd->argv[1];
+	cmd->iface = cmd->argv[2]; /* Either iface name or NULL */
 
 	return IZ_CONT_OK;
 }
@@ -137,7 +138,9 @@ static iz_res_t add_phy_parse(struct iz_cmd *cmd)
 static iz_res_t add_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
 {
 	/* add single interface */
-	nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->iface);
+	nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->phy);
+	if (cmd->iface)
+		nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, cmd->iface);
 
 	return IZ_CONT_OK;
 }
@@ -161,12 +164,18 @@ static iz_res_t add_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, st
 
 static iz_res_t del_phy_parse(struct iz_cmd *cmd)
 {
-	if (cmd->argc != 2 && cmd->argc != 3) {
+	switch (cmd->argc) {
+	case 2:
+		cmd->iface = cmd->argv[1];
+		break;
+	case 3:
+		cmd->phy = cmd->argv[1];
+		cmd->iface = cmd->argv[2];
+		break;
+	default:
 		printf("Incorrect number of arguments!\n");
 		return IZ_STOP_ERR;
 	}
-
-	cmd->iface = cmd->argv[1];
 
 	return IZ_CONT_OK;
 }
@@ -175,8 +184,8 @@ static iz_res_t del_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
 {
 	/* add single interface */
 	nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, cmd->iface);
-	if (cmd->argv[2])
-		nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->argv[2]);
+	if (cmd->phy)
+		nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->phy);
 
 	return IZ_CONT_OK;
 }
@@ -208,7 +217,7 @@ const struct iz_cmd_desc phy_commands[] = {
 	},
 	{
 		.name		= "add",
-		.usage		= "phy",
+		.usage		= "phy [iface]",
 		.doc		= "Add an interface attached to specified phy.",
 		.nl_cmd		= IEEE802154_ADD_IFACE,
 		.nl_resp	= IEEE802154_ADD_IFACE,
@@ -218,7 +227,7 @@ const struct iz_cmd_desc phy_commands[] = {
 	},
 	{
 		.name		= "del",
-		.usage		= "iface [phy]",
+		.usage		= "[phy] iface",
 		.doc		= "Delete the specified interface.",
 		.nl_cmd		= IEEE802154_DEL_IFACE,
 		.nl_resp	= IEEE802154_DEL_IFACE,
