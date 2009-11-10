@@ -74,6 +74,7 @@ static iz_res_t list_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
 static iz_res_t list_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs)
 {
 	char * dev_name;
+	uint8_t chan;
 
 	/* Check for mandatory attributes */
 	if (!attrs[IEEE802154_ATTR_PHY_NAME] ||
@@ -86,9 +87,14 @@ static iz_res_t list_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, s
 
 	/* Display information about interface */
 	printf("%-10s IEEE 802.15.4 PHY object\n", dev_name);
-	printf("    page: %d  channel: %d\n",
-			nla_get_u8(attrs[IEEE802154_ATTR_PAGE]),
-			nla_get_u8(attrs[IEEE802154_ATTR_CHANNEL]));
+	printf("    page: %d  channel: ",
+			nla_get_u8(attrs[IEEE802154_ATTR_PAGE]));
+	chan = nla_get_u8(attrs[IEEE802154_ATTR_CHANNEL]);
+	if (chan == 255)
+		printf("n/a\n");
+	else
+		printf("%d\n", chan);
+
 	if (attrs[IEEE802154_ATTR_CHANNEL_PAGE_LIST]) {
 		int len = nla_len(attrs[IEEE802154_ATTR_CHANNEL_PAGE_LIST]);
 		int i, j;
