@@ -42,6 +42,7 @@
 %option reentrant
 %option bison-bridge bison-locations
 %option warn
+%option nodefault
 
 %%
 [\{\}:;]			return yytext[0];
