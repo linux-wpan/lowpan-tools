@@ -101,6 +101,13 @@ AC_CHECK_TYPE(struct sockaddr_ieee802154,
 AC_FUNC_FORK
 AC_CHECK_FUNCS([malloc realloc memset socket getopt_long select strdup strtol])
 
+# Handle this last so -Werror doesn't get in the way of compile tests
+AC_ARG_ENABLE(werror, [AC_HELP_STRING([--disable-werror],
+	      [do not compile with -Werror])])
+if test "x$enable_werror" != "xno" ; then
+	CFLAGS="-Werror $CFLAGS"
+fi
+
 AC_CONFIG_FILES([
 	Makefile
 	lib/Makefile
