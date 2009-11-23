@@ -3,16 +3,16 @@ include $(top_srcdir)/Makefile.common
 sbin_PROGRAMS = izattach izcoordinator iz
 bin_PROGRAMS = izchat
 
-manpages = izcoordinator.8 iz.8 izattach.8 izchat.1
 if MANPAGES
-dist_man_MANS = $(manpages)
+manpages = izcoordinator.8 iz.8 izattach.8 izchat.1
+else
+manpages =
 endif
+dist_man_MANS = $(manpages)
 izattach_DESC = "attach a serial device to IEEE 802.15.4 stack"
 izcoordinator_DESC = "simple coordinator for IEEE 802.15.4 network"
 iz_DESC = "configure an IEEE 802.15.4 interface"
 izchat_DESC = "simple chat program using IEEE 802.15.4"
-
-DISTCLEANFILES = $(manpages)
 
 izattach_SOURCES = serial.c
 
