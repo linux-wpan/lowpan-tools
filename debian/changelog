@@ -1,3 +1,10 @@
+lowpan-tools (0.2~rc3-1) unstable; urgency=low
+
+  * New upstream release.
+  * Use "3.0 (quilt)" source format.
+
+ -- Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>  Mon, 23 Nov 2009 04:24:17 +0300
+
 lowpan-tools (0.2~rc2-1) unstable; urgency=low
 
   * New upstream release.
