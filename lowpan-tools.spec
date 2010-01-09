@@ -32,6 +32,7 @@ Source: %{name}-%{srcver}.tar.gz
 #Requires:
 #Conflicts:
 #Prereq:
+BuildRequires: libnl-devel, python
 
 Prefix: /usr
 #BuildRoot: /var/tmp/%{name}-%{srcver}
@@ -104,7 +105,7 @@ rm -rf $RPM_BUILD_ROOT
 #%config
 
 %files tests
-/usr/libexec/%{name}
+/usr/lib*/%{name}
 /usr/lib/python?.?
 
 %files devel
