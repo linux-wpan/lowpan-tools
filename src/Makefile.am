@@ -39,3 +39,7 @@ iz.8: $(iz_SOURCES) $(top_srcdir)/configure.ac
 izchat.1: $(izchat_SOURCES) $(top_srcdir)/configure.ac
 	-$(HELP2MAN) -o $@ -s 1 -N -n $(izchat_DESC) $(builddir)/izchat
 
+install-data-hook:
+	$(mkinstalldirs) $(DESTDIR)`dirname $(leasefile)`
+	$(mkinstalldirs) $(DESTDIR)`dirname $(pidfile)`
+
