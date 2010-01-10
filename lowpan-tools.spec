@@ -97,7 +97,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root)
 /usr/bin
 /usr/sbin
-/usr/lib/ip
 /usr/share/man
 %doc README NEWS AUTHORS
 #%docdir

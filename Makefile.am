@@ -2,7 +2,10 @@ include $(top_srcdir)/Makefile.common
 
 ACLOCAL_AMFLAGS = -I m4
 
-SUBDIRS = lib addrdb src iplink tests test-serial
+SUBDIRS = lib addrdb src tests test-serial
+if IP_PLUGIN
+SUBDIRS += iplink
+endif
 
 include_HEADERS = include/ieee802154.h include/nl802154.h
 noinst_HEADERS = include/libcommon.h include/addrdb.h include/logging.h
