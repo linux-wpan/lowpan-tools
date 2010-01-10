@@ -43,16 +43,6 @@ AC_ARG_ENABLE([manpages],[AS_HELP_STRING([--disable-manpages],
 	esac], [manpages=yes])
 AM_CONDITIONAL([MANPAGES], [test x$manpages = xyes])
 
-AC_ARG_ENABLE([ip-plugin],[AS_HELP_STRING([--enable-ip-plugin],
-	      [enables iptools plugin for devices management (obsolete)])],
-	 [case "${enableval}" in
-		yes | true) ipplugin=yes ;;
-		no | fale) ipplugin=no ;;
-		*) AC_MSG_ERROR([bad value ${enableval} for --enable-ip-plugin]) ;;
-	esac], [ipplugin=no])
-AM_CONDITIONAL([IP_PLUGIN], [test x$ipplugin = xyes])
-
-
 AC_ARG_WITH(pidfile, [AC_HELP_STRING([--with-pidfile],
 	    [pid file location])],
 	    [pidfile=$withval],
