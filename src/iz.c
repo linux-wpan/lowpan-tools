@@ -45,12 +45,14 @@ static int iz_cb_seq_check(struct nl_msg *msg, void *arg);
 static int iz_cb_valid(struct nl_msg *msg, void *arg);
 static int iz_cb_finish(struct nl_msg *msg, void *arg);
 
+#ifdef HAVE_GETOPT_LONG
 static const struct option iz_long_opts[] = {
 	{ "debug", optional_argument, NULL, 'd' },
 	{ "version", no_argument, NULL, 'v' },
 	{ "help", no_argument, NULL, 'h' },
 	{ NULL, 0, NULL, 0 },
 };
+#endif
 
 /* Expected sequence number */
 static int iz_seq = 0;
@@ -95,7 +97,6 @@ const struct iz_cmd_desc *get_cmd(const char *name)
 
 int main(int argc, char **argv)
 {
-	int opt_idx;
 	int c;
 	int i;
 	int family;
@@ -108,9 +109,13 @@ int main(int argc, char **argv)
 
 
 	/* Parse options */
-	opt_idx = -1;
 	while (1) {
+#ifdef HAVE_GETOPT_LONG
+		int opt_idx = -1;
 		c = getopt_long(argc, argv, "d::vh", iz_long_opts, &opt_idx);
+#else
+		c = getopt(argc, argv, "d::vh");
+#endif
 		if (c == -1)
 			break;
 
