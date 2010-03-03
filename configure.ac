@@ -113,7 +113,6 @@ AC_CONFIG_FILES([
 	lib/Makefile
 	addrdb/Makefile
 	src/Makefile
-	iplink/Makefile
 	tests/Makefile
 	test-serial/Makefile
 ])
