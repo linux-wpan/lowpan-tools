@@ -296,18 +296,18 @@ int main(int argc, char **argv)
 
 	strncpy(pname, argv[0], PATH_MAX);
 
-#ifndef HAVE_GETOPT_LONG
-	while ((opt = getopt(argc, argv, "l:d:m:n:i:s:p:c:hv")) != -1) {
-#else
 	while(1) {
+#ifdef HAVE_GETOPT_LONG
 		int option_index = 0;
 		opt = getopt_long(argc, argv, "l:d:m:n:i:s:p:c:hv",
 				long_options, &option_index);
+#else
+		opt = getopt(argc, argv, "l:d:m:n:i:s:p:c:hv");
+#endif
 		fprintf(stderr, "Opt: %c (%hhx)\n", opt, opt);
 		if (opt == -1)
 			break;
-#endif
-		fprintf(stderr, "Opt: %c (%hhx)\n", opt, opt);
+
 		switch(opt) {
 		case 'l':
 			strncpy(lease_file, optarg, PATH_MAX);
