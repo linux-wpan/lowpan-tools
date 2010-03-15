@@ -70,25 +70,26 @@ static int iz_debug = 0;
 /* Exit from receive loop (set from receive callback) */
 static int iz_exit = 0;
 
+extern const struct iz_module iz_common;
+extern const struct iz_module iz_mac;
+extern const struct iz_module iz_phy;
+
+static const struct iz_module *iz_modules[] = {
+	&iz_common,
+	&iz_mac,
+	&iz_phy,
+	NULL
+};
+
 const struct iz_cmd_desc *get_cmd(const char *name)
 {
-	int i;
+	int i, j;
 
-	for (i = 0; iz_commands[i].name; i++) {
-		if (!strcmp(name, iz_commands[i].name)) {
-			return &iz_commands[i];
-		}
-	}
-
-	for (i = 0; mac_commands[i].name; i++) {
-		if (!strcmp(name, mac_commands[i].name)) {
-			return &mac_commands[i];
-		}
-	}
-
-	for (i = 0; phy_commands[i].name; i++) {
-		if (!strcmp(name, phy_commands[i].name)) {
-			return &phy_commands[i];
+	for (i = 0; iz_modules[i]; i++) {
+		for (j = 0; iz_modules[i]->commands[j].name; j++) {
+			if (!strcmp(name, iz_modules[i]->commands[j].name)) {
+				return &iz_modules[i]->commands[j];
+			}
 		}
 	}
 
@@ -234,7 +235,7 @@ int main(int argc, char **argv)
 
 void iz_help(const char *pname)
 {
-	int i;
+	int i, j;
 
 	printf("Usage: %s [options] [command]\n", pname);
 	printf("Manage IEEE 802.15.4 network interfaces\n\n");
@@ -245,25 +246,13 @@ void iz_help(const char *pname)
 	printf("  -h, --help                     print help\n");
 
 	/* Print short help for available commands */
-	printf("\nCommon commands:\n");
-	for (i = 0; iz_commands[i].name; i++) {
-		printf("  %s  %s\n     %s\n\n", iz_commands[i].name,
-			iz_commands[i].usage,
-			iz_commands[i].doc);
-	}
-
-	printf("\nPHY 802.15.4 commands:\n");
-	for (i = 0; phy_commands[i].name; i++) {
-		printf("  %s  %s\n     %s\n\n", phy_commands[i].name,
-			phy_commands[i].usage,
-			phy_commands[i].doc);
-	}
-
-	printf("\nMAC 802.15.4 commands:\n");
-	for (i = 0; mac_commands[i].name; i++) {
-		printf("  %s  %s\n     %s\n\n", mac_commands[i].name,
-			mac_commands[i].usage,
-			mac_commands[i].doc);
+	for (i = 0; iz_modules[i]; i++) {
+		printf("\n%s commands:\n", iz_modules[i]->name);
+		for (j = 0; iz_modules[i]->commands[j].name; j++) {
+			printf("  %s  %s\n     %s\n\n", iz_modules[i]->commands[j].name,
+				iz_modules[i]->commands[j].usage,
+				iz_modules[i]->commands[j].doc);
+		}
 	}
 
 	printf("\n");

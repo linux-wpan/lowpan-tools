@@ -387,7 +387,9 @@ static iz_res_t disassoc_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, s
 	return IZ_STOP_OK;
 }
 
-const struct iz_cmd_desc mac_commands[] = {
+const struct iz_module iz_mac = {
+	.name = "MAC 802.15.4",
+	.commands = {
 	{
 		.name		= "scan",
 		.usage		= "<iface> <ed|active|passive|orphan> <channels> <duration>",
@@ -429,6 +431,6 @@ const struct iz_cmd_desc mac_commands[] = {
 		.response	= list_response,
 		.finish		= list_finish,
 	},
-	{}
+	{}}
 };
 

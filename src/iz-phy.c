@@ -209,7 +209,9 @@ static iz_res_t del_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, st
 	return IZ_STOP_OK;
 }
 
-const struct iz_cmd_desc phy_commands[] = {
+const struct iz_module iz_phy = {
+	.name = "PHY 802.15.4",
+	.commands = {
 	{
 		.name		= "listphy",
 		.usage		= "[phy]",
@@ -241,6 +243,6 @@ const struct iz_cmd_desc phy_commands[] = {
 		.request	= del_phy_request,
 		.response	= del_phy_response,
 	},
-	{}
+	{}}
 };
 

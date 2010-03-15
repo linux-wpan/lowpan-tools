@@ -149,7 +149,9 @@ static iz_res_t event_finish(struct iz_cmd *cmd)
 
 
 /* Command descriptors */
-const struct iz_cmd_desc iz_commands[] = {
+const struct iz_module iz_common = {
+	.name = "Common",
+	.commands = {
 	{
 		.name		= "help",
 		.usage		= "[command]",
@@ -165,6 +167,6 @@ const struct iz_cmd_desc iz_commands[] = {
 		.finish		= event_finish,
 		.listener	= 1,
 	},
-	{}
+	{}}
 };
 

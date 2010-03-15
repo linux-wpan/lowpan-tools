@@ -77,9 +77,10 @@ struct iz_cmd {
 	uint32_t seq;
 };
 
-extern const struct iz_cmd_desc iz_commands[];
-extern const struct iz_cmd_desc mac_commands[];
-extern const struct iz_cmd_desc phy_commands[];
+struct iz_module {
+	const char *name;
+	const struct iz_cmd_desc commands[];
+};
 
 void iz_help(const char *pname);
 const struct iz_cmd_desc *get_cmd(const char *name);
