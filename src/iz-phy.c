@@ -66,9 +66,12 @@ static iz_res_t list_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
 {
 	/* List single interface */
 	if (cmd->phy)
-		nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->phy);
+		NLA_PUT_STRING(msg, IEEE802154_ATTR_PHY_NAME, cmd->phy);
 
 	return IZ_CONT_OK;
+
+nla_put_failure:
+	return IZ_STOP_ERR;
 }
 
 static iz_res_t list_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs)
@@ -144,11 +147,15 @@ static iz_res_t add_phy_parse(struct iz_cmd *cmd)
 static iz_res_t add_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
 {
 	/* add single interface */
-	nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->phy);
+	NLA_PUT_STRING(msg, IEEE802154_ATTR_PHY_NAME, cmd->phy);
 	if (cmd->iface)
-		nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, cmd->iface);
+		NLA_PUT_STRING(msg, IEEE802154_ATTR_DEV_NAME, cmd->iface);
 
 	return IZ_CONT_OK;
+
+nla_put_failure:
+	return IZ_STOP_ERR;
+
 }
 
 static iz_res_t add_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs)
@@ -189,11 +196,14 @@ static iz_res_t del_phy_parse(struct iz_cmd *cmd)
 static iz_res_t del_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
 {
 	/* add single interface */
-	nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, cmd->iface);
+	NLA_PUT_STRING(msg, IEEE802154_ATTR_DEV_NAME, cmd->iface);
 	if (cmd->phy)
-		nla_put_string(msg, IEEE802154_ATTR_PHY_NAME, cmd->phy);
+		NLA_PUT_STRING(msg, IEEE802154_ATTR_PHY_NAME, cmd->phy);
 
 	return IZ_CONT_OK;
+
+nla_put_failure:
+	return IZ_STOP_ERR;
 }
 
 static iz_res_t del_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs)
