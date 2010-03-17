@@ -60,7 +60,7 @@ static iz_res_t scan_request(struct iz_cmd *cmd, struct nl_msg *msg) {
 
 	if (!cmd->argv[1])
 		return IZ_STOP_ERR;
-	nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, cmd->argv[1]);
+	NLA_PUT_STRING(msg, IEEE802154_ATTR_DEV_NAME, cmd->argv[1]);
 
 	if (!cmd->argv[2])
 		return IZ_STOP_ERR;
@@ -169,9 +169,12 @@ static iz_res_t list_request(struct iz_cmd *cmd, struct nl_msg *msg)
 {
 	/* List single interface */
 	if (cmd->iface)
-		nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, cmd->iface);
+		NLA_PUT_STRING(msg, IEEE802154_ATTR_DEV_NAME, cmd->iface);
 
 	return IZ_CONT_OK;
+
+nla_put_failure:
+	return IZ_STOP_ERR;
 }
 
 static iz_res_t list_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs)
@@ -248,7 +251,7 @@ static iz_res_t assoc_request(struct iz_cmd *cmd, struct nl_msg *msg)
 
 	if (!cmd->argv[1])
 		return IZ_STOP_ERR;
-	nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, cmd->argv[1]);
+	NLA_PUT_STRING(msg, IEEE802154_ATTR_DEV_NAME, cmd->argv[1]);
 
 	if (!cmd->argv[2])
 		return IZ_STOP_ERR;
@@ -338,7 +341,7 @@ static iz_res_t disassoc_request(struct iz_cmd *cmd, struct nl_msg *msg)
 
 	if (!cmd->argv[1])
 		return IZ_STOP_ERR;
-	nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, cmd->argv[1]);
+	NLA_PUT_STRING(msg, IEEE802154_ATTR_DEV_NAME, cmd->argv[1]);
 
 	if (!cmd->argv[2])
 		return IZ_STOP_ERR;
