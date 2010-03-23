@@ -133,7 +133,7 @@ static iz_res_t list_phy_finish(struct iz_cmd *cmd)
 
 static iz_res_t add_phy_parse(struct iz_cmd *cmd)
 {
-	if (cmd->argc != 2 && cmd->argc != 3) {
+	if (cmd->argc < 2 || cmd->argc > 4) {
 		printf("Incorrect number of arguments!\n");
 		return IZ_STOP_ERR;
 	}
@@ -146,10 +146,22 @@ static iz_res_t add_phy_parse(struct iz_cmd *cmd)
 
 static iz_res_t add_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
 {
+	unsigned char hwa[IEEE802154_ADDR_LEN];
+
 	/* add single interface */
 	NLA_PUT_STRING(msg, IEEE802154_ATTR_PHY_NAME, cmd->phy);
 	if (cmd->iface)
 		NLA_PUT_STRING(msg, IEEE802154_ATTR_DEV_NAME, cmd->iface);
+
+	if (cmd->argc >= 4) {
+		int ret = parse_hw_addr(cmd->argv[3], hwa);
+		if (ret) {
+			printf("Bad coordinator address!\n");
+			return IZ_STOP_ERR;
+		}
+		NLA_PUT(msg, IEEE802154_ATTR_HW_ADDR,
+			IEEE802154_ADDR_LEN, hwa);
+	}
 
 	return IZ_CONT_OK;
 
