@@ -16,6 +16,9 @@ AM_MAINTAINER_MODE([enable])
 AC_CONFIG_SRCDIR([src/serial.c])
 AC_CONFIG_HEADER([config.h])
 
+# Test for new silent rules and enable only if they are available
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+
 AC_ARG_WITH(zbtestdir, [AC_HELP_STRING([--with-zbtestdir],
 	    [directory where all test programs will be installed])],
 	    [zbtestdir=$withval],
