@@ -316,10 +316,10 @@ int main(int argc, char **argv)
 			debug = atoi(optarg);
 			break;
 		case 'm':
-			range_min = atoi(optarg);
+			range_min = strtol(optarg, NULL, 16);
 			break;
 		case 'n':
-			range_max = atoi(optarg);
+			range_max = strtol(optarg, NULL, 16);
 			break;
 		case 'i':
 			iface = strdup(optarg);
