@@ -21,4 +21,4 @@ resync:
 	patch include/nl802154.h include/nl802154.h.patch
 	cp $(KDIR)/net/ieee802154/nl_policy.c lib/
 	patch lib/nl_policy.c lib/nl_policy.c.patch
-	[ ! -z "$(NOCOMMIT)" ] || git commit -s include/nl802154.h lib/nl_policy.c -m "Resync with kernel"
+	[ ! -z "$(NOCOMMIT)" ] || git commit -s include/nl802154.h include/nl802154.h.patch lib/nl_policy.c -m "Resync with kernel"
