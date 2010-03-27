@@ -153,6 +153,8 @@ static iz_res_t add_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
 	if (cmd->iface)
 		NLA_PUT_STRING(msg, IEEE802154_ATTR_DEV_NAME, cmd->iface);
 
+	NLA_PUT_U8(msg, IEEE802154_ATTR_DEV_TYPE, IEEE802154_DEV_WPAN);
+
 	if (cmd->argc >= 4) {
 		int ret = parse_hw_addr(cmd->argv[3], hwa);
 		if (ret) {
@@ -177,6 +179,51 @@ static iz_res_t add_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, st
 		return IZ_STOP_ERR;
 
 	printf("Registered new device ('%s') on phy %s\n",
+			nla_get_string(attrs[IEEE802154_ATTR_DEV_NAME]),
+			nla_get_string(attrs[IEEE802154_ATTR_PHY_NAME]));
+
+	return IZ_STOP_OK;
+}
+
+/********************
+ * MONITOR handling *
+ ********************/
+
+static iz_res_t monitor_phy_parse(struct iz_cmd *cmd)
+{
+	if (cmd->argc < 2 || cmd->argc > 3) {
+		printf("Incorrect number of arguments!\n");
+		return IZ_STOP_ERR;
+	}
+
+	cmd->phy = cmd->argv[1];
+	cmd->iface = cmd->argv[2] ? : "wpanmon%d";
+
+	return IZ_CONT_OK;
+}
+
+static iz_res_t monitor_phy_request(struct iz_cmd *cmd, struct nl_msg *msg)
+{
+	/* monitor single interface */
+	NLA_PUT_STRING(msg, IEEE802154_ATTR_PHY_NAME, cmd->phy);
+	NLA_PUT_STRING(msg, IEEE802154_ATTR_DEV_NAME, cmd->iface);
+
+	NLA_PUT_U8(msg, IEEE802154_ATTR_DEV_TYPE, IEEE802154_DEV_MONITOR);
+
+	return IZ_CONT_OK;
+
+nla_put_failure:
+	return IZ_STOP_ERR;
+
+}
+
+static iz_res_t monitor_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs)
+{
+	if (!attrs[IEEE802154_ATTR_DEV_NAME] ||
+	    !attrs[IEEE802154_ATTR_PHY_NAME])
+		return IZ_STOP_ERR;
+
+	printf("Registered new monitor ('%s') on phy %s\n",
 			nla_get_string(attrs[IEEE802154_ATTR_DEV_NAME]),
 			nla_get_string(attrs[IEEE802154_ATTR_PHY_NAME]));
 
@@ -247,13 +294,23 @@ const struct iz_module iz_phy = {
 	},
 	{
 		.name		= "add",
-		.usage		= "phy [iface]",
-		.doc		= "Add an interface attached to specified phy.",
+		.usage		= "phy [name [hwaddr]]",
+		.doc		= "Add an WPAN interface attached to specified phy.",
 		.nl_cmd		= IEEE802154_ADD_IFACE,
 		.nl_resp	= IEEE802154_ADD_IFACE,
 		.parse		= add_phy_parse,
 		.request	= add_phy_request,
 		.response	= add_phy_response,
+	},
+	{
+		.name		= "monitor",
+		.usage		= "phy [name]",
+		.doc		= "Add monitoring interface, passing all received frames.",
+		.nl_cmd		= IEEE802154_ADD_IFACE,
+		.nl_resp	= IEEE802154_ADD_IFACE,
+		.parse		= monitor_phy_parse,
+		.request	= monitor_phy_request,
+		.response	= monitor_phy_response,
 	},
 	{
 		.name		= "del",
