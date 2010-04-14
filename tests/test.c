@@ -36,7 +36,7 @@
 
 int main(int argc, char **argv) {
 	int ret;
-	char *iface = argv[1] ?: "mwpan0";
+	char *iface = argv[1] ?: "wpan0";
 
 	char buf[] = {0x40, 0x00, 0x56};
 	int sd = socket(PF_IEEE802154, SOCK_RAW, 0);
