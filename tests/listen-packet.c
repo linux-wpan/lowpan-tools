@@ -42,6 +42,7 @@ int main(int argc, char **argv) {
 	unsigned char buf[256];
 	struct sockaddr_ll sa = {};
 	struct ifreq req = {};
+	char *iface = argv[1] ?: "wpan0";
 
 	int sd = socket(PF_PACKET, (argv[2] && argv[2][0] == 'd') ? SOCK_DGRAM : SOCK_RAW , htons(ETH_P_ALL));
 	if (sd < 0) {
@@ -49,7 +50,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	strncpy(req.ifr_name, argv[1], IF_NAMESIZE);
+	strncpy(req.ifr_name, iface, IF_NAMESIZE);
 	ret = ioctl(sd, SIOCGIFINDEX, &req);
 	if (ret < 0)
 		perror("ioctl: SIOCGIFINDEX");
