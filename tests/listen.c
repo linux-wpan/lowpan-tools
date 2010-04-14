@@ -39,6 +39,7 @@ int main(int argc, char **argv) {
 	unsigned char buf[256];
 	struct sockaddr_ieee802154 sa = {};
 	struct ifreq req = {};
+	char *iface = argv[1] ?: "wpan0";
 
 	int sd = socket(PF_IEEE802154, SOCK_RAW, 0);
 	if (sd < 0) {
@@ -46,7 +47,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	strncpy(req.ifr_name, argv[1], IFNAMSIZ);
+	strncpy(req.ifr_name, iface, IFNAMSIZ);
 	ret = ioctl(sd, SIOCGIFHWADDR, &req);
 	if (ret < 0)
 		perror("ioctl: SIOCGIFHWADDR");
