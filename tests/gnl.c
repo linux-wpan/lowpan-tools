@@ -73,7 +73,7 @@ int main(void) {
 
 	struct nl_msg *msg = nlmsg_alloc();
 	nl_perror("nlmsg_alloc");
-	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_ECHO, /* cmd */ 0, /* vers */ 1);
+	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_ECHO, /* cmd */ IEEE802154_LIST_IFACE, /* vers */ 1);
 	nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, "wpan0");
 
 	nl_send_auto_complete(nl, msg);
