@@ -62,7 +62,7 @@ struct sockaddr_ieee802154 {
 #endif
 
 #ifndef N_IEEE802154
-#define N_IEEE802154 19
+#define N_IEEE802154 22
 #endif
 
 #ifndef PF_IEEE802154
