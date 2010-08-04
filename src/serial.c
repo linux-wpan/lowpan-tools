@@ -34,6 +34,7 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include <net/if.h>
 
@@ -118,6 +119,12 @@ int main(int argc, char **argv) {
 	int arg;
 	arg = N_IEEE802154;
 	ret = ioctl(fd, TIOCSETD, &arg);
+#ifdef ENABLE_KERNEL_COMPAT
+	if (ret < 0 && errno == EINVAL) {
+		arg = N_IEEE802154_OLD;
+		ret = ioctl(fd, TIOCSETD, &arg);
+	}
+#endif
 	if (ret < 0) {
 		perror("ioctl: TIOCSETD");
 		return 6;
