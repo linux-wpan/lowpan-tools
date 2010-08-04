@@ -46,6 +46,19 @@ AC_ARG_ENABLE([manpages],[AS_HELP_STRING([--disable-manpages],
 	esac], [manpages=yes])
 AM_CONDITIONAL([MANPAGES], [test x$manpages = xyes])
 
+AC_ARG_ENABLE([kernel-compat],[AS_HELP_STRING([--enable-kernel-compat],
+	      [enable compatibility with older kernels])],
+	[case "${enableval}" in
+		yes | true) kernelcompat=yes ;;
+		no | false) kernelcompat=no ;;
+		*) AC_MSG_ERROR([bad value ${enableval} for --enable-kernel-compat]) ;;
+	esac], [kernelcompat=no])
+if test "x$kernelcompat" == "xyes"
+then
+	AC_DEFINE([ENABLE_KERNEL_COMPAT], [1],
+		  [Define to 1 if you want to enable compatibility with older kernels])
+fi
+
 AC_ARG_WITH(pidfile, [AC_HELP_STRING([--with-pidfile],
 	    [pid file location])],
 	    [pidfile=$withval],
