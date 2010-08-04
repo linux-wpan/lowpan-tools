@@ -24,22 +24,16 @@
 #endif
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/ioctl.h>
-#include <sys/socket.h>
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
 #include <errno.h>
 
-#include <net/if.h>
-
 #include "ieee802154.h"
-#define N_ZB 19
 
 int main(int argc, char **argv) {
 	int fd, ret, s;
@@ -138,7 +132,7 @@ int main(int argc, char **argv) {
 
 	if (daemon(0, 0) < 0) {
 		perror("daemon");
-		exit(255);
+		return 8;
 	}
 
 	while (1)
