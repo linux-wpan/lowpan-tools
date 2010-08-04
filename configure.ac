@@ -58,7 +58,7 @@ AC_ARG_ENABLE([kernel-compat],[AS_HELP_STRING([--enable-kernel-compat],
 		yes | true) kernelcompat=yes ;;
 		no | false) kernelcompat=no ;;
 		*) AC_MSG_ERROR([bad value ${enableval} for --enable-kernel-compat]) ;;
-	esac], [kernelcompat=no])
+	esac], [kernelcompat=yes])
 if test "x$kernelcompat" == "xyes"
 then
 	AC_DEFINE([ENABLE_KERNEL_COMPAT], [1],
