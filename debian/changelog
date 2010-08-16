@@ -1,8 +1,13 @@
 lowpan-tools (0.2.2-1) unstable; urgency=low
 
   * New upstream release.
+  * Add a patch fixing cross-compilation with libnl.so.
+  * Bump Standards-Version to 3.9.1 (no source changes needed).
+  * Add pkg-config to Depends field.
+  * Move debian/dirs to debian/lowpan-tools.dirs.
+  * Move debian/docs to debian/lowpan-tools.docs.
 
- -- Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>  Wed, 04 Aug 2010 04:20:55 +0400
+ -- Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>  Mon, 16 Aug 2010 18:47:08 +0400
 
 lowpan-tools (0.2.1-1) unstable; urgency=low
 
