@@ -9,7 +9,7 @@ noinst_HEADERS = include/libcommon.h include/addrdb.h include/logging.h
 
 EXTRA_DIST = $(srcdir)/debian/changelog $(srcdir)/debian/compat $(srcdir)/debian/control $(srcdir)/debian/copyright \
 	     $(srcdir)/debian/rules $(srcdir)/debian/watch $(srcdir)/debian/source/format \
-	     $(srcdir)/debian/dirs $(srcdir)/debian/docs $(srcdir)/debian/*.examples $(srcdir)/debian/*.install \
+	     $(srcdir)/debian/*.dirs $(srcdir)/debian/*.docs $(srcdir)/debian/*.examples $(srcdir)/debian/*.install \
 	     $(srcdir)/include/linux
 
 libtool: $(LIBTOOL_DEPS)
