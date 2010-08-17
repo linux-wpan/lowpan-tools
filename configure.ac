@@ -3,7 +3,7 @@
 
 AC_PREREQ(2.61)
 AC_INIT([Userspace tools for Linux IEEE 802.15.4 stack],
-	[0.2],[linux-zigbee-devel@lists.sourceforge.net],
+	[0.3-pre],[linux-zigbee-devel@lists.sourceforge.net],
 	[lowpan-tools], [http://linux-zigbee.sourceforge.net/])
 m4_ifndef([AC_PACKAGE_URL],
 	  [AC_SUBST([PACKAGE_URL], [http://linux-zigbee.sourceforge.net/])
