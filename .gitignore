@@ -1,7 +1,9 @@
 aclocal.m4
 autom4te.cache
+autoscan.log
 config.*
 configure
+configure.scan
 .deps
 .dirstamp
 INSTALL
