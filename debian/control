@@ -2,7 +2,7 @@ Source: lowpan-tools
 Section: net
 Priority: extra
 Maintainer: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
-Build-Depends: debhelper (>= 6), autotools-dev, python-central, libnl-dev, bison, flex, pkg-config
+Build-Depends: debhelper (>= 7.0.50~), autotools-dev, python-central, libnl-dev, bison, flex, pkg-config
 Standards-Version: 3.9.1
 Homepage: http://linux-zigbee.sourceforge.net/
 XS-Python-Version: all
