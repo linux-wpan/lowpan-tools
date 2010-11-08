@@ -1,3 +1,9 @@
+lowpan-tools (0.2.2-6) unstable; urgency=low
+
+  * Mention lib/genl.c in debian/copyright.
+
+ -- Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>  Mon, 08 Nov 2010 12:37:39 +0300
+
 lowpan-tools (0.2.2-5) unstable; urgency=low
 
   * Fix two more errors in debian/copyright: my e-mail and upstream address.
