@@ -20,11 +20,11 @@ iz_SOURCES = iz.c iz-common.c iz-mac.c iz-phy.c
 noinst_HEADERS = iz.h
 
 izcoordinator_SOURCES = coordinator.c
-izcoordinator_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS) -DLEASE_FILE=\"$(leasefile)\"
+izcoordinator_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS) -DLEASE_FILE=\"$(leasefile)\" -D_GNU_SOURCE
 izcoordinator_CFLAGS += -DPID_FILE=\"$(pidfile)\"
 izcoordinator_LDADD = ../addrdb/libaddrdb.la $(LDADD) $(NL_LIBS) $(LEXLIB)
 
-iz_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS)
+iz_CFLAGS = $(AM_CFLAGS) $(NL_CFLAGS) -D_GNU_SOURCE
 iz_LDADD = $(LDADD) $(NL_LIBS)
 
 izattach.8: $(izattach_SOURCES) $(top_srcdir)/configure.ac
