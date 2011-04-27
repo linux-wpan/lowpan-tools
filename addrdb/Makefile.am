@@ -1,7 +1,7 @@
 include $(top_srcdir)/Makefile.common
 
 AM_YFLAGS = -d --report=all
-BUILT_SOURCE = coord-config-parse.h
+BUILT_SOURCES = coord-config-parse.h
 
 noinst_LTLIBRARIES = libaddrdb.la
 check_PROGRAMS = parsetest
