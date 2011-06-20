@@ -299,8 +299,14 @@ static int iz_cb_valid(struct nl_msg *msg, void *arg)
 	dprintf(1, "Received command %d (%d) for interface\n",
 			ghdr->cmd, ghdr->version);
 
-	if (cmd->desc->listener || cmd->desc->nl_resp == ghdr->cmd) {
-		iz_exit = cmd->desc->response(cmd, ghdr, attrs);
+	if (cmd->desc->response[0].nl == __IEEE802154_CMD_MAX)
+		iz_exit = cmd->desc->response->call(cmd, ghdr, attrs);
+	else {
+		int i;
+
+		for (i = 0; cmd->desc->response[i].nl; i++)
+			if (cmd->desc->response[i].nl == ghdr->cmd)
+				iz_exit = cmd->desc->response->call(cmd, ghdr, attrs);
 	}
 
 	return 0;

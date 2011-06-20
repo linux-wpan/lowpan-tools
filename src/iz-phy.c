@@ -127,6 +127,14 @@ static iz_res_t list_phy_finish(struct iz_cmd *cmd)
 	return IZ_STOP_OK;
 }
 
+static struct iz_cmd_event list_phy_response_event[] = {
+	{
+		.call = list_phy_response,
+		.nl = IEEE802154_LIST_PHY,
+	},
+	{ 0, 0 },
+};
+
 /******************
  *  ADD handling  *
  ******************/
@@ -185,6 +193,14 @@ static iz_res_t add_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, st
 	return IZ_STOP_OK;
 }
 
+static struct iz_cmd_event add_phy_response_event[] = {
+	{
+		.call = add_phy_response,
+		.nl = IEEE802154_ADD_IFACE,
+	},
+	{ 0, 0 },
+};
+
 /********************
  * MONITOR handling *
  ********************/
@@ -229,6 +245,14 @@ static iz_res_t monitor_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr
 
 	return IZ_STOP_OK;
 }
+
+static struct iz_cmd_event monitor_phy_response_event[] = {
+	{
+		.call = monitor_phy_response,
+		.nl = IEEE802154_ADD_IFACE,
+	},
+	{ 0, 0 },
+};
 
 /******************
  *  DEL handling  *
@@ -278,6 +302,14 @@ static iz_res_t del_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, st
 	return IZ_STOP_OK;
 }
 
+static struct iz_cmd_event del_phy_response_event[] = {
+	{
+		.call = del_phy_response,
+		.nl = IEEE802154_ADD_IFACE,
+	},
+	{ 0, 0 },
+};
+
 const struct iz_module iz_phy = {
 	.name = "PHY 802.15.4",
 	.commands = {
@@ -286,10 +318,9 @@ const struct iz_module iz_phy = {
 		.usage		= "[phy]",
 		.doc		= "List phys(s).",
 		.nl_cmd		= IEEE802154_LIST_PHY,
-		.nl_resp	= IEEE802154_LIST_PHY,
 		.parse		= list_phy_parse,
 		.request	= list_phy_request,
-		.response	= list_phy_response,
+		.response	= list_phy_response_event,
 		.finish		= list_phy_finish,
 	},
 	{
@@ -297,30 +328,27 @@ const struct iz_module iz_phy = {
 		.usage		= "phy [name [hwaddr]]",
 		.doc		= "Add an WPAN interface attached to specified phy.",
 		.nl_cmd		= IEEE802154_ADD_IFACE,
-		.nl_resp	= IEEE802154_ADD_IFACE,
 		.parse		= add_phy_parse,
 		.request	= add_phy_request,
-		.response	= add_phy_response,
+		.response	= add_phy_response_event,
 	},
 	{
 		.name		= "monitor",
 		.usage		= "phy [name]",
 		.doc		= "Add monitoring interface, passing all received frames.",
 		.nl_cmd		= IEEE802154_ADD_IFACE,
-		.nl_resp	= IEEE802154_ADD_IFACE,
 		.parse		= monitor_phy_parse,
 		.request	= monitor_phy_request,
-		.response	= monitor_phy_response,
+		.response	= monitor_phy_response_event,
 	},
 	{
 		.name		= "del",
 		.usage		= "[phy] iface",
 		.doc		= "Delete the specified interface.",
 		.nl_cmd		= IEEE802154_DEL_IFACE,
-		.nl_resp	= IEEE802154_DEL_IFACE,
 		.parse		= del_phy_parse,
 		.request	= del_phy_request,
-		.response	= del_phy_response,
+		.response	= del_phy_response_event,
 	},
 	{}}
 };

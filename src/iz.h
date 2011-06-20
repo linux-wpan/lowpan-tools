@@ -37,14 +37,21 @@ typedef enum {
 	IZ_STOP_ERR,
 } iz_res_t;
 
+/*
+ * iz command event
+ * FIXME: add event-style for all commands..
+ */
+struct iz_cmd_event {
+	iz_res_t (*call)();
+	int nl;
+};
+
 /* iz command descriptor */
 struct iz_cmd_desc {
 	const char *name;	/* Name (as in command line) */
 	const char *usage;	/* Arguments list */
 	const char *doc;	/* One line command description */
 	unsigned char nl_cmd;	/* NL command ID */
-	unsigned char nl_resp;	/* NL command response ID (optional) */
-	unsigned listener : 1;	/* Listen for all events */
 
 	/* Parse command line, fill in iz_cmd struct. */
 	/* You must set cmd->flags here! */
@@ -55,7 +62,7 @@ struct iz_cmd_desc {
 	iz_res_t (*request)(struct iz_cmd *cmd, struct nl_msg *msg);
 
 	/* Handle an incoming netlink message */
-	iz_res_t (*response)(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs);
+	struct iz_cmd_event *response;
 
 	/* Handle the end of multipart message */
 	iz_res_t (*finish)(struct iz_cmd *cmd);

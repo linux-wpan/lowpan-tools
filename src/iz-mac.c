@@ -109,6 +109,13 @@ static iz_res_t scan_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struc
 	int i;
 	uint8_t edl[27];
 
+	if (ghdr->cmd == 21) {
+		printf("Found beacon:\n\tShort addr: %d\n\tPAN id: %d\n",
+			nla_get_u16(attrs[IEEE802154_ATTR_COORD_SHORT_ADDR]),
+			nla_get_u16(attrs[IEEE802154_ATTR_COORD_PAN_ID]));
+		return IZ_CONT_OK;
+	}
+
 	if (!attrs[IEEE802154_ATTR_DEV_INDEX] ||
 	    !attrs[IEEE802154_ATTR_STATUS] ||
 	    !attrs[IEEE802154_ATTR_SCAN_TYPE])
@@ -131,8 +138,8 @@ static iz_res_t scan_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struc
 			return IZ_STOP_OK;
 
 		case IEEE802154_MAC_SCAN_ACTIVE:
-			printf("Started active (beacons) scan...\n");
-			return IZ_CONT_OK;
+			printf("Finished active (beacons) scan...\n");
+			return IZ_STOP_OK;
 		default:
 			printf("Unsupported scan type: %d\n", type);
 			break;
@@ -140,6 +147,18 @@ static iz_res_t scan_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struc
 
 	return IZ_STOP_OK;
 }
+
+static struct iz_cmd_event scan_response_event[] = {
+	{
+		.call = scan_response,
+		.nl = IEEE802154_SCAN_CONF,
+	},
+	{
+		.call = scan_response,
+		.nl = IEEE802154_BEACON_NOTIFY_INDIC,
+	},
+	{ 0, 0 },
+};
 
 /******************/
 /* LIST handling  */
@@ -225,6 +244,14 @@ static iz_res_t list_finish(struct iz_cmd *cmd)
 {
 	return IZ_STOP_OK;
 }
+
+static struct iz_cmd_event list_response_event[] = {
+	{
+		.call = list_response,
+		.nl = IEEE802154_LIST_IFACE,
+	},
+	{ 0, 0 },
+};
 
 /************************/
 /* ASSOCIATE handling   */
@@ -321,6 +348,14 @@ static iz_res_t assoc_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, stru
 	return IZ_STOP_OK;
 }
 
+static struct iz_cmd_event assoc_response_event[] = {
+	{
+		.call = assoc_response,
+		.nl = IEEE802154_ASSOCIATE_CONF,
+	},
+	{ 0, 0 },
+};
+
 /*************************/
 /* DISASSOCIATE handling */
 /*************************/
@@ -390,6 +425,14 @@ static iz_res_t disassoc_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, s
 	return IZ_STOP_OK;
 }
 
+static struct iz_cmd_event disassoc_response_event[] = {
+	{
+		.call = disassoc_response,
+		.nl = IEEE802154_DISASSOCIATE_CONF,
+	},
+	{ 0, 0 },
+};
+
 const struct iz_module iz_mac = {
 	.name = "MAC 802.15.4",
 	.commands = {
@@ -398,40 +441,36 @@ const struct iz_module iz_mac = {
 		.usage		= "<iface> <ed|active|passive|orphan> <channels> <duration>",
 		.doc		= "Perform network scanning on specified channels.",
 		.nl_cmd		= IEEE802154_SCAN_REQ,
-		.nl_resp	= IEEE802154_SCAN_CONF,
 		.parse		= scan_parse,
 		.request	= scan_request,
-		.response	= scan_response,
+		.response	= scan_response_event,
 	},
 	{
 		.name		= "assoc",
 		.usage		= "<iface> <pan> <coord> <chan> ['short']",
 		.doc		= "Associate with a given network via coordinator.",
 		.nl_cmd		= IEEE802154_ASSOCIATE_REQ,
-		.nl_resp	= IEEE802154_ASSOCIATE_CONF,
 		.parse		= assoc_parse,
 		.request	= assoc_request,
-		.response	= assoc_response,
+		.response	= assoc_response_event,
 	},
 	{
 		.name		= "disassoc",
 		.usage		= "<iface> <addr> <reason>",
 		.doc		= "Disassociate from a network.",
 		.nl_cmd		= IEEE802154_DISASSOCIATE_REQ,
-		.nl_resp	= IEEE802154_DISASSOCIATE_CONF,
 		.parse		= disassoc_parse,
 		.request	= disassoc_request,
-		.response	= disassoc_response,
+		.response	= disassoc_response_event,
 	},
 	{
 		.name		= "list",
 		.usage		= "[iface]",
 		.doc		= "List interface(s).",
 		.nl_cmd		= IEEE802154_LIST_IFACE,
-		.nl_resp	= IEEE802154_LIST_IFACE,
 		.parse		= list_parse,
 		.request	= list_request,
-		.response	= list_response,
+		.response	= list_response_event,
 		.finish		= list_finish,
 	},
 	{}}

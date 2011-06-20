@@ -147,6 +147,13 @@ static iz_res_t event_finish(struct iz_cmd *cmd)
 	return IZ_CONT_OK;
 }
 
+static struct iz_cmd_event monitor_response_event[] = {
+	{
+		.call = event_response,
+		.nl = __IEEE802154_CMD_MAX,
+	},
+	{ 0, 0 },
+};
 
 /* Command descriptors */
 const struct iz_module iz_common = {
@@ -163,9 +170,8 @@ const struct iz_module iz_common = {
 		.usage		= "[iface]",
 		.doc		= "Monitor events from the kernel (^C to stop).",
 		.parse		= event_parse,
-		.response	= event_response,
+		.response	= monitor_response_event,
 		.finish		= event_finish,
-		.listener	= 1,
 	},
 	{}}
 };
