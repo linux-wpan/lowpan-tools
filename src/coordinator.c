@@ -55,7 +55,7 @@ static int seq_expected;
 static int family;
 static struct nl_handle *nl;
 static const char *iface;
-static char lease_file[PATH_MAX];
+static char *lease_file;
 static char *pid_file;
 static int die_flag = 0;
 
@@ -283,18 +283,16 @@ int main(int argc, char **argv)
 	int opt, debug, pid_fd, uid;
 	uint16_t pan = 0xffff, short_addr = 0xffff;
 	char pname[PATH_MAX];
-	char * p;
 	uint8_t channel = 0;
 
 	debug = 0;
 	range_min = 0x8000;
 	range_max = 0xfffd;
 
-	memcpy(lease_file, LEASE_FILE, sizeof(lease_file));
 
-	p = getenv("LEASE_FILE");
-	if(p)
-		strncpy(lease_file, p, PATH_MAX);
+	lease_file = getenv("LEASE_FILE");
+	if(!lease_file)
+		lease_file = LEASE_FILE;
 
 	strncpy(pname, argv[0], PATH_MAX);
 
@@ -316,7 +314,7 @@ int main(int argc, char **argv)
 
 		switch(opt) {
 		case 'l':
-			strncpy(lease_file, optarg, PATH_MAX);
+			lease_file = optarg;
 			break;
 		case 'f':
 			pid_file = optarg;
