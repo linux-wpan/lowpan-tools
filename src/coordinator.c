@@ -56,6 +56,7 @@ static int family;
 static struct nl_handle *nl;
 static const char *iface;
 static char lease_file[PATH_MAX];
+static char *pid_file;
 static int die_flag = 0;
 
 
@@ -234,7 +235,7 @@ static void cleanup(int ret)
 	if(ret == 0)
 		addrdb_dump_leases(lease_file);
 	nl_close(nl);
-	unlink(PID_FILE);
+	unlink(pid_file);
 	exit(ret);	
 }
 
@@ -249,6 +250,7 @@ static void usage(char * name)
 	printf("Usage: %s [OPTION]... -i IFACE\n", name);
 	printf("Provide a userspace part of IEEE 802.15.4 coordinator on specified IFACE.\n\n");
 	printf(	" -l lease_file      Where we store lease file.\n"
+		" -f pid_file        Where to store process PID.\n"
 		" -d debug_level     Set debug level of application.\n"
 		"                    Will not demonize on levels > 0.\n"
 		" -m range_min       Minimal new 16-bit address allocated.\n"
@@ -296,13 +298,17 @@ int main(int argc, char **argv)
 
 	strncpy(pname, argv[0], PATH_MAX);
 
+	pid_file = getenv("PID_FILE");
+	if (!pid_file)
+		pid_file = PID_FILE;
+
 	while(1) {
 #ifdef HAVE_GETOPT_LONG
 		int option_index = 0;
-		opt = getopt_long(argc, argv, "l:d:m:n:i:s:p:c:hv",
+		opt = getopt_long(argc, argv, "l:f:d:m:n:i:s:p:c:hv",
 				long_options, &option_index);
 #else
-		opt = getopt(argc, argv, "l:d:m:n:i:s:p:c:hv");
+		opt = getopt(argc, argv, "l:f:d:m:n:i:s:p:c:hv");
 #endif
 		fprintf(stderr, "Opt: %c (%hhx)\n", opt, opt);
 		if (opt == -1)
@@ -311,6 +317,9 @@ int main(int argc, char **argv)
 		switch(opt) {
 		case 'l':
 			strncpy(lease_file, optarg, PATH_MAX);
+			break;
+		case 'f':
+			pid_file = optarg;
 			break;
 		case 'd':
 			debug = atoi(optarg);
