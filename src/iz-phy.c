@@ -132,7 +132,7 @@ static struct iz_cmd_event list_phy_response_event[] = {
 		.call = list_phy_response,
 		.nl = IEEE802154_LIST_PHY,
 	},
-	{ 0, 0 },
+	{},
 };
 
 /******************
@@ -198,7 +198,7 @@ static struct iz_cmd_event add_phy_response_event[] = {
 		.call = add_phy_response,
 		.nl = IEEE802154_ADD_IFACE,
 	},
-	{ 0, 0 },
+	{},
 };
 
 /********************
@@ -251,7 +251,7 @@ static struct iz_cmd_event monitor_phy_response_event[] = {
 		.call = monitor_phy_response,
 		.nl = IEEE802154_ADD_IFACE,
 	},
-	{ 0, 0 },
+	{},
 };
 
 /******************
@@ -307,7 +307,7 @@ static struct iz_cmd_event del_phy_response_event[] = {
 		.call = del_phy_response,
 		.nl = IEEE802154_ADD_IFACE,
 	},
-	{ 0, 0 },
+	{},
 };
 
 const struct iz_module iz_phy = {

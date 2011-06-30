@@ -290,6 +290,7 @@ static int iz_cb_valid(struct nl_msg *msg, void *arg)
 	struct nlattr *attrs[IEEE802154_ATTR_MAX+1];
         struct genlmsghdr *ghdr;
 	struct iz_cmd *cmd = arg;
+	int i;
 
 	/* Validate message and parse attributes */
 	genlmsg_parse(nlh, 0, attrs, IEEE802154_ATTR_MAX, ieee802154_policy);
@@ -299,14 +300,10 @@ static int iz_cb_valid(struct nl_msg *msg, void *arg)
 	dprintf(1, "Received command %d (%d) for interface\n",
 			ghdr->cmd, ghdr->version);
 
-	if (cmd->desc->response[0].nl == __IEEE802154_CMD_MAX)
-		iz_exit = cmd->desc->response->call(cmd, ghdr, attrs);
-	else {
-		int i;
-
-		for (i = 0; cmd->desc->response[i].nl; i++)
-			if (cmd->desc->response[i].nl == ghdr->cmd)
-				iz_exit = cmd->desc->response->call(cmd, ghdr, attrs);
+	for (i = 0; cmd->desc->response[i].nl; i++)
+		if (cmd->desc->response[i].nl == ghdr->cmd ||
+		    cmd->desc->response[i].nl == IZ_RESPONSE_ALL) {
+			iz_exit = cmd->desc->response->call(cmd, ghdr, attrs);
 	}
 
 	return 0;

@@ -157,7 +157,7 @@ static struct iz_cmd_event scan_response_event[] = {
 		.call = scan_response,
 		.nl = IEEE802154_BEACON_NOTIFY_INDIC,
 	},
-	{ 0, 0 },
+	{},
 };
 
 /******************/
@@ -250,7 +250,7 @@ static struct iz_cmd_event list_response_event[] = {
 		.call = list_response,
 		.nl = IEEE802154_LIST_IFACE,
 	},
-	{ 0, 0 },
+	{},
 };
 
 /************************/
@@ -353,7 +353,7 @@ static struct iz_cmd_event assoc_response_event[] = {
 		.call = assoc_response,
 		.nl = IEEE802154_ASSOCIATE_CONF,
 	},
-	{ 0, 0 },
+	{},
 };
 
 /*************************/
@@ -430,7 +430,7 @@ static struct iz_cmd_event disassoc_response_event[] = {
 		.call = disassoc_response,
 		.nl = IEEE802154_DISASSOCIATE_CONF,
 	},
-	{ 0, 0 },
+	{},
 };
 
 const struct iz_module iz_mac = {

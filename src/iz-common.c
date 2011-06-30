@@ -150,9 +150,9 @@ static iz_res_t event_finish(struct iz_cmd *cmd)
 static struct iz_cmd_event monitor_response_event[] = {
 	{
 		.call = event_response,
-		.nl = __IEEE802154_CMD_MAX,
+		.nl = IZ_RESPONSE_ALL,
 	},
-	{ 0, 0 },
+	{},
 };
 
 /* Command descriptors */

@@ -39,12 +39,17 @@ typedef enum {
 
 /*
  * iz command event
- * FIXME: add event-style for all commands..
+ *
+ * This assumes that 0 is invalid nl_resp (end of the list)
  */
 struct iz_cmd_event {
-	iz_res_t (*call)();
+	iz_res_t (*call)(struct iz_cmd *cmd, struct genlmsghdr *ghdr,
+			struct nlattr **attrs);
 	int nl;
 };
+
+/* receive all event */
+#define IZ_RESPONSE_ALL (-1)
 
 /* iz command descriptor */
 struct iz_cmd_desc {
