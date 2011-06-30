@@ -83,6 +83,7 @@ static iz_res_t event_parse(struct iz_cmd *cmd)
 }
 
 static char *iz_cmd_names[__IEEE802154_CMD_MAX + 1] = {
+	[0 ... __IEEE802154_CMD_MAX] = "?? unknown ??",
 	[__IEEE802154_COMMAND_INVALID] = "IEEE802154_COMMAND_INVALID",
 
 	[IEEE802154_ASSOCIATE_REQ] = "IEEE802154_ASSOCIATE_REQ",
