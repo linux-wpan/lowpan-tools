@@ -207,7 +207,7 @@ static iz_res_t list_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struc
 		phy_name = nla_get_string(attrs[IEEE802154_ATTR_PHY_NAME]);
 
 	/* Display information about interface */
-	printf("%s\n", dev_name);
+	printf("%s (%d)\n", dev_name, dev_index);
 	dev_type_str = "IEEE 802.15.4 MAC interface";
 	printf("    link: %s\n", dev_type_str);
 	if (phy_name)
