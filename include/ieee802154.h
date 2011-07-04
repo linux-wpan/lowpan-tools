@@ -62,9 +62,10 @@ struct sockaddr_ieee802154 {
 #endif
 
 #ifndef N_IEEE802154
-#define N_IEEE802154 22
+#define N_IEEE802154 25
 #ifdef ENABLE_KERNEL_COMPAT
-#define N_IEEE802154_OLD 19
+#define N_IEEE802154_OLD 22
+#define N_IEEE802154_VERY_OLD 19
 #endif
 #endif
 

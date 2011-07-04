@@ -118,6 +118,10 @@ int main(int argc, char **argv) {
 		arg = N_IEEE802154_OLD;
 		ret = ioctl(fd, TIOCSETD, &arg);
 	}
+	if (ret < 0 && errno == EINVAL) {
+		arg = N_IEEE802154_VERY_OLD;
+		ret = ioctl(fd, TIOCSETD, &arg);
+	}
 #endif
 	if (ret < 0) {
 		perror("ioctl: TIOCSETD");
