@@ -89,7 +89,7 @@ static int family_handler(struct nl_msg *msg, void *arg)
 	return NL_SKIP;
 }
 
-int nl_get_multicast_id(struct nl_handle *handle, const char *family, const char *group)
+int nl_get_multicast_id(struct nl_sock *handle, const char *family, const char *group)
 {
 	struct nl_msg *msg;
 	struct nl_cb *cb;

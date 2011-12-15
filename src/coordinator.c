@@ -53,7 +53,7 @@
 
 static int seq_expected;
 static int family;
-static struct nl_handle *nl;
+static struct nl_sock *nl;
 static const char *iface;
 static char *lease_file;
 static char *pid_file;
@@ -64,10 +64,10 @@ extern int yydebug;
 
 static void cleanup(int ret);
 
-static void log_msg_nl_perror(char *s)
+static void log_msg_nl_perror(char *s, int err)
 {
-	if (nl_get_errno()) {
-		log_msg(0, "%s: %s", s, nl_geterror());
+	if (err != NLE_SUCCESS) {
+		log_msg(0, "%s: %s", s, nl_geterror(err));
 		cleanup(1);
 	}
 }
@@ -93,8 +93,8 @@ static int mlme_start(uint16_t short_addr, uint16_t pan, uint8_t channel, uint8_
 	nla_put_u8(msg, IEEE802154_ATTR_BAT_EXT, 0);
 	nla_put_u8(msg, IEEE802154_ATTR_COORD_REALIGN, 0);
 #endif
-	nl_send_auto_complete(nl, msg);
-	log_msg_nl_perror("nl_send_auto_complete");
+	int err = nl_send_auto_complete(nl, msg);
+	log_msg_nl_perror("nl_send_auto_complete", err);
 	return 0;
 }
 
@@ -127,9 +127,9 @@ static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 	nla_put_u64(msg, IEEE802154_ATTR_DEST_HW_ADDR, nla_get_u64(attrs[IEEE802154_ATTR_SRC_HW_ADDR]));
 	nla_put_u16(msg, IEEE802154_ATTR_DEST_SHORT_ADDR, shaddr);
 
-	nl_send_auto_complete(nl, msg);
+	int err = nl_send_auto_complete(nl, msg);
 
-	log_msg_nl_perror("nl_send_auto_complete");
+	log_msg_nl_perror("nl_send_auto_complete", err);
 
 	return 0;
 }
@@ -396,19 +396,19 @@ int main(int argc, char **argv)
 	sa.sa_handler = SIG_IGN;
 	sigaction(SIGPIPE, &sa, NULL);
 
-	nl = nl_handle_alloc();
+	int err = NLE_SUCCESS;
+	nl = nl_socket_alloc();
 
 	if (!nl) {
-		log_msg_nl_perror("nl_handle_alloc");
+		log_msg_nl_perror("nl_sock_alloc", NLE_NOMEM);
 		return 1;
 	}
 
-	log_msg_nl_perror("genl_connect");
-	genl_connect(nl);
-	log_msg_nl_perror("genl_connect");
+	err = genl_connect(nl);
+	log_msg_nl_perror("genl_connect", err);
 
 	family = genl_ctrl_resolve(nl, IEEE802154_NL_NAME);
-	log_msg_nl_perror("genl_ctrl_resolve");
+	log_msg_nl_perror("genl_ctrl_resolve", NLE_NOMEM);
 
 	nl_socket_add_membership(nl, nl_get_multicast_id(nl, IEEE802154_NL_NAME, IEEE802154_MCAST_COORD_NAME));
 
@@ -469,8 +469,8 @@ int main(int argc, char **argv)
 	mlme_start(short_addr, pan, channel, 1, iface);
 
 	while (!die_flag) {
-		nl_recvmsgs_default(nl);
-		log_msg_nl_perror("nl_recvmsgs");
+		err = nl_recvmsgs_default(nl);
+		log_msg_nl_perror("nl_recvmsgs", err);
 	}
 	cleanup(0);
 

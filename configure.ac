@@ -80,7 +80,7 @@ AM_PATH_PYTHON(,, [:])
 AM_MISSING_PROG(HELP2MAN, help2man, $missing_dir)
 
 # Checks for libraries.
-PKG_CHECK_MODULES([NL], [libnl-1])
+PKG_CHECK_MODULES([NL], [libnl-3.0])
 
 AC_MSG_CHECKING([whether libnl requires additional libraries])
 _libnl_save_libs="$LIBS"

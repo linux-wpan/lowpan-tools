@@ -58,26 +58,30 @@ static int parse_cb(struct nl_msg *msg, void *arg)
 
 int main(void) {
 
-	struct nl_handle *nl = nl_handle_alloc();
+	struct nl_sock *nl = nl_socket_alloc();
+	int err;
 
 	if (!nl) {
-		nl_perror("nl_handle_alloc");
+		nl_perror(NLE_NOMEM, "nl_sock_alloc");
 		return 1;
 	}
 
-	genl_connect(nl);
-	nl_perror("genl_connect");
+	err = genl_connect(nl);
+	nl_perror(err, "genl_connect");
 
 	int family = genl_ctrl_resolve(nl, "802.15.4 MAC");
-	nl_perror("genl_ctrl_resolve");
+	nl_perror(family, "genl_ctrl_resolve");
 
 	struct nl_msg *msg = nlmsg_alloc();
-	nl_perror("nlmsg_alloc");
+	if (!msg) {
+		nl_perror(NLE_NOMEM, "nlmsg_alloc");
+		return 1;
+	}
 	genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0, NLM_F_ECHO, /* cmd */ IEEE802154_LIST_IFACE, /* vers */ 1);
 	nla_put_string(msg, IEEE802154_ATTR_DEV_NAME, "wpan0");
 
-	nl_send_auto_complete(nl, msg);
-	nl_perror("nl_send_auto_complete");
+	err = nl_send_auto_complete(nl, msg);
+	nl_perror(err, "nl_send_auto_complete");
 
 	nlmsg_free(msg);
 

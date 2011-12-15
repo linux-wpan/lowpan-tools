@@ -26,8 +26,8 @@ void printbuf(const unsigned char *buf, int len);
 
 int parse_hw_addr(const char *addr, unsigned char *buf);
 
-struct nl_handle;
-int nl_get_multicast_id(struct nl_handle *handle, const char *family, const char *group);
+struct nl_sock;
+int nl_get_multicast_id(struct nl_sock *handle, const char *family, const char *group);
 
 struct simple_hash;
 typedef unsigned int (*shash_hash)(const void *key);

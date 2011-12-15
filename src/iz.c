@@ -102,7 +102,7 @@ int main(int argc, char **argv)
 	int i;
 	int family;
 	int group;
-	struct nl_handle *nl;
+	struct nl_sock *nl;
 	struct nl_msg *msg;
 	char *dummy = NULL;
 
@@ -178,9 +178,9 @@ int main(int argc, char **argv)
 	}
 
 	/* Prepare NL command */
-	nl = nl_handle_alloc();
+	nl = nl_socket_alloc();
 	if (!nl) {
-		nl_perror("Could not allocate NL handle");
+		nl_perror(NLE_NOMEM, "Could not allocate NL handle");
 		return 1;
 	}
 	genl_connect(nl);
@@ -204,7 +204,7 @@ int main(int argc, char **argv)
 	if (cmd.desc->request) {
 		msg = nlmsg_alloc();
 		if (!msg) {
-			nl_perror("Could not allocate NL message!\n");
+			nl_perror(NLE_NOMEM, "Could not allocate NL message!\n"); /* FIXME: err */
 			return 1;
 		}
 		genlmsg_put(msg, NL_AUTO_PID, NL_AUTO_SEQ, family, 0,
@@ -225,8 +225,9 @@ int main(int argc, char **argv)
 
 	/* Received message handling loop */
 	while (iz_exit == IZ_CONT_OK) {
-		if(nl_recvmsgs_default(nl)) {
-			nl_perror("Receive failed");
+		int err = nl_recvmsgs_default(nl);
+		if (err != NLE_SUCCESS) {
+			nl_perror(err, "Receive failed");
 			return 1;
 		}
 	}
