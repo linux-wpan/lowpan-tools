@@ -129,7 +129,7 @@ int main(int argc, char **argv) {
 	}
 
 	s = socket(PF_IEEE802154, SOCK_RAW, 0);
-	if (ret < 0) {
+	if (s < 0) {
 		perror("socket");
 		return 7;
 	}
