@@ -40,7 +40,7 @@
 	static uint16_t short_addr;
 	static uint8_t hwaddr[8];
 	static time_t mystamp;
-	static void yyerror(YYLTYPE * yylloc, yyscan_t yyscanner, char *s)
+	static void yyerror(YYLTYPE * yylloc, yyscan_t yyscanner, const char *s)
 	{
 		fprintf(stderr, "Error: %s at line %d\n", s, yylloc->first_line);
 	}
