@@ -94,7 +94,8 @@ static int mlme_start(uint16_t short_addr, uint16_t pan, uint8_t channel, uint8_
 	nla_put_u8(msg, IEEE802154_ATTR_COORD_REALIGN, 0);
 #endif
 	int err = nl_send_auto_complete(nl, msg);
-	log_msg_nl_perror("nl_send_auto_complete", err);
+	if (err < 0)
+		log_msg_nl_perror("nl_send_auto_complete", err);
 	return 0;
 }
 
@@ -129,7 +130,8 @@ static int coordinator_associate(struct genlmsghdr *ghdr, struct nlattr **attrs)
 
 	int err = nl_send_auto_complete(nl, msg);
 
-	log_msg_nl_perror("nl_send_auto_complete", err);
+	if (err < 0)
+		log_msg_nl_perror("nl_send_auto_complete", err);
 
 	return 0;
 }
@@ -408,7 +410,8 @@ int main(int argc, char **argv)
 	log_msg_nl_perror("genl_connect", err);
 
 	family = genl_ctrl_resolve(nl, IEEE802154_NL_NAME);
-	log_msg_nl_perror("genl_ctrl_resolve", NLE_NOMEM);
+	if (family < 0)
+		log_msg_nl_perror("genl_ctrl_resolve", family);
 
 	nl_socket_add_membership(nl, nl_get_multicast_id(nl, IEEE802154_NL_NAME, IEEE802154_MCAST_COORD_NAME));
 
