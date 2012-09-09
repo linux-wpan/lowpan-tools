@@ -81,32 +81,7 @@ AM_PATH_PYTHON(,, [:])
 AM_MISSING_PROG(HELP2MAN, help2man, $missing_dir)
 
 # Checks for libraries.
-PKG_CHECK_MODULES([NL], [libnl-3.0])
-
-AC_MSG_CHECKING([whether libnl requires additional libraries])
-_libnl_save_libs="$LIBS"
-LIBS="$NL_LIBS $LIBS"
-AC_LINK_IFELSE([AC_LANG_CALL([], [genl_connect])], libnl_add="none" , libnl_add="fail")
-if test "$libnl_add" = fail
-then
-LIBS="$NL_LIBS -lm $_libnl_save_libs"
-AC_LINK_IFELSE([AC_LANG_CALL([], [genl_connect])], libnl_add="-lm" , libnl_add="fail")
-fi
-LIBS="$_libnl_save_libs"
-if test "$libnl_add" = fail
-then
-	AC_MSG_RESULT(failure)
-dnl	AC_MSG_RESULT([failed])
-	AC_MSG_FAILURE([failed to link program with libnl])
-else if test "$libnl_add" = none
-then
-	AC_MSG_RESULT([none required])
-else
-	AC_MSG_RESULT([$libnl_add])
-	NL_LIBS="$NL_LIBS $libnl_add"
-fi
-fi
-
+PKG_CHECK_MODULES([NL], [libnl-3.0 libnl-genl-3.0])
 
 # Checks for header files.
 AC_HEADER_STDC
