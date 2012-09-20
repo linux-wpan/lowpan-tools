@@ -1,6 +1,6 @@
 include $(top_srcdir)/Makefile.common
 
-zbtest_PROGRAMS = listen-packet test test2 test3 test4 test5 test6 test7 gnl izlisten
+zbtest_PROGRAMS = listen-packet test1 test2 test3 test4 test5 test6 test7 gnl izlisten
 
 izlisten_SOURCES = listen.c
 
