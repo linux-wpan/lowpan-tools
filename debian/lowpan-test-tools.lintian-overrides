@@ -1,0 +1,7 @@
+lowpan-test-tools binary: hardening-no-fortify-functions usr/lib/*/lowpan-tools/test1
+lowpan-test-tools binary: hardening-no-fortify-functions usr/lib/*/lowpan-tools/test2
+lowpan-test-tools binary: hardening-no-fortify-functions usr/lib/*/lowpan-tools/test3
+lowpan-test-tools binary: hardening-no-fortify-functions usr/lib/*/lowpan-tools/test4
+lowpan-test-tools binary: hardening-no-fortify-functions usr/lib/*/lowpan-tools/test5
+lowpan-test-tools binary: hardening-no-fortify-functions usr/lib/*/lowpan-tools/test6
+lowpan-test-tools binary: hardening-no-fortify-functions usr/lib/*/lowpan-tools/test7

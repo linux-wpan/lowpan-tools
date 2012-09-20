@@ -14,7 +14,7 @@
 #export DH_VERBOSE=1
 
 %:
-	dh $@ --with autotools_dev,python-central
+	dh $@ --with autotools_dev,python2
 
 # Don't run tests in cross environment
 ifneq ($(shell dpkg-architecture -qDEB_HOST_GNU_TYPE),$(shell dpkg-architecture -qDEB_BUILD_GNU_TYPE))
@@ -23,5 +23,5 @@ override_dh_auto_test:
 endif
 
 override_dh_auto_configure:
-	dh_auto_configure -- --with-zbtestdir=\$${libexecdir} --enable-kernel-compat
+	dh_auto_configure -- --enable-kernel-compat --with-pidfile=/run/izcoordinator.pid
 

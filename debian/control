@@ -2,17 +2,18 @@ Source: lowpan-tools
 Section: net
 Priority: extra
 Maintainer: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
-Build-Depends: debhelper (>= 7.0.50~), autotools-dev, python-central, libnl-dev, bison, flex, pkg-config
-Standards-Version: 3.9.1
+Uploaders: Luca Bruno <lucab@debian.org>
+Build-Depends: debhelper (>= 9), autotools-dev, libnl-3-dev,
+		libnl-genl-3-dev, bison, flex, pkg-config,
+		python-all (>= 2.6.6-3~)
+Standards-Version: 3.9.3
 Homepage: http://linux-zigbee.sourceforge.net/
 XS-Python-Version: all
 
 Package: lowpan-test-tools
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-XB-Python-Version: ${python:Version}
-Provides: ${python:Provides}
-Recommends: python
+Architecture: linux-any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+XB-Python-Version: ${python:Versions}
 Replaces: lowpan-tools (<< 0.2)
 Description: Testing programs for LoWPAN stack in Linux
  This package provides several programs for testing various aspects of
@@ -21,7 +22,7 @@ Description: Testing programs for LoWPAN stack in Linux
  Normal users don't need to install this package.
 
 Package: lowpan-tools
-Architecture: any
+Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Base programs for LoWPAN in Linux, the net-tools for LoWPAN
  This package provides all basic prorgrams needed for setting up, monitoring

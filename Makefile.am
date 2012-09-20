@@ -8,7 +8,7 @@ include_HEADERS = include/ieee802154.h include/nl802154.h
 noinst_HEADERS = include/libcommon.h include/addrdb.h include/logging.h
 
 EXTRA_DIST = $(srcdir)/debian/changelog $(srcdir)/debian/compat $(srcdir)/debian/control $(srcdir)/debian/copyright \
-	     $(srcdir)/debian/rules $(srcdir)/debian/watch $(srcdir)/debian/source/format \
+	     $(srcdir)/debian/rules $(srcdir)/debian/watch $(srcdir)/debian/source/format $(srcdir)/debian/*.lintian-overrides \
 	     $(srcdir)/debian/*.dirs $(srcdir)/debian/*.docs $(srcdir)/debian/*.examples $(srcdir)/debian/*.install \
 	     $(srcdir)/include/linux
 
