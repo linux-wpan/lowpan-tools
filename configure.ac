@@ -11,7 +11,7 @@ m4_ifndef([AC_PACKAGE_URL],
 			     [Define to the home page for this package.])])
 AC_CONFIG_AUX_DIR([misc])
 AC_CONFIG_MACRO_DIR([m4])
-AM_INIT_AUTOMAKE([-Wall -Werror gnu])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AM_MAINTAINER_MODE([enable])
 AC_CONFIG_SRCDIR([src/serial.c])
 AC_CONFIG_HEADER([config.h])
