@@ -5,7 +5,7 @@
 %define name lowpan-tools
 #%define version 0.1+0.2rc4
 #%define srcver 0.2-rc4
-%define version 0.2.2
+%define version 0.3
 %define srcver %{version}
 %define release 1
 
@@ -34,7 +34,7 @@ Source: %{name}-%{srcver}.tar.gz
 #Requires:
 #Conflicts:
 #Prereq:
-BuildRequires: libnl-devel, python
+BuildRequires: libnl3-devel, python
 
 Prefix: /usr
 #BuildRoot: /var/tmp/%{name}-%{srcver}
@@ -100,7 +100,7 @@ rm -rf $RPM_BUILD_ROOT
 /usr/bin
 /usr/sbin
 /usr/share/man
-%doc README NEWS AUTHORS
+%doc README AUTHORS
 #%docdir
 %dir /var/lib/lowpan-tools
 #%config
