@@ -77,6 +77,9 @@ AC_PROG_LIBTOOL
 AM_PROG_LEX
 AC_PROG_YACC
 AC_SUBST(LIBTOOL_DEPS)
+# Currently the scripts works with python2.x only
+# Check for this at first
+AC_PATH_PROG(PYTHON, python2 python2.7 python2.6 python2.5 python)
 AM_PATH_PYTHON(,, [:])
 AM_MISSING_PROG(HELP2MAN, help2man, $missing_dir)
 
