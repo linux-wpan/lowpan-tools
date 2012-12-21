@@ -20,6 +20,8 @@
  *  with this program; if not, write to the Free Software Foundation, Inc.,
  *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+	#define YYDEBUG 1
+
 	#include <stdio.h>
 	#include <unistd.h>
 	#include <stdlib.h>
@@ -32,10 +34,9 @@
 	#include <libcommon.h>
 	#include <time.h>
 	#include <addrdb.h>
+	#include "scanner.h"
 	#include "coord-config-parse.h"
 	#include "parser.h"
-
-	#define YYDEBUG 1
 
 	static uint16_t short_addr;
 	static uint8_t hwaddr[8];
