@@ -81,6 +81,7 @@ AC_SUBST(LIBTOOL_DEPS)
 # Check for this at first
 AC_PATH_PROG(PYTHON, python2 python2.7 python2.6 python2.5 python)
 AM_PATH_PYTHON(,, [:])
+py_CHECK_MAJOR_VERSION([PYTHON_VERSION], [2])
 AM_MISSING_PROG(HELP2MAN, help2man, $missing_dir)
 
 # Checks for libraries.
