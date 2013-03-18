@@ -315,14 +315,16 @@ nla_put_failure:
 
 static iz_res_t set_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, struct nlattr **attrs)
 {
-	if (!attrs[IEEE802154_ATTR_SHORT_ADDR] ||
-		!attrs[IEEE802154_ATTR_STATUS] )
+	uint8_t status;
+	
+	if (!attrs[IEEE802154_ATTR_STATUS])
 		return IZ_STOP_ERR;
-
-	printf("Set PAN ID %04hx, short address %04hx, status %i\n",
-		nla_get_u16(attrs[IEEE802154_ATTR_COORD_PAN_ID]),
-		nla_get_u16(attrs[IEEE802154_ATTR_SHORT_ADDR]),
-		nla_get_u8(attrs[IEEE802154_ATTR_CHANNEL]));
+	
+	status = nla_get_u8(attrs[IEEE802154_ATTR_STATUS]);
+	if (status != 0) {
+		printf("Operation Failed. Check channel and PAN ID\n");
+		return IZ_STOP_ERR;
+	}
 
 	return IZ_STOP_OK;
 }
