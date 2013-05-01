@@ -76,8 +76,8 @@ int main(int argc, char **argv) {
 	tbuf.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
 	tbuf.c_iflag &= ~(INPCK | ISTRIP);
 	tbuf.c_oflag &= ~OPOST;
-	tbuf.c_cc[VTIME] = 5; 
-                                                                                  
+	tbuf.c_cc[VTIME] = 5;
+
 	/*
 	tbuf.c_cflag |= CLOCAL;
 	tbuf.c_lflag = 0;
