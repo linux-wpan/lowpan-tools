@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <sys/types.h>
 #include <sys/ioctl.h>
@@ -32,33 +33,95 @@
 #include <termios.h>
 #include <unistd.h>
 #include <errno.h>
+#include <getopt.h>
 
 #include "ieee802154.h"
 
+#ifdef HAVE_GETOPT_LONG
+static const struct option iz_long_opts[] = {
+	{ "baudrate", required_argument, NULL, 'b' },
+	{ "help", no_argument, NULL, 'h' },
+	{ "version", no_argument, NULL, 'v' },
+	{ NULL, 0, NULL, 0 },
+};
+#endif
+
+void serial_help(const char * pname) {
+	printf("Usage: %s [options] SERIAL_DEV\n", pname);
+	printf("Attach serial devices via UART to IEEE 802.15.4/ZigBee stack\n\n");
+	printf("Options:\n");
+	printf("  -b, --baudrate[=115200]        set the baudrate\n");
+	printf("  -h, --help                     print help\n");
+	printf("  -v, --version                  print program version\n");
+	printf("  SERIAL_DEV                     this specifies the serial device to attach.\n");
+	printf("Report bugs to " PACKAGE_BUGREPORT "\n\n");
+	printf(PACKAGE_NAME " homepage <" PACKAGE_URL ">\n");
+}
+
+speed_t baudrate_to_speed(long baudrate) {
+	switch(baudrate) {
+	case 9600: return B9600;
+	case 19200: return B19200;
+	case 38400: return B38400;
+	case 57600: return B57600;
+	case 115200: return B115200;
+	case 230400: return B230400;
+	case 460800: return B460800;
+	case 921600: return B921600;
+	default:
+		printf("Unrecognized baudrate %ld\n", baudrate);
+		exit(EXIT_FAILURE);
+    }
+}
+
 int main(int argc, char **argv) {
-	int fd, ret, s;
+	int fd, ret, s, c;
+	long baudrate;
+	char * endptr;
+	speed_t speed = B115200;
 
-	if (argc == 1 || !strcmp(argv[1], "--version")) {
-		printf(	"izattach " VERSION "\n"
-			"Copyright (C) 2008, 2009 by Siemens AG\n"
-			"License GPLv2 GNU GPL version 2 <http://gnu.org/licenses/gpl.html>.\n"
-			"This is free software: you are free to change and redistribute it.\n"
-			"There is NO WARRANTY, to the extent permitted by law.\n"
-			"\n"
-			"Written by Dmitry Eremin-Solenikov, Sergey Lapin and Maxim Osipov\n");
-		return 0;
+	/* Parse options */
+	while (1) {
+#ifdef HAVE_GETOPT_LONG
+		int opt_idx = -1;
+		c = getopt_long(argc, argv, "b:hv", iz_long_opts, &opt_idx);
+#else
+		c = getopt(argc, argv, "b:hv");
+#endif
+		if (c == -1)
+			break;
+
+		switch(c) {
+		case 'h':
+			serial_help(argv[0]);
+			return 0;
+		case 'b':
+			baudrate = strtol(optarg, &endptr, 10);
+			if (* endptr == '\0')
+			    speed = baudrate_to_speed(baudrate);
+			break;
+		case 'v':
+			printf(	"izattach " VERSION "\n"
+				"Copyright (C) 2008, 2009 by Siemens AG\n"
+				"License GPLv2 GNU GPL version 2 <http://gnu.org/licenses/gpl.html>.\n"
+				"This is free software: you are free to change and redistribute it.\n"
+				"There is NO WARRANTY, to the extent permitted by law.\n"
+				"\n"
+				"Written by Dmitry Eremin-Solenikov, Sergey Lapin and Maxim Osipov\n");
+			return 0;
+		default:
+			serial_help(argv[0]);
+			return 1;
+		}
 	}
 
-	if (argc != 2 || (argc >= 1 && !strcmp(argv[1], "--help"))) {
-		printf("Usage: %s SERIAL_DEV\n", argv[0]);
-		printf("Attach serial devices via UART to IEEE 802.15.4/ZigBee stack\n\n");
-		printf("  SERIAL_DEV  This specifies the serial device to attach.\n");
-		printf("Report bugs to " PACKAGE_BUGREPORT "\n\n");
-		printf(PACKAGE_NAME " homepage <" PACKAGE_URL ">\n");
-		return 1;
+	if (argc <= optind) {
+		printf("SERIAL_DEV argument is missing\n\n");
+		serial_help(argv[0]);
+		return 2;
 	}
 
-	fd = open(argv[1], O_RDWR | O_NOCTTY);
+	fd = open(argv[optind], O_RDWR | O_NOCTTY);
 	if (fd < 0) {
 		perror("open");
 		return 2;
@@ -91,8 +154,8 @@ int main(int argc, char **argv) {
 	tbuf.c_cc[7] = 0;
 	tbuf.c_cc[VMIN] = 1;
 	*/
-	cfsetospeed(&tbuf, B115200);
-	cfsetispeed(&tbuf, B115200);
+	cfsetospeed(&tbuf, speed);
+	cfsetispeed(&tbuf, speed);
 
 	if (tcsetattr(fd, TCSANOW, &tbuf) < 0) {
 		perror("tcsetattr");
