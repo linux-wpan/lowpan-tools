@@ -6,14 +6,12 @@ Uploaders: Luca Bruno <lucab@debian.org>
 Build-Depends: debhelper (>= 9), autotools-dev, libnl-3-dev,
 		libnl-genl-3-dev, bison, flex, pkg-config,
 		python-all (>= 2.6.6-3~)
-Standards-Version: 3.9.3
+Standards-Version: 3.9.5
 Homepage: http://linux-zigbee.sourceforge.net/
-XS-Python-Version: all
 
 Package: lowpan-test-tools
 Architecture: linux-any
 Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
-XB-Python-Version: ${python:Versions}
 Replaces: lowpan-tools (<< 0.2)
 Description: Testing programs for LoWPAN stack in Linux
  This package provides several programs for testing various aspects of
