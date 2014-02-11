@@ -8,7 +8,7 @@ check_PROGRAMS = parsetest
 check_SCRIPTS = parsetest-check.sh
 TESTS = parsetest-check.sh
 
-libaddrdb_la_SOURCES = coord-config-parse.y coord-config-lex.l addrdb.c parser.h
+libaddrdb_la_SOURCES = coord-config-parse.y coord-config-lex.l addrdb.c parser.h scanner.h
 parsetest_CFLAGS = $(AM_CFLAGS) -DLEASE_FILE=\"$(leasefile)\"
 parsetest_LDADD = libaddrdb.la $(LDADD)
 
