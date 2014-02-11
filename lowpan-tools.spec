@@ -5,7 +5,7 @@
 %define name lowpan-tools
 #%define version 0.1+0.2rc4
 #%define srcver 0.2-rc4
-%define version 0.3
+%define version 0.3.1
 %define srcver %{version}
 %define release 1
 
