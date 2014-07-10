@@ -305,7 +305,7 @@ static iz_res_t del_phy_response(struct iz_cmd *cmd, struct genlmsghdr *ghdr, st
 static struct iz_cmd_event del_phy_response_event[] = {
 	{
 		.call = del_phy_response,
-		.nl = IEEE802154_ADD_IFACE,
+		.nl = IEEE802154_DEL_IFACE,
 	},
 	{},
 };
