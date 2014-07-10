@@ -15,6 +15,7 @@ Makefile
 misc/
 *stamp*
 TAGS
+tags
 
 *~
 *.1
